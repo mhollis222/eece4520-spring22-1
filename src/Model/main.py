@@ -1,4 +1,4 @@
-from Player import Player
+from AbstractPlayer import Player
 from Game import Game
 
 

@@ -1,4 +1,4 @@
-from Player import Player
+from AbstractPlayer import Player
 from enum import Enum
 from random import random
 from Move import Move
@@ -18,7 +18,7 @@ class Game:
         self.x = x
         self.y = y
         self.board = [[Cell.EMPTY for x in range(self.x)] for y in range(self.y)]
-        self.order = ()
+        self.order = []
         self.running = False
         self.round = 0
 
@@ -51,7 +51,7 @@ class Game:
         """
         Updates the board after a valid move has been made.
         :param m: move
-        :param p: player making move
+        :param c: the type of piece to be placed
         :return: None
         """
 
