@@ -1,34 +1,23 @@
-from Model.Game import Game
+from abstract_view import AbstractView
 
 
 class TextView:
 
-    def drawBoard(board: Game):
+    def displayBoard(BoardView):
 
         # constants for drawing board borders
-        horizontalLine = ' +---+---+---+---+---+---+---+---+'
-        verticalLine = ' |   |   |   |   |   |   |   |   |'
+        horizontalLine = '  +---+---+---+---+---+---+---+---+'
+        verticalLine = '  |   |   |   |   |   |   |   |   |'
 
         # nested for loop to draw in board
+        print('    1   2   3   4   5   6   7   8')
         print(horizontalLine)
         for i in range(8):
             print(verticalLine)
+            print(i + 1, end=' ')
 
             for j in range(8):
-                print('| %s' % (board[i][j]), end=' ')
+                print('| %s' % (BoardView[i][j]), end=' ')
                 print('|')
                 print(verticalLine)
                 print(horizontalLine)
-
-
-def restartBoard(board):
-    # fills entire board with blanks
-    for i in range(8):
-        for j in range(8):
-            board[i][j] = ' '
-
-    # Starting position
-    board[3][3] = 'X'
-    board[4][4] = 'X'
-    board[3][4] = 'O'
-    board[4][3] = 'O'
