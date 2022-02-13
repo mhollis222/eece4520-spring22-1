@@ -65,8 +65,8 @@ class Game:
             # iterate over distances emerging from m
             for dist in range(1, board_size):
 
-                location = Game.get_cardinal_location(m, dist, dire)    # obtain coordinates of current cell (tuple)
-                current_cell = self.board[location]  # obtain enum value of current cell
+                location = Game.get_cardinal_location(m.getCoords(), dist, dire)    # obtain coordinates of current cell (tuple)
+                current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
 
                 # next direction if board limit is reached, discard tracked cells
                 if (location[0] > self.x) | (location[1] > self.y):
@@ -101,14 +101,14 @@ class Game:
         :return: target cell location (x, y)
         """
         location = (
-            (origin_cell(0),            origin_cell(1) + distance),     # N
-            (origin_cell(0) + distance, origin_cell(1) + distance),     # NE
-            (origin_cell(0) + distance, origin_cell(1)),                # E
-            (origin_cell(0) + distance, origin_cell(1) - distance),     # SE
-            (origin_cell(0),            origin_cell(1) - distance),     # S
-            (origin_cell(0) - distance, origin_cell(1) - distance),     # SW
-            (origin_cell(0) - distance, origin_cell(1)),                # W
-            (origin_cell(0) - distance, origin_cell(1) + distance)      # NW
+            (origin_cell[0],            origin_cell[1] + distance),     # N
+            (origin_cell[0] + distance, origin_cell[1] + distance),     # NE
+            (origin_cell[0] + distance, origin_cell[1]),                # E
+            (origin_cell[0] + distance, origin_cell[1] - distance),     # SE
+            (origin_cell[0],            origin_cell[1] - distance),     # S
+            (origin_cell[0] - distance, origin_cell[1] - distance),     # SW
+            (origin_cell[0] - distance, origin_cell[1]),                # W
+            (origin_cell[0] - distance, origin_cell[1] + distance)      # NW
         )
         return location[direction]
 
