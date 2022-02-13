@@ -12,7 +12,7 @@ class Cell(Enum):
 
 class Game:
 
-    def __init__(self, p1: Player, p2: Player, x: int = 8, y: int = 8):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, x: int = 8, y: int = 8):
         self.p1 = p1
         self.p2 = p2
         self.x = x
@@ -22,14 +22,14 @@ class Game:
         self.running = False
         self.round = 0
 
-    def coinFlip(self) -> [Player, Player]:
+    def coinFlip(self) -> [AbstractPlayer, AbstractPlayer]:
         """
         simulates a coin flip to decide which player goes first
         :return: the player to go first
         """
         return [self.p1, self.p2] if random() > 0.5 else [self.p2, self.p1]
 
-    def validateMove(self, move: Move, play: Player) -> bool:
+    def validateMove(self, move: Move, play: AbstractPlayer) -> bool:
         """
         makes sure the desired move is in fact possible.
         :param move: The player requested move
