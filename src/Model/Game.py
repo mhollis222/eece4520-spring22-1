@@ -1,4 +1,4 @@
-from AbstractPlayer import Player
+from AbstractPlayer import AbstractPlayer
 from enum import Enum
 from random import random
 from Move import Move
@@ -75,6 +75,7 @@ class Game:
 
             valid = False
             move = None
+
             # loop until the player picks a valid move
             # Functionality will probably change with the addition of a front end
             while not valid:

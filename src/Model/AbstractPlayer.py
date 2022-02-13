@@ -10,8 +10,7 @@ class AbstractPlayer(ABC):
 
     @abstractmethod
     def getMove(self) -> Move:
-        print(self.name + " choosing a move!")
-        return Move(0, 0)
+        pass
 
     def __str__(self) -> str:
         return self.name
