@@ -1,10 +1,10 @@
-from AbstractPlayer import Player
+from HumanPlayer import HumanPlayer
 from Game import Game
 
 
 def main():
-    player1 = Player("steve")
-    player2 = Player("jill")
+    player1 = HumanPlayer("steve")
+    player2 = HumanPlayer("jill")
     game = Game(player1, player2)
 
     game.start()
