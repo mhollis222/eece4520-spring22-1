@@ -1,9 +1,11 @@
 from abstract_view import AbstractView
+from Model.Game import Game
 
 
-class TextView:
+class TextView(AbstractView):
 
-    def display_board(BoardView):
+    def display_board(self, model: Game):
+        BoardView = model.getBoard()
 
         # constants for drawing board borders
         horizontalLine = '  +---+---+---+---+---+---+---+---+'
@@ -44,8 +46,4 @@ class TextView:
             print("X wins")
         else:
             print("O wins")
-
-
-
-
 

@@ -1,12 +1,13 @@
 from abc import abstractmethod, ABC
+from Model.Game import Game
 
 
 class AbstractView(ABC):
-    def __init__(self, board):
+    def __init__(self, board: Game):
         self.board = board
 
     @abstractmethod
-    def display_board(self):
+    def display_board(self, board: Game):
         pass
 
     @abstractmethod
