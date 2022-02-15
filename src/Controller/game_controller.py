@@ -1,20 +1,20 @@
 from Model.Game import Game
-# from View.Game_View import GameView
+from View.text_view import TextView
 
 class GameController:
 
-    def __init__(self, model: Game, view: GameView):
+    def __init__(self, model: Game, view: TextView):
         self.model = model
         self.view = view
 
     def play_game(self):
-        terminated = False
+        terminated = self.model.running
 
         while not terminated:
-            self.view.display_board()
-            # self.view.display_current_player()
+            self.view.displayBoard()
+            self.view.displaycurrentPlayer()
 
-            # row, col = self.view.get_move()
+            row, col = self.view.getMove()
             # while not self.model.is_legal_move(row, col):
                 # self.view.is_illegal_move()
                 # self.view.get_move()

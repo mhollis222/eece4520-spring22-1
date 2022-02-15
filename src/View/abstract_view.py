@@ -10,9 +10,9 @@ class AbstractView(ABC):
         pass
 
 
-'''
+
     def __init__(self, board_view):
-        self.board_view =board_view
+        self.board_view = board_view
 
     @abstractmethod
     def displaycurrentPlayer(self, player):
@@ -33,4 +33,4 @@ class AbstractView(ABC):
     @abstractmethod
     def displayWinner(self, winner):
         pass
-'''
+
