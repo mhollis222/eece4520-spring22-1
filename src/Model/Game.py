@@ -45,7 +45,7 @@ class Game:
         """
         self.order = self.coinFlip()
         self.running = True
-        self.loop()
+        # self.loop()
 
     def getBoard(self) -> [[Cell]]:
         return self.board
@@ -115,37 +115,37 @@ class Game:
         )
         return location[direction]
 
-    def loop(self) -> None:
-        """
-        Main loop for game
-        :return: None
-        """
-        while self.running:
-            valid = False
-            move = None
-
-            # loop until the player picks a valid move
-            # Functionality will probably change with the addition of a front end
-            # Can probably break this into a helper fn
-            while not valid:
-                move = self.order[0].getMove()
-                valid = self.validateMove(move, self.order[0])
-
-            self.updateBoard(move, Cell.P1)
-
-            valid = False
-            move = None
-
-            # loop until the player picks a valid move
-            # Functionality will probably change with the addition of a front end
-            while not valid:
-                move = self.order[1].getMove()
-                valid = self.validateMove(move, self.order[1])
-
-            self.updateBoard(move, Cell.P2)
-
-            self.round += 1
-            print("finished round " + str(self.round))
-            if self.round == 5:
-                self.running = False
+    # def loop(self) -> None:
+    #     """
+    #     Main loop for game
+    #     :return: None
+    #     """
+    #     while self.running:
+    #         valid = False
+    #         move = None
+    #
+    #         # loop until the player picks a valid move
+    #         # Functionality will probably change with the addition of a front end
+    #         # Can probably break this into a helper fn
+    #         while not valid:
+    #             move = self.order[0].getMove()
+    #             valid = self.validateMove(move, self.order[0])
+    #
+    #         self.updateBoard(move, Cell.P1)
+    #
+    #         valid = False
+    #         move = None
+    #
+    #         # loop until the player picks a valid move
+    #         # Functionality will probably change with the addition of a front end
+    #         while not valid:
+    #             move = self.order[1].getMove()
+    #             valid = self.validateMove(move, self.order[1])
+    #
+    #         self.updateBoard(move, Cell.P2)
+    #
+    #         self.round += 1
+    #         print("finished round " + str(self.round))
+    #         if self.round == 5:
+    #             self.running = False
 
