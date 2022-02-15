@@ -28,12 +28,12 @@ class TextView(AbstractView):
         print(player + "'s turn!")
 
     def get_move(self):
-        move = input('Enter your move (row, column): ')
+        move = input('Enter your move (x, y): ')
         move = move.split(',')
-        row = int(move[0]) - 1
-        column = int(move[1]) - 1
+        x = int(move[0]) - 1
+        y = int(move[1]) - 1
 
-        return row, column
+        return x, y
 
     def display_valid_moves(self):
         pass

@@ -1,20 +1,51 @@
-from Model.Game import Game
-from View.text_view import TextView
+from HumanPlayer import HumanPlayer
+from Model.Game import Game, Cell
+from Model.Move import Move
+from View.abstract_view import AbstractView
+
 
 class GameController:
 
-    def __init__(self, model: Game, view: TextView):
+    def __init__(self, model: Game, view: AbstractView):
         self.model = model
         self.view = view
 
     def play_game(self):
-        terminated = self.model.running
+        self.model.start()
 
-        while not terminated:
-            self.view.displayBoard()
-            self.view.displaycurrentPlayer()
+        while self.model.running:
+            counter = 0
 
-            row, col = self.view.getMove()
+            while counter <= 1:
+                self.view.display_board()
+                self.view.display_current_player(self.model.order[counter])
+                x, y = self.view.get_move()
+
+                attemptedMove = Move(x, y)
+
+                while not self.model.validateMove(attemptedMove):
+                    self.view.display_invalid_moves()
+                    self.view.get_move()
+
+                if counter == 0:
+                    self.model.updateBoard(attemptedMove, Cell.P1)
+                else:
+                    self.model.updateBoard(attemptedMove, Cell.P2)
+
+                if not self.model.running:
+                    self.view.display_winner(0)
+                else:
+                    counter = counter + 1
+
+
+
+        # terminated = self.model.running
+        #
+        # while not terminated:
+        #     self.view.displayBoard()
+        #     self.view.displaycurrentPlayer()
+        #
+        #     row, col = self.view.getMove()
             # while not self.model.is_legal_move(row, col):
                 # self.view.is_illegal_move()
                 # self.view.get_move()
