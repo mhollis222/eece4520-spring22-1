@@ -17,46 +17,28 @@ class GameController:
             counter = 0
 
             while counter <= 1:
-                # self.view.display_board(self.model)
-                self.view.display_current_player(self.model.order[counter])
-                x, y = self.view.get_move()
+                if self.model.valid_moves_avail(self.model.order[counter]):
+                    # self.view.display_board(self.model)
+                    self.view.display_current_player(self.model.order[counter])
+                    x, y = self.view.get_move()
 
-                attemptedMove = Move(x, y)
+                    attemptedMove = Move(x, y)
 
-                while not self.model.validateMove(attemptedMove):
-                    self.view.display_invalid_moves()
-                    self.view.get_move()
+                    while not self.model.validate_move(attemptedMove, self.model.order[counter]):
+                        self.view.display_invalid_moves()
+                        self.view.get_move()
 
-                if counter == 0:
-                    self.model.updateBoard(attemptedMove, Cell.P1)
-                else:
-                    self.model.updateBoard(attemptedMove, Cell.P2)
+                    if counter == 0:
+                        self.model.updateBoard(attemptedMove, Cell.BLACK)
+                    else:
+                        self.model.updateBoard(attemptedMove, Cell.WHITE)
 
-                if not self.model.running:
-                    self.view.display_winner(0)
+                    if not self.model.running:
+                        self.view.display_winner(counter)
+                    else:
+                        counter = counter + 1
+
                 else:
                     counter = counter + 1
-
-
-
-        # terminated = self.model.running
-        #
-        # while not terminated:
-        #     self.view.displayBoard()
-        #     self.view.displaycurrentPlayer()
-        #
-        #     row, col = self.view.getMove()
-            # while not self.model.is_legal_move(row, col):
-                # self.view.is_illegal_move()
-                # self.view.get_move()
-
-            # self.model.make_move(row, col)
-            # if self.model.has_game_ended():
-                # terminated = True
-            # else:
-                # self.model.switch_turn()
-
-
-        # self.view.display_board()
-        # winner = self.model.get_winner()
-        # self.view.display_winner(winner)
+                    if not counter > 1:
+                        self.view.display_player_skipped(self.model.order[counter])

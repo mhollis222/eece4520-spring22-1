@@ -47,3 +47,5 @@ class TextView(AbstractView):
         else:
             print("O wins")
 
+    def display_player_skipped(self, player):
+        print(str(player) + "'s turn has been skipped!")

@@ -97,6 +97,10 @@ class Game:
         """
         self.order = self._coin_flip()
         self.running = True
+        self.board[3][3] = Cell.BLACK
+        self.board[3][4] = Cell.WHITE
+        self.board[4][3] = Cell.WHITE
+        self.board[4][4] = Cell.BLACK
         # self.loop()
 
     def get_board(self) -> [[Cell]]:

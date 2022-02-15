@@ -33,3 +33,6 @@ class AbstractView(ABC):
     def display_winner(self, winner):
         pass
 
+    @abstractmethod
+    def display_player_skipped(self, player):
+        pass

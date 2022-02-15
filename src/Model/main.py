@@ -5,8 +5,8 @@ from Controller.game_controller import GameController
 
 
 def main():
-    player1 = HumanPlayer("steve")
-    player2 = HumanPlayer("jill")
+    player1 = HumanPlayer("Steve")
+    player2 = HumanPlayer("Jill")
     game = Game(player1, player2)
     text = TextView(game)
     control = GameController(game, text)
