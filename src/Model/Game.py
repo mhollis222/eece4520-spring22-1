@@ -86,7 +86,7 @@ class Game:
         :return: moves available? (boolean)
         """
         # list evaluates to False if empty
-        if self._get_valid_moves(play):
+        if not self._get_valid_moves(play):
             return False
         return True
 
