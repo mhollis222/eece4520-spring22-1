@@ -47,6 +47,9 @@ class Game:
         self.running = True
         self.loop()
 
+    def getBoard(self) -> [[Cell]]:
+        return self.board
+
     def updateBoard(self, m: Move, c: Cell) -> None:
         """
         Updates the board after a valid move has been made.

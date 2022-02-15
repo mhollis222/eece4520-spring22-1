@@ -1,36 +1,35 @@
 from abc import abstractmethod, ABC
+from Model.Game import Game
 
 
 class AbstractView(ABC):
-    def __init__(self, board):
+    def __init__(self, board: Game):
         self.board = board
 
     @abstractmethod
-    def displayBoard(self):
+    def display_board(self, board: Game):
         pass
-
-
 
     def __init__(self, board_view):
         self.board_view = board_view
 
     @abstractmethod
-    def displaycurrentPlayer(self, player):
+    def display_current_player(self, player):
         pass
 
     @abstractmethod
-    def displayvalidMoves(self):
+    def get_move(self):
         pass
 
     @abstractmethod
-    def displayinvalidMoves(self):
+    def display_valid_moves(self):
         pass
 
     @abstractmethod
-    def getMove(self):
+    def display_invalid_moves(self):
         pass
 
     @abstractmethod
-    def displayWinner(self, winner):
+    def display_winner(self, winner):
         pass
 
