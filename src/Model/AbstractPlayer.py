@@ -6,6 +6,7 @@ class AbstractPlayer(ABC):
     def __init__(self, name: str):
         self.score = 0
         self.name = name
+        self.identifier = 0
 
     @abstractmethod
     def getMove(self) -> Move:
