@@ -1,4 +1,4 @@
-from HumanPlayer import HumanPlayer
+from Model.HumanPlayer import HumanPlayer
 from Model.Game import Game, Cell
 from Model.Move import Move
 from View.abstract_view import AbstractView
@@ -17,7 +17,7 @@ class GameController:
             counter = 0
 
             while counter <= 1:
-                self.view.display_board()
+                # self.view.display_board(self.model)
                 self.view.display_current_player(self.model.order[counter])
                 x, y = self.view.get_move()
 

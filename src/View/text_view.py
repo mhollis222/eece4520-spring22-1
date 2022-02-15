@@ -1,4 +1,4 @@
-from abstract_view import AbstractView
+from View.abstract_view import AbstractView
 from Model.Game import Game
 
 
@@ -25,7 +25,7 @@ class TextView(AbstractView):
                 print(horizontalLine)
 
     def display_current_player(self, player):
-        print(player + "'s turn!")
+        print(str(player) + "'s turn!")
 
     def get_move(self):
         move = input('Enter your move (x, y): ')
