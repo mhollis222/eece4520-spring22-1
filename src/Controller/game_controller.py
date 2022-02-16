@@ -16,11 +16,12 @@ class GameController:
             counter = 0
 
             while counter <= 1:
+
                 player = self.model.order[counter]
+
                 if self.model.valid_moves_avail(player):
                     self.view.display_board()
                     self.view.display_current_player(player)
-                    # self.view.display_valid_moves(player)
 
                     x, y = self.view.get_move()
 
