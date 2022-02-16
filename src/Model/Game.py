@@ -43,11 +43,11 @@ class Game:
         :return: valid?
         """
         # if this move is found in the list of valid moves at least once, return true
-        if self._get_valid_moves(play).count(move) > 0:
+        if self.get_valid_moves(play).count(move.getCoords()) > 0:
             return True
         return False
 
-    def _get_valid_moves(self, play: AbstractPlayer) -> list:
+    def get_valid_moves(self, play: AbstractPlayer) -> list:
         """
         obtain cell locations for valid moves
         :param play: Player making move
@@ -58,24 +58,32 @@ class Game:
         for x in range(self.x):
             for y in range(self.y):
                 if self.board[x][y].value == play.identifier:
+                    # print("active player piece found at ", x, y)
                     for dire in range(8):
+                        # print("\ndirection ", dire)
                         flag = False
                         for dist in range(1, board_size):
                             location = Game._get_cardinal_location((x, y), dist,
                                                                    dire)  # obtain coordinates of current cell (tuple)
                             current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
+                            # print("searching ", location)
                             # next direction if board limit is reached
                             if (location[0] > self.x) | (location[1] > self.y):
+                                # print("board limit reached, next direction")
                                 break
                             # next direction if same cell reached
                             if current_cell.value == play.identifier:
+                                # print("cell of same player reached, next direction")
                                 break
                             # next direction if empty cell reached, append if flag==True
                             if current_cell == Cell.EMPTY:
+                                # print("empty cell reached, next direction")
                                 if flag:
+                                    # print("cell valid at ", location)
                                     valid.append(location)
                                 break
                             # next distance if opposite cell reached, enable flag
+                            # print("cell of opponent reached, continuing")
                             flag = True
         return valid
 
@@ -86,7 +94,7 @@ class Game:
         :return: moves available? (boolean)
         """
         # list evaluates to False if empty
-        if not self._get_valid_moves(play):
+        if not self.get_valid_moves(play):
             return False
         return True
 
@@ -97,10 +105,10 @@ class Game:
         """
         self.order = self._coin_flip()
         self.running = True
-        self.board[3][3] = Cell.BLACK
-        self.board[3][4] = Cell.WHITE
-        self.board[4][3] = Cell.WHITE
-        self.board[4][4] = Cell.BLACK
+        self.board[3][3] = Cell.WHITE
+        self.board[3][4] = Cell.BLACK
+        self.board[4][3] = Cell.BLACK
+        self.board[4][4] = Cell.WHITE
         # self.loop()
 
     def get_board(self) -> [[Cell]]:
@@ -117,39 +125,45 @@ class Game:
         board_size = max(self.x, self.y)  # 1D board size in event of asymmetrical board
         flip = []  # track cells to flip guaranteed
 
-        # iterate over cardinal directions: N, NE, E, SE, S, SW, W, NW
+        # iterate over cardinal directions: W, SW, S, SE, E, NE, N
         for dire in range(8):
             tracked = []  # track cells to flip if terminus == c
-
+            # print("\ndirection ", dire)
             # iterate over distances emerging from m
             for dist in range(1, board_size):
 
                 location = Game._get_cardinal_location(m.getCoords(), dist,
                                                        dire)  # obtain coordinates of current cell (tuple)
                 current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
-
+                # print("searching ", location)
                 # next direction if board limit is reached, discard tracked cells
                 if (location[0] > self.x) | (location[1] > self.y):
                     tracked.clear()
+                    # print("board limit reached, next direction")
                     break
 
                 # next direction if empty cell is reached, discard tracked cells
                 if current_cell == Cell.EMPTY:
                     tracked.clear()
+                    # print("empty cell reached, next direction")
                     break
 
                 # next distance if opposite color is found, track
-                if current_cell != c:
+                if current_cell.value != c.value:
+                    # print("opponent cell reached, tracking ", location)
                     tracked.append(location)
                     continue
 
                 # next direction if same cell is reached, save tracked cells
                 for location in tracked:
+                    # print("saving ", tracked)
                     flip.append(location)
 
         # flip cells using location tuple as index
         for x, y in flip:
+            # print("flipped ", x, y)
             self.board[x][y] = c
+        self.board[m.x][m.y] = c
 
     @staticmethod
     def _get_cardinal_location(origin_cell, distance, direction):
@@ -161,14 +175,14 @@ class Game:
         :return: target cell location (x, y)
         """
         location = (
-            (origin_cell[0], origin_cell[1] + distance),  # N
-            (origin_cell[0] + distance, origin_cell[1] + distance),  # NE
-            (origin_cell[0] + distance, origin_cell[1]),  # E
-            (origin_cell[0] + distance, origin_cell[1] - distance),  # SE
-            (origin_cell[0], origin_cell[1] - distance),  # S
-            (origin_cell[0] - distance, origin_cell[1] - distance),  # SW
-            (origin_cell[0] - distance, origin_cell[1]),  # W
-            (origin_cell[0] - distance, origin_cell[1] + distance)  # NW
+            (origin_cell[0], origin_cell[1] - distance),  # W
+            (origin_cell[0] + distance, origin_cell[1] - distance),  # SW
+            (origin_cell[0] + distance, origin_cell[1]),  # S
+            (origin_cell[0] + distance, origin_cell[1] + distance),  # SE
+            (origin_cell[0], origin_cell[1] + distance),  # E
+            (origin_cell[0] - distance, origin_cell[1] + distance),  # NE
+            (origin_cell[0] - distance, origin_cell[1]),  # N
+            (origin_cell[0] - distance, origin_cell[1] - distance)  # NW
         )
         return location[direction]
 
