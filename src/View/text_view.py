@@ -21,7 +21,10 @@ class TextView(AbstractView):
         for i, x in enumerate(board_view):
             print(i+1, end='  ')
             for y in range(8):
-                print('| %s' % x[y].value, end=' ')
+                if x[y].value == 0:
+                    print('|  ', end=' ')
+                else:
+                    print('| %s' % x[y].value, end=' ')
             print("|")
         print(horizontal_line)
 

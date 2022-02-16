@@ -134,13 +134,14 @@ class Game:
 
                 location = Game._get_cardinal_location(m.getCoords(), dist,
                                                        dire)  # obtain coordinates of current cell (tuple)
-                current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
                 # print("searching ", location)
                 # next direction if board limit is reached, discard tracked cells
                 if (location[0] > self.x) | (location[1] > self.y):
                     tracked.clear()
                     # print("board limit reached, next direction")
                     break
+
+                current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
 
                 # next direction if empty cell is reached, discard tracked cells
                 if current_cell == Cell.EMPTY:
