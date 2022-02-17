@@ -228,7 +228,7 @@ class Game:
         for i in range(self.x):
             for j in range(self.y):
                 if self.board[i][j].value == 1:
-                    self.p1.score = self.p1.score + 1
+                    self.order[0].score = self.order[0].score + 1
                 if self.board[i][j].value == 2:
-                    self.p2.score = self.p2.score + 1
+                    self.order[1].score = self.order[1].score + 1
 
