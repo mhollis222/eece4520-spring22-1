@@ -48,8 +48,10 @@ class TextView(AbstractView):
     def display_winner(self, winner):
         if winner == 1:
             print(str(self.model.p1.name) + " wins!") # player X
+        elif winner == 2:
+            print(str(self.model.p2.name) + " wins!")  # player O
         else:
-            print(str(self.model.p2.name) + " wins!")  # player X
+            print("Tie Game!")
 
     def display_player_skipped(self, player: AbstractPlayer):
         print(" ")

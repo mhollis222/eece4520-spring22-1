@@ -109,7 +109,6 @@ class Game:
         self.board[3][4] = Cell.BLACK
         self.board[4][3] = Cell.BLACK
         self.board[4][4] = Cell.WHITE
-        # self.loop()
 
     def get_board(self) -> [[Cell]]:
         return self.board
@@ -187,43 +186,10 @@ class Game:
         )
         return location[direction]
 
-    # def loop(self) -> None:
-    #     """
-    #     Main loop for game
-    #     :return: None
-    #     """
-    #     while self.running:
-    #         valid = False
-    #         move = None
-    #
-    #         # loop until the player picks a valid move
-    #         # Functionality will probably change with the addition of a front end
-    #         # Can probably break this into a helper fn
-    #         while not valid:
-    #             move = self.order[0].getMove()
-    #             valid = self.validateMove(move, self.order[0])
-    #
-    #         self.updateBoard(move, Cell.P1)
-    #
-    #         valid = False
-    #         move = None
-    #
-    #         # loop until the player picks a valid move
-    #         # Functionality will probably change with the addition of a front end
-    #         while not valid:
-    #             move = self.order[1].getMove()
-    #             valid = self.validateMove(move, self.order[1])
-    #
-    #         self.updateBoard(move, Cell.P2)
-    #
-    #         self.round += 1
-    #         print("finished round " + str(self.round))
-    #         if self.round == 5:
-    #             self.running = False
 
     def update_score(self):
-        self.p1.score = 0
-        self.p2.score = 0
+        self.order[0].score = 0
+        self.order[1].score = 0
 
         for i in range(self.x):
             for j in range(self.y):
@@ -231,4 +197,26 @@ class Game:
                     self.order[0].score = self.order[0].score + 1
                 if self.board[i][j].value == 2:
                     self.order[1].score = self.order[1].score + 1
+
+    def is_board_filled(self) -> bool:
+        for i in range(self.x):
+            for j in range(self.y):
+                if(self.board[i][j].value == 0):
+                    return False
+
+        return True
+
+    def has_game_ended(self) -> bool:
+        return (not ((self.valid_moves_avail(self.order[0])) or (self.valid_moves_avail(self.order[1])))) \
+               or (not self.is_board_filled())
+
+    def display_winner(self) -> int:
+        if self.order[0].score > self.order[1].score:
+            return 1
+        elif self.order[0].score < self.order[1].score:
+            return 2
+        else:
+            return 0
+
+
 
