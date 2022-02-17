@@ -4,7 +4,7 @@ from Move import Move
 
 class AbstractPlayer(ABC):
     def __init__(self, name: str):
-        self.score = 0
+        self.score = 2
         self.name = name
         self.identifier = 0
 

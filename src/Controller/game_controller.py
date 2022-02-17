@@ -9,17 +9,21 @@ class GameController:
         self.view = view
 
     def play_game(self):
+        """
+         Simulates a game between two players
+         """
         self.model.start()
 
         end = 0
         while self.model.running:
             counter = 0
-            while counter <= 1 and end < 2:
 
+            while counter <= 1 and end < 2:
                 player = self.model.order[counter]
 
                 if self.model.valid_moves_avail(player):
                     self.view.display_board()
+                    self.view.display_score()
                     self.view.display_current_player(player)
 
                     x, y = self.view.get_move()
@@ -36,16 +40,21 @@ class GameController:
                     else:
                         self.model.update_board(attempt, Cell.WHITE)
 
+                    self.model.update_score()
+
                     if not self.model.running:
                         self.view.display_winner(counter)
                     else:
                         counter = counter + 1
 
                 else:
-                    counter = counter + 1
                     if not counter > 1:
                         self.view.display_player_skipped(self.model.order[counter])
                         end = end + 1
                         if end == 2:
-                            print("Game Over")
+                            print("Game Over!")
+                            self.view.display_board()
                             self.view.display_winner(counter)
+                            self.view.display_score()
+
+                    counter = counter + 1

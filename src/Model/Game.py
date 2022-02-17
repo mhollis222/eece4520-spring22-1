@@ -220,3 +220,15 @@ class Game:
     #         print("finished round " + str(self.round))
     #         if self.round == 5:
     #             self.running = False
+
+    def update_score(self):
+        self.p1.score = 0
+        self.p2.score = 0
+
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.board[i][j].value == 1:
+                    self.p1.score = self.p1.score + 1
+                if self.board[i][j].value == 2:
+                    self.p2.score = self.p2.score + 1
+

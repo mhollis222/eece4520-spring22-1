@@ -29,7 +29,7 @@ class TextView(AbstractView):
         print(horizontal_line)
 
     def display_current_player(self, player: AbstractPlayer):
-        print(str(player) + "'s turn!")
+        print("Player " + str(player.identifier) + " (" + str(player) + "'s) turn!")
 
     def get_move(self):
         move = input('Enter your move (row, column): ')
@@ -47,11 +47,15 @@ class TextView(AbstractView):
 
     def display_winner(self, winner):
         if winner == 1:
-            print("Jill wins") # player X
+            print(str(self.model.p1.name) + " wins!") # player X
         else:
-            print("Steve wins") # player O
+            print(str(self.model.p2.name) + " wins!")  # player X
 
     def display_player_skipped(self, player: AbstractPlayer):
         print(" ")
         # print(str(player) + "'s turn has been skipped!")
         # game explicitly states which player's turn is next
+
+    def display_score(self):
+        print(str(self.model.p1.name) + ": " + str(self.model.p1.score))
+        print(str(self.model.p2.name) + ": " + str(self.model.p2.score))
