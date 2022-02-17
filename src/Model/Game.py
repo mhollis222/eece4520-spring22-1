@@ -65,12 +65,12 @@ class Game:
                         for dist in range(1, board_size):
                             location = Game._get_cardinal_location((x, y), dist,
                                                                    dire)  # obtain coordinates of current cell (tuple)
-                            current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
                             # print("searching ", location)
                             # next direction if board limit is reached
-                            if (location[0] > self.x) | (location[1] > self.y):
+                            if (location[0] >= self.x) | (location[1] >= self.y):
                                 # print("board limit reached, next direction")
                                 break
+                            current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
                             # next direction if same cell reached
                             if current_cell.value == play.identifier:
                                 # print("cell of same player reached, next direction")
@@ -136,7 +136,7 @@ class Game:
                                                        dire)  # obtain coordinates of current cell (tuple)
                 # print("searching ", location)
                 # next direction if board limit is reached, discard tracked cells
-                if (location[0] > self.x) | (location[1] > self.y):
+                if (location[0] >= self.x) | (location[1] >= self.y):
                     tracked.clear()
                     # print("board limit reached, next direction")
                     break

@@ -47,9 +47,11 @@ class TextView(AbstractView):
 
     def display_winner(self, winner):
         if winner == 1:
-            print("X wins")
+            print("Jill wins") # player X
         else:
-            print("O wins")
+            print("Steve wins") # player O
 
     def display_player_skipped(self, player: AbstractPlayer):
-        print(str(player) + "'s turn has been skipped!")
+        print(" ")
+        # print(str(player) + "'s turn has been skipped!")
+        # game explicitly states which player's turn is next
