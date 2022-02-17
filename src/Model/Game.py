@@ -59,7 +59,7 @@ class Game:
             for y in range(self.y):
                 if self.board[x][y].value == play.identifier:
                     # print("active player piece found at ", x, y)
-                    for dire in range(8):
+                    for dire in range(board_size):
                         # print("\ndirection ", dire)
                         flag = False
                         for dist in range(1, board_size):
@@ -96,6 +96,7 @@ class Game:
         # list evaluates to False if empty
         if not self.get_valid_moves(play):
             return False
+        print(self.get_valid_moves(play))
         return True
 
     def start(self) -> None:
@@ -126,7 +127,7 @@ class Game:
         flip = []  # track cells to flip guaranteed
 
         # iterate over cardinal directions: W, SW, S, SE, E, NE, N
-        for dire in range(8):
+        for dire in range(board_size):
             tracked = []  # track cells to flip if terminus == c
             # print("\ndirection ", dire)
             # iterate over distances emerging from m
