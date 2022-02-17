@@ -21,6 +21,7 @@ class Game:
         self.order = []
         self.running = False
         self.round = 0
+        self.active_player = None
 
     def _coin_flip(self) -> [AbstractPlayer, AbstractPlayer]:
         """
@@ -187,7 +188,6 @@ class Game:
         )
         return location[direction]
 
-
     def update_score(self):
         self.order[0].score = 0
         self.order[1].score = 0
@@ -219,5 +219,5 @@ class Game:
         else:
             return 0
 
-
-
+    def get_active_player(self):
+        return self.active_player

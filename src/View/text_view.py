@@ -55,7 +55,7 @@ class TextView(AbstractView):
 
     def display_player_skipped(self, player: AbstractPlayer):
         print(" ")
-        # print(str(player) + "'s turn has been skipped!")
+        print(str(player) + "'s turn has been skipped!")
         # game explicitly states which player's turn is next
 
     def display_score(self):
