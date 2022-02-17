@@ -10,7 +10,6 @@ def main():
     game = Game(player1, player2)
     text = TextView(game)
     control = GameController(game, text)
-
     control.play_game()
 
 

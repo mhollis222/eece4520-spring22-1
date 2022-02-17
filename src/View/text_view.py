@@ -29,7 +29,7 @@ class TextView(AbstractView):
         print(horizontal_line)
 
     def display_current_player(self, player: AbstractPlayer):
-        print(str(player) + "'s turn!")
+        print(str(player) + "'s turn! (" + str(player.identifier) + ')')
 
     def get_move(self):
         move = input('Enter your move (row, column): ')
