@@ -28,16 +28,34 @@ class AbstractView(ABC):
 
     @abstractmethod
     def display_winner(self, winner):
+        """
+        Prints who won the game
+        :param winner: Number representative of the player who won the game (int)
+        :return: none
+        """
         pass
 
     @abstractmethod
     def display_player_skipped(self, player):
+        """
+        Alerts player their turn has been skipped via print statement
+        :param player: Player whose turn's been skipped
+        :return: none
+        """
         pass
 
     @abstractmethod
     def display_score(self):
+        """
+        Displays the current score of both players alongside their names
+        :return: none
+        """
         pass
 
     @abstractmethod
     def display_end_of_game(self):
+        """
+        Alerts the players that the game is over
+        :return: none
+        """
         pass
