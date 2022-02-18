@@ -9,7 +9,8 @@ def main():
     player2 = HumanPlayer("Jill")
     game = Game(player1, player2)
     text = TextView(game)
-    text.display_board()
+    control = GameController(game, text)
+    control.play_game()
 
 
 if __name__ == "__main__":

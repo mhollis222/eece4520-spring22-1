@@ -7,12 +7,12 @@ class AbstractView(ABC):
     def __init__(self, model: Game):
         self.model = model
 
+    def __init__(self, board_view):
+        self.board_view = board_view
+
     @abstractmethod
     def display_board(self):
         pass
-
-    def __init__(self, board_view):
-        self.board_view = board_view
 
     @abstractmethod
     def display_current_player(self, player: AbstractPlayer):
@@ -23,11 +23,7 @@ class AbstractView(ABC):
         pass
 
     @abstractmethod
-    def display_valid_moves(self, player: AbstractPlayer):
-        pass
-
-    @abstractmethod
-    def display_invalid_moves(self):
+    def display_invalid_moves(self, player):
         pass
 
     @abstractmethod
@@ -36,4 +32,12 @@ class AbstractView(ABC):
 
     @abstractmethod
     def display_player_skipped(self, player):
+        pass
+
+    @abstractmethod
+    def display_score(self):
+        pass
+
+    @abstractmethod
+    def display_end_of_game(self):
         pass

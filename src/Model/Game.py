@@ -5,22 +5,21 @@ from Move import Move
 
 
 class Cell(Enum):
-    EMPTY = 0
-    BLACK = 1
-    WHITE = 2
+    EMPTY = 0  # Empty Cell
+    BLACK = 1  # Player One's Piece
+    WHITE = 2  # Player Two's Piece
 
 
 class Game:
 
     def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, x: int = 8, y: int = 8):
-        self.p1 = p1
-        self.p2 = p2
-        self.x = x
-        self.y = y
-        self.board = [[Cell.EMPTY for x in range(self.x)] for y in range(self.y)]
-        self.order = []
-        self.running = False
-        self.round = 0
+        self.p1 = p1  # Player One
+        self.p2 = p2  # Player Two
+        self.x = x  # width of board
+        self.y = y  # height of board
+        self.board = [[Cell.EMPTY for x in range(self.x)] for y in range(self.y)]  # 2D array of cells
+        self.order = []  # order of players
+        self.active_player = None  # Player whose turn it currently is
 
     def _coin_flip(self) -> [AbstractPlayer, AbstractPlayer]:
         """
@@ -59,7 +58,7 @@ class Game:
             for y in range(self.y):
                 if self.board[x][y].value == play.identifier:
                     # print("active player piece found at ", x, y)
-                    for dire in range(8):
+                    for dire in range(board_size):
                         # print("\ndirection ", dire)
                         flag = False
                         for dist in range(1, board_size):
@@ -100,18 +99,20 @@ class Game:
 
     def start(self) -> None:
         """
-        Starts a game
+        Initializes a game
         :return: None
         """
         self.order = self._coin_flip()
-        self.running = True
+        self.active_player = self.order[0]
         self.board[3][3] = Cell.WHITE
         self.board[3][4] = Cell.BLACK
         self.board[4][3] = Cell.BLACK
         self.board[4][4] = Cell.WHITE
-        # self.loop()
 
     def get_board(self) -> [[Cell]]:
+        """
+        :return: 2D array of cells representative of the board ([[Cell]])
+        """
         return self.board
 
     def update_board(self, m: Move, c: Cell) -> None:
@@ -126,7 +127,7 @@ class Game:
         flip = []  # track cells to flip guaranteed
 
         # iterate over cardinal directions: W, SW, S, SE, E, NE, N
-        for dire in range(8):
+        for dire in range(board_size):
             tracked = []  # track cells to flip if terminus == c
             # print("\ndirection ", dire)
             # iterate over distances emerging from m
@@ -187,36 +188,68 @@ class Game:
         )
         return location[direction]
 
-    # def loop(self) -> None:
-    #     """
-    #     Main loop for game
-    #     :return: None
-    #     """
-    #     while self.running:
-    #         valid = False
-    #         move = None
-    #
-    #         # loop until the player picks a valid move
-    #         # Functionality will probably change with the addition of a front end
-    #         # Can probably break this into a helper fn
-    #         while not valid:
-    #             move = self.order[0].getMove()
-    #             valid = self.validateMove(move, self.order[0])
-    #
-    #         self.updateBoard(move, Cell.P1)
-    #
-    #         valid = False
-    #         move = None
-    #
-    #         # loop until the player picks a valid move
-    #         # Functionality will probably change with the addition of a front end
-    #         while not valid:
-    #             move = self.order[1].getMove()
-    #             valid = self.validateMove(move, self.order[1])
-    #
-    #         self.updateBoard(move, Cell.P2)
-    #
-    #         self.round += 1
-    #         print("finished round " + str(self.round))
-    #         if self.round == 5:
-    #             self.running = False
+    def update_score(self):
+        """
+        Iterates through the board to count the number of cells each player has
+        :return: none
+        """
+        self.order[0].score = 0
+        self.order[1].score = 0
+
+        # iterates through the board
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.board[i][j].value == 1:
+                    self.order[0].score = self.order[0].score + 1  # Updates Player One's score
+                if self.board[i][j].value == 2:
+                    self.order[1].score = self.order[1].score + 1  # Updates Player Two's score
+
+    def is_board_filled(self) -> bool:
+        """
+        Checks if the board is full
+        :return: whether or not the board is completely filled (boolean)
+        """
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.board[i][j].value == 0:
+                    return False
+        return True
+
+    def has_game_ended(self) -> bool:
+        """
+        Checks if the game has ended
+        :return: whether or not the game has ended (boolean)
+        """
+        return (not ((self.valid_moves_avail(self.order[0])) or (self.valid_moves_avail(self.order[1])))) \
+               or self.is_board_filled()
+
+    def display_winner(self) -> int:
+        """
+        Returns a number representative of the player who won the game
+        :return: a 1 if player one has the most points, a 2 if player two does, and a 0 if they tied
+        """
+        if self.order[0].score > self.order[1].score:
+            return 1
+        elif self.order[0].score < self.order[1].score:
+            return 2
+        else:
+            return 0
+
+    def get_active_player(self):
+        """
+        Returns the player whose turn it is
+        :return: The player whose turn it currently is
+        """
+        return self.active_player
+
+    def switch_players(self, player: AbstractPlayer):
+        """
+        Changes the currently active player to the other player
+        :param player: The player whose turn it currently is
+        :return: none
+        """
+        # Checks if the given player is Player One
+        if player == self.order[0]:
+            self.active_player = self.order[1]  # Passes play to Player Two
+        else:
+            self.active_player = self.order[0]  # Passes play to Player One
