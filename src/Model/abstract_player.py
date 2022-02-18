@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import abstractmethod, ABC
 
 
 class AbstractPlayer(ABC):
@@ -9,3 +9,12 @@ class AbstractPlayer(ABC):
 
     def __str__(self) -> str:
         return self.name
+
+    @staticmethod
+    @abstractmethod
+    def make_move(row, column):
+        """
+        Declares a move request to be made within active game.
+        :return: Move(int, int)
+        """
+        pass

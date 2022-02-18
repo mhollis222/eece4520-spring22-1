@@ -4,7 +4,7 @@ class Move:
         self.y = y
         self.skip = skip
 
-    def getCoords(self) -> (int, int):
+    def get_coords(self) -> (int, int):
         """
         :return: the x and y coordinates representative of the location of the desired cell (int, int)
         """

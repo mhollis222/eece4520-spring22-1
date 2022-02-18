@@ -1,5 +1,5 @@
-from Model.Game import Game, Cell
-from Model.Move import Move
+from Model.game import Game, Cell
+from Model.move import Move
 from View.abstract_view import AbstractView
 
 
@@ -11,8 +11,9 @@ class GameController:
 
     def play_game(self):
         """
-         Simulates a game between two players
-         """
+        Simulates a local game between two human players
+        :return: none
+        """
         self.model.start()  # Initializes game
 
         while not self.model.has_game_ended():
@@ -25,9 +26,9 @@ class GameController:
                 self.view.display_score()
                 self.view.display_current_player(player)
 
-                x, y = self.view.get_move()  # Asks and retrieves the user for their desired coordinates
+                r, c = self.view.get_move()  # Asks and retrieves the user for their desired coordinates
 
-                attempt = Move(x, y)
+                attempt = player.make_move(r, c)
 
                 # Checks if the given coordinate is a valid move
                 while not self.model.validate_move(attempt, player):

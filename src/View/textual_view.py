@@ -1,9 +1,9 @@
 from View.abstract_view import AbstractView
-from Model.Game import Game
-from Model.AbstractPlayer import AbstractPlayer
+from Model.game import Game
+from Model.abstract_player import AbstractPlayer
 
 
-class TextView(AbstractView):
+class TextualView(AbstractView):
 
     def __init__(self, model: Game):
         super().__init__(model)
@@ -45,11 +45,15 @@ class TextView(AbstractView):
         Takes in user input for x and y
         :return: x and y
         """
-        move = input('Enter your move (row, column): ')
-        move = move.split(',')
-        x = int(move[0]) - 1
-        y = int(move[1]) - 1
-
+        while True:
+            move = input('Enter your move (row, column): ')
+            move = move.split(',')
+            try:
+                x = int(move[0]) - 1
+                y = int(move[1]) - 1
+                break
+            except ValueError:
+                print("Could not convert data to an integer.")
         return x, y
 
     def display_invalid_moves(self, player):
@@ -60,7 +64,9 @@ class TextView(AbstractView):
         """
         print("Invalid move, please pick another spot.")
         print("Try these instead:")
-        print(str(self.model.get_valid_moves(player)))
+        for i in self.model.get_valid_moves(player):
+            print("(", i[0] + 1, ",", i[1] + 1, end=" ) ", )
+        print("\n")
 
     def display_winner(self, winner):
         """

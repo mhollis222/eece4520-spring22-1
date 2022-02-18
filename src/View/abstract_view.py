@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
-from Model.Game import Game
-from Model import AbstractPlayer
+from Model.game import Game
+from Model import abstract_player
 
 
 class AbstractView(ABC):
@@ -19,7 +19,7 @@ class AbstractView(ABC):
         pass
 
     @abstractmethod
-    def display_current_player(self, player: AbstractPlayer):
+    def display_current_player(self, player: abstract_player):
         """
         Prints a message to indicate current player's turn
         :param player: Number representative of the player who is up (int)

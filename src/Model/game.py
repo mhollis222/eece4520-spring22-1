@@ -1,7 +1,7 @@
-from AbstractPlayer import AbstractPlayer
+from abstract_player import AbstractPlayer
 from enum import Enum
 from random import random
-from Move import Move
+from move import Move
 
 
 class Cell(Enum):
@@ -42,7 +42,7 @@ class Game:
         :return: valid?
         """
         # if this move is found in the list of valid moves at least once, return true
-        if self.get_valid_moves(play).count(move.getCoords()) > 0:
+        if self.get_valid_moves(play).count(move.get_coords()) > 0:
             return True
         return False
 
@@ -133,7 +133,7 @@ class Game:
             # iterate over distances emerging from m
             for dist in range(1, board_size):
 
-                location = Game._get_cardinal_location(m.getCoords(), dist,
+                location = Game._get_cardinal_location(m.get_coords(), dist,
                                                        dire)  # obtain coordinates of current cell (tuple)
                 # print("searching ", location)
                 # next direction if board limit is reached, discard tracked cells

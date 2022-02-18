@@ -1,6 +1,6 @@
-from HumanPlayer import HumanPlayer
-from Game import Game
-from View.text_view import TextView
+from human_player import HumanPlayer
+from game import Game
+from View.textual_view import TextualView
 from Controller.game_controller import GameController
 
 
@@ -8,7 +8,7 @@ def main():
     player1 = HumanPlayer("Steve")
     player2 = HumanPlayer("Jill")
     game = Game(player1, player2)
-    text = TextView(game)
+    text = TextualView(game)
     control = GameController(game, text)
     control.play_game()
 
