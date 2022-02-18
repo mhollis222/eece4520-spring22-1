@@ -7,12 +7,12 @@ class AbstractView(ABC):
     def __init__(self, model: Game):
         self.model = model
 
+    def __init__(self, board_view):
+        self.board_view = board_view
+
     @abstractmethod
     def display_board(self):
         pass
-
-    def __init__(self, board_view):
-        self.board_view = board_view
 
     @abstractmethod
     def display_current_player(self, player: AbstractPlayer):

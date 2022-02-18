@@ -45,6 +45,11 @@ class TextView(AbstractView):
         print(str(self.model.get_valid_moves(player)))
 
     def display_winner(self, winner):
+        """
+        Prints who won the game
+        :param winner: Number representative of the player who won the game (int)
+        :return: none
+        """
         if winner == 1:
             print(str(self.model.order[0].name) + " wins!")  # player X
         elif winner == 2:
@@ -53,14 +58,26 @@ class TextView(AbstractView):
             print("Tie Game!")
 
     def display_player_skipped(self, player: AbstractPlayer):
+        """
+        Alerts player their turn has been skipped via print statement
+        :param player: Player whose turn's been skipped
+        :return: none
+        """
         print(" ")
         print(str(player) + "'s turn has been skipped!")
-        # game explicitly states which player's turn is next
 
     def display_score(self):
+        """
+        Displays the current score of both players alongside their names
+        :return: none
+        """
         print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
         print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
 
     def display_end_of_game(self):
+        """
+        Alerts the players that the game is over
+        :return: none
+        """
         print("\n")
         print("Game Over!")
