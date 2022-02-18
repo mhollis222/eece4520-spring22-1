@@ -10,6 +10,10 @@ class TextView(AbstractView):
         self.model = model
 
     def display_board(self):
+        """
+        Prints a 8 by 8 board and fills in pieces as game goes on
+        :return: none
+        """
         board_view = self.model.get_board()
 
         # constants for drawing board borders
@@ -29,9 +33,18 @@ class TextView(AbstractView):
         print(horizontal_line)
 
     def display_current_player(self, player: AbstractPlayer):
+        """
+        Prints a message to indicate current player's turn
+        :param player: Number representative of the player who is up (int)
+        :return: non
+        """
         print("Player " + str(player.identifier) + " (" + str(player) + "'s) turn!")
 
     def get_move(self):
+        """
+        Takes in user input for x and y
+        :return: x and y
+        """
         move = input('Enter your move (row, column): ')
         move = move.split(',')
         x = int(move[0]) - 1
@@ -40,6 +53,11 @@ class TextView(AbstractView):
         return x, y
 
     def display_invalid_moves(self, player):
+        """
+        Prints message indicating that move made was invalid
+        :param player: Number representative of the player who made the invalid move (int)
+        :return: none
+        """
         print("Invalid move, please pick another spot.")
         print("Try these instead:")
         print(str(self.model.get_valid_moves(player)))
