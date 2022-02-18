@@ -19,7 +19,7 @@ class TextView(AbstractView):
         print('     1   2   3   4   5   6   7   8')
         print(horizontal_line)
         for i, x in enumerate(board_view):
-            print(i+1, end='  ')
+            print(i + 1, end='  ')
             for y in range(8):
                 if x[y].value == 0:
                     print('|  ', end=' ')
@@ -39,17 +39,16 @@ class TextView(AbstractView):
 
         return x, y
 
-    def display_valid_moves(self, player: AbstractPlayer):
-        print("Valid moves:", self.model.get_valid_moves(player))
-
-    def display_invalid_moves(self):
+    def display_invalid_moves(self, player):
         print("Invalid move, please pick another spot.")
+        print("Try these instead:")
+        print(str(self.model.get_valid_moves(player)))
 
     def display_winner(self, winner):
         if winner == 1:
-            print(str(self.model.p1.name) + " wins!") # player X
+            print(str(self.model.order[0].name) + " wins!")  # player X
         elif winner == 2:
-            print(str(self.model.p2.name) + " wins!")  # player O
+            print(str(self.model.order[1].name) + " wins!")  # player O
         else:
             print("Tie Game!")
 
@@ -59,5 +58,9 @@ class TextView(AbstractView):
         # game explicitly states which player's turn is next
 
     def display_score(self):
-        print(str(self.model.p1.name) + ": " + str(self.model.p1.score))
-        print(str(self.model.p2.name) + ": " + str(self.model.p2.score))
+        print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
+        print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
+
+    def display_end_of_game(self):
+        print("\n")
+        print("Game Over!")

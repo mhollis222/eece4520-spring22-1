@@ -23,11 +23,7 @@ class AbstractView(ABC):
         pass
 
     @abstractmethod
-    def display_valid_moves(self, player: AbstractPlayer):
-        pass
-
-    @abstractmethod
-    def display_invalid_moves(self):
+    def display_invalid_moves(self, player):
         pass
 
     @abstractmethod
@@ -40,4 +36,8 @@ class AbstractView(ABC):
 
     @abstractmethod
     def display_score(self):
+        pass
+
+    @abstractmethod
+    def display_end_of_game(self):
         pass

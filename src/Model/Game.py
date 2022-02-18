@@ -97,7 +97,6 @@ class Game:
         # list evaluates to False if empty
         if not self.get_valid_moves(play):
             return False
-        print(self.get_valid_moves(play))
         return True
 
     def start(self) -> None:
@@ -107,6 +106,7 @@ class Game:
         """
         self.order = self._coin_flip()
         self.running = True
+        self.active_player = self.order[0]
         self.board[3][3] = Cell.WHITE
         self.board[3][4] = Cell.BLACK
         self.board[4][3] = Cell.BLACK
@@ -202,14 +202,14 @@ class Game:
     def is_board_filled(self) -> bool:
         for i in range(self.x):
             for j in range(self.y):
-                if(self.board[i][j].value == 0):
+                if self.board[i][j].value == 0:
                     return False
 
         return True
 
     def has_game_ended(self) -> bool:
         return (not ((self.valid_moves_avail(self.order[0])) or (self.valid_moves_avail(self.order[1])))) \
-               or (not self.is_board_filled())
+               or self.is_board_filled()
 
     def display_winner(self) -> int:
         if self.order[0].score > self.order[1].score:
@@ -221,3 +221,9 @@ class Game:
 
     def get_active_player(self):
         return self.active_player
+
+    def switch_players(self, player: AbstractPlayer):
+        if player == self.order[0]:
+            self.active_player = self.order[1]
+        else:
+            self.active_player = self.order[0]
