@@ -11,7 +11,7 @@ class AbstractView(ABC):
         self.board_view = board_view
 
     @abstractmethod
-    def display_board(self):
+    def display_board(self, valid_moves: list):
         """
         Prints the game board and fills in pieces as game goes on
         :return: none
