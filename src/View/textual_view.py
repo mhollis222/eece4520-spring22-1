@@ -9,7 +9,7 @@ class TextualView(AbstractView):
         super().__init__(model)
         self.model = model
 
-    def display_board(self):
+    def display_board(self, valid_moves: list):
         """
         Prints a 8 by 8 board and fills in pieces as game goes on
         :return: none
@@ -25,7 +25,9 @@ class TextualView(AbstractView):
         for i, x in enumerate(board_view):
             print(i + 1, end='  ')
             for y in range(8):
-                if x[y].value == 0:
+                if (y, i) in valid_moves:
+                    print('| .', end=' ')
+                elif x[y].value == 0:
                     print('|  ', end=' ')
                 else:
                     print('| %s' % x[y].value, end=' ')
@@ -49,8 +51,9 @@ class TextualView(AbstractView):
             move = input('Enter your move (row, column): ')
             move = move.split(',')
             try:
-                x = int(move[0]) - 1
-                y = int(move[1]) - 1
+                # Flipped since we ask for `row, col`: row -> y, col -> x
+                x = int(move[1]) - 1
+                y = int(move[0]) - 1
                 break
             except ValueError:
                 print("Could not convert data to an integer.")
@@ -65,7 +68,7 @@ class TextualView(AbstractView):
         print("Invalid move, please pick another spot.")
         print("Try these instead:")
         for i in self.model.get_valid_moves(player):
-            print("(", i[0] + 1, ",", i[1] + 1, end=" ) ", )
+            print("(", i[1] + 1, ",", i[0] + 1, end=" ) ", )
         print("\n")
 
     def display_winner(self, winner):
