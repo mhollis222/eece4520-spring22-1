@@ -17,14 +17,18 @@ class TextualView(AbstractView):
         board_view = self.model.get_board()
 
         # constants for drawing board borders
-        horizontal_line = '   +---+---+---+---+---+---+---+---+'
+        horizontal_line = '    ' + '+---' * len(board_view) + '+'
 
         # nested for loop to draw in board
-        print('     1   2   3   4   5   6   7   8')
+        numbers = "\t  "
+        for i in range(len(board_view[0])):
+            numbers += str(i + 1) + '   '
+        print(numbers)
+
         print(horizontal_line)
         for i, x in enumerate(board_view):
-            print(i + 1, end='  ')
-            for y in range(8):
+            print(i + 1, end='\t')
+            for y in range(len(x)):
                 if (y, i) in valid_moves:
                     print('| .', end=' ')
                 elif x[y].value == 0:
