@@ -89,11 +89,11 @@ class GameController:
 
         view_type = settings['View']['style']
         # Currently, unused
-        # p1_col = settings['View']['p1_color']
-        # p2_col = settings['View']['p2_color']
+        p1_col = settings['View']['p1_color']
+        p2_col = settings['View']['p2_color']
 
         if view_type == 'textual':
-            self.view = TextualView(self.model)
+            self.view = TextualView(self.model, p1_col, p2_col)
         elif view_type == 'GUI':
             # dont have other option yet
             pass

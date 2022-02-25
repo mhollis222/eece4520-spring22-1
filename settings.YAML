@@ -2,7 +2,8 @@ View:
   # Accepts one of ['textual', 'GUI']
   style: 'textual'
   # Accepts any color in ["white", "black", "red", "green", "blue", "cyan", "yellow", "magenta"] or hex val.
-  p1_color: "black"
+  # in textual mode only accepts ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+  p1_color: "white"
   p2_color: "white"
 Model:
   # must be greater than 4 and even

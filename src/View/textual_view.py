@@ -1,13 +1,16 @@
 from View.abstract_view import AbstractView
 from Model.game import Game
 from Model.abstract_player import AbstractPlayer
+from termcolor import colored
 
 
 class TextualView(AbstractView):
 
-    def __init__(self, model: Game):
+    def __init__(self, model: Game, p1_color: str, p2_color: str):
         super().__init__(model)
         self.model = model
+        self.p1_color = p1_color
+        self.p2_color = p2_color
 
     def display_board(self, valid_moves: list):
         """
@@ -30,11 +33,11 @@ class TextualView(AbstractView):
             print(i + 1, end='\t')
             for y in range(len(x)):
                 if (y, i) in valid_moves:
-                    print('| .', end=' ')
+                    print('| ∘', end=' ')
                 elif x[y].value == 0:
                     print('|  ', end=' ')
                 else:
-                    print('| %s' % x[y].value, end=' ')
+                    print('| %s' % colored(x[y].value, self.p1_color if x[y].value == 1 else self.p2_color), end=' ')
             print("|")
         print(horizontal_line)
 
