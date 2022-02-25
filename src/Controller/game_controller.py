@@ -1,13 +1,21 @@
 from Model.game import Game, Cell
 from Model.move import Move
-from View.abstract_view import AbstractView
+from Model.abstract_player import AbstractPlayer
+from View.textual_view import TextualView
+import yaml
+
+settings_path = '../../settings.YAML'
 
 
 class GameController:
 
-    def __init__(self, model: Game, view: AbstractView):
-        self.model = model
-        self.view = view
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer):
+        self.model = None
+        self.view = None
+        self.p1 = p1
+        self.p2 = p2
+        self.settings = self.load_settings()
+        self.setup(self.settings)
 
     def play_game(self):
         """
@@ -58,3 +66,33 @@ class GameController:
             else:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
+
+    def load_settings(self) -> dict:
+        with open(settings_path) as f:
+            return yaml.safe_load(f)
+
+    def setup(self, settings: dict) -> None:
+        # Make the game object
+        width = settings['Model']['board_width']
+        height = settings['Model']['board_height']
+
+        # Currently, unused
+        # ai_difficult = settings['Model']['AI_difficulty']
+        # start_filled = settings['Model']['start_filled']
+        # debug = settings['Debug']
+
+        self.model = Game(self.p1, self.p2, width, height)
+
+        view_type = settings['View']['style']
+        # Currently, unused
+        # p1_col = settings['View']['p1_color']
+        # p2_col = settings['View']['p2_color']
+
+        if view_type == 'textual':
+            self.view = TextualView(self.model)
+        elif view_type == 'GUI':
+            # dont have other option yet
+            pass
+
+
+

@@ -7,9 +7,9 @@ from Controller.game_controller import GameController
 def main():
     player1 = HumanPlayer("Steve")
     player2 = HumanPlayer("Jill")
-    game = Game(player1, player2)
-    text = TextualView(game)
-    control = GameController(game, text)
+    # game = Game(player1, player2)
+    # text = TextualView(game)
+    control = GameController(player1, player2)
     control.play_game()
 
 

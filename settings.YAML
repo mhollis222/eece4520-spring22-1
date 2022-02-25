@@ -1,0 +1,16 @@
+View:
+  # Accepts one of ['textual', 'GUI']
+  style: 'textual'
+  # Accepts any color in ["white", "black", "red", "green", "blue", "cyan", "yellow", "magenta"] or hex val.
+  p1_color: "black"
+  p2_color: "white"
+Model:
+  # must be greater than 4 and even
+  board_height: 8
+  board_width: 8
+  # If false, players can start wherever (may not be used)
+  start_filled: True
+  # accepts a range from [1-10]. Internally dictates number of moves ahead AI looks.
+  AI_difficulty: 5
+  # disables status printouts if false
+Debug: True
