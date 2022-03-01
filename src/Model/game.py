@@ -4,6 +4,10 @@ from random import random
 from move import Move
 
 
+# the more I think about this, the less I think we actually need an enum here.
+# I don't think it detracts anything, but I'm not sure what advantage we actually get from it.
+# the only real downside is that flipping involves an extra if statement when we could just use
+# (identity + 2) % 2 + 1 to flip it if it was just an int
 class Cell(Enum):
     EMPTY = 0  # Empty Cell
     BLACK = 1  # Player One's Piece
@@ -52,39 +56,54 @@ class Game:
         :param play: Player making move
         :return: list of locations on board (list:tuple)
         """
-        board_size = max(self.x, self.y)  # 1D board size in event of asymmetrical board
         valid = []
-        for x in range(self.x):
-            for y in range(self.y):
-                if self.board[x][y].value == play.identifier:
-                    # print("active player piece found at ", x, y)
-                    for dire in range(board_size):
-                        # print("\ndirection ", dire)
-                        flag = False
-                        for dist in range(1, board_size):
-                            location = Game._get_cardinal_location((x, y), dist,
-                                                                   dire)  # obtain coordinates of current cell (tuple)
-                            # print("searching ", location)
-                            # next direction if board limit is reached
-                            if (location[0] >= self.x) | (location[1] >= self.y):
-                                # print("board limit reached, next direction")
-                                break
-                            current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
-                            # next direction if same cell reached
-                            if current_cell.value == play.identifier:
-                                # print("cell of same player reached, next direction")
-                                break
-                            # next direction if empty cell reached, append if flag==True
-                            if current_cell == Cell.EMPTY:
-                                # print("empty cell reached, next direction")
-                                if flag:
-                                    # print("cell valid at ", location)
-                                    valid.append(location)
-                                break
-                            # next distance if opposite cell reached, enable flag
-                            # print("cell of opponent reached, continuing")
-                            flag = True
+        # Should this be based on the history or live pieces
+        live_pieces = [(x, y) for x in range(self.x) for y in range(self.y) if
+                       self.board[y][x].value == play.identifier]
+        for move in live_pieces:
+            valid = valid + self.search(move, play.identifier)
         return valid
+
+    def search(self, move: tuple, identity: int) -> list:
+        """
+        Searches for possible moves in all directions from a radial point
+        :param move: Starting point
+        :param identity: Current Player
+        :return: List of viable moves
+        """
+        valid = [self._search_help(move, identity, dx=1, dy=0), self._search_help(move, identity, dx=0, dy=1),
+                 self._search_help(move, identity, dx=-1, dy=0), self._search_help(move, identity, dx=0, dy=-1),
+                 self._search_help(move, identity, dx=-1, dy=-1), self._search_help(move, identity, dx=1, dy=-1),
+                 self._search_help(move, identity, dx=-1, dy=1), self._search_help(move, identity, dx=1, dy=1)]
+
+        return [x for x in valid if x is not None]
+
+    def _search_help(self, move: tuple, identity: int, dx, dy) -> tuple:
+        """
+        Helper function for finding possible moves in a certain direction
+        :param move: Starting point
+        :param identity: Current player
+        :param dx: Constant shift in the x direction
+        :param dy: Constant shift in the y direction
+        :return: List of possible moves in a certain direction
+        """
+        (x, y) = move
+        x = x + dx
+        y = y + dy
+
+        if x in range(1, self.x - 1) and y in range(1, self.y - 1):
+            # funny math to alternate between 1 and 2
+            if self.board[y][x].value == (identity + 2) % 2 + 1:
+                while x in range(1, self.x - 1) and y in range(1, self.y - 1):
+                    x = x + dx
+                    y = y + dy
+                    # If we hit our own piece before an empty square, no valid move
+                    if self.board[y][x].value == identity:
+                        return None
+                    if self.board[y][x] == Cell.EMPTY:
+                        return x, y
+
+        return None
 
     def valid_moves_avail(self, play: AbstractPlayer) -> bool:
         """
@@ -93,9 +112,7 @@ class Game:
         :return: moves available? (boolean)
         """
         # list evaluates to False if empty
-        if not self.get_valid_moves(play):
-            return False
-        return True
+        return bool(self.get_valid_moves(play))
 
     def start(self) -> None:
         """
@@ -122,51 +139,49 @@ class Game:
         :param c: the type of piece to be placed
         :return: None
         """
+        x, y = m.get_coords()
+        self.board[y][x] = c
+        # Call all 8 directions
+        to_flip = self._flip_help(m, c, dx=1, dy=0) + \
+                  self._flip_help(m, c, dx=0, dy=1) + \
+                  self._flip_help(m, c, dx=-1, dy=0) + \
+                  self._flip_help(m, c, dx=0, dy=-1) + \
+                  self._flip_help(m, c, dx=-1, dy=-1) + \
+                  self._flip_help(m, c, dx=1, dy=-1) + \
+                  self._flip_help(m, c, dx=-1, dy=1) + \
+                  self._flip_help(m, c, dx=1, dy=1)
 
-        board_size = max(self.x, self.y)  # 1D board size in event of asymmetrical board
-        flip = []  # track cells to flip guaranteed
+        for x, y in to_flip:
+            self.board[y][x] = c
 
-        # iterate over cardinal directions: W, SW, S, SE, E, NE, N
-        for dire in range(board_size):
-            tracked = []  # track cells to flip if terminus == c
-            # print("\ndirection ", dire)
-            # iterate over distances emerging from m
-            for dist in range(1, board_size):
+    def _flip_help(self, m: Move, identity: Cell, dx: int, dy: int):
+        """
+        Helper to decide which cells need to be flipped in a certain direction
+        :param m: The piece being placed
+        :param identity: Identity of current player
+        :param dx: constant shift in x direction
+        :param dy: constant shift in y direction
+        :return: List of cells to be flipped
+        """
+        visited = []
+        x, y = m.get_coords()
+        x = x + dx
+        y = y + dy
+        while x in range(self.x) and y in range(self.y):
+            # Once we hit our own piece we're done
+            if self.board[y][x].value == identity.value:
+                return visited
+            # If we hit an empty cell there is nothing to flip
+            elif self.board[y][x] == Cell.EMPTY:
+                return []
+            visited.append((x, y))
+            x = x + dx
+            y = y + dy
 
-                location = Game._get_cardinal_location(m.get_coords(), dist,
-                                                       dire)  # obtain coordinates of current cell (tuple)
-                # print("searching ", location)
-                # next direction if board limit is reached, discard tracked cells
-                if (location[0] >= self.x) | (location[1] >= self.y):
-                    tracked.clear()
-                    # print("board limit reached, next direction")
-                    break
+        # Here in the event that a piece is placed on the edge, since while loop won't trigger
+        return []
 
-                current_cell = self.board[location[0]][location[1]]  # obtain enum value of current cell
-
-                # next direction if empty cell is reached, discard tracked cells
-                if current_cell == Cell.EMPTY:
-                    tracked.clear()
-                    # print("empty cell reached, next direction")
-                    break
-
-                # next distance if opposite color is found, track
-                if current_cell.value != c.value:
-                    # print("opponent cell reached, tracking ", location)
-                    tracked.append(location)
-                    continue
-
-                # next direction if same cell is reached, save tracked cells
-                for location in tracked:
-                    # print("saving ", tracked)
-                    flip.append(location)
-
-        # flip cells using location tuple as index
-        for x, y in flip:
-            # print("flipped ", x, y)
-            self.board[x][y] = c
-        self.board[m.x][m.y] = c
-
+    # deprecated?
     @staticmethod
     def _get_cardinal_location(origin_cell, distance, direction):
         """
@@ -235,7 +250,7 @@ class Game:
         else:
             return 0
 
-    def get_active_player(self):
+    def get_active_player(self) -> AbstractPlayer:
         """
         Returns the player whose turn it is
         :return: The player whose turn it currently is

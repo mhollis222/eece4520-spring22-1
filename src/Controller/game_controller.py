@@ -22,7 +22,8 @@ class GameController:
 
             # Checks if there are any available moves for the current player
             if self.model.valid_moves_avail(player):
-                self.view.display_board()
+                # TODO: combine into fn
+                self.view.display_board(self.model.get_valid_moves(player))
                 self.view.display_score()
                 self.view.display_current_player(player)
 
@@ -42,6 +43,9 @@ class GameController:
                     self.model.update_board(attempt, Cell.BLACK)
                 else:
                     self.model.update_board(attempt, Cell.WHITE)
+
+                # add the move to the player history
+                self.model.get_active_player().add_move(attempt)
 
                 # Updates both of the players' scores
                 self.model.update_score()
