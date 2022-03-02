@@ -14,7 +14,7 @@ def main():
     # control.play_game()
     view = gui_board(game)
     view.display_board(control.model.get_valid_moves(player1))
-    view.display_current_player(player1)
+    # view.display_current_player(player1) #<-- This doesn't work with display_board above, only one can work at a time
     view.root.mainloop()
 
 
