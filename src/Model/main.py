@@ -17,5 +17,6 @@ def main():
     view.display_current_player(player1)
     view.root.mainloop()
 
+
 if __name__ == "__main__":
     main()

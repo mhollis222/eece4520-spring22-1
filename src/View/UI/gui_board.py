@@ -3,6 +3,7 @@ from Model.game import Game
 from Model.abstract_player import AbstractPlayer
 import tkinter as tk
 
+
 # Constants
 DEFAULT_BOARD = 8
 BOARD_SIZE = DEFAULT_BOARD * 100
