@@ -14,7 +14,8 @@ class GameController:
         self.view = None
         self.p1 = p1
         self.p2 = p2
-        self.config = configparser.ConfigParser()
+        # special options to save comments on writes (i hope)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
         self.setup()
 
@@ -72,17 +73,16 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
-    @staticmethod
-    def save_settings(settings: dict) -> bool:
+    def save_settings(self) -> bool:
         """
         Stores the desired settings dict as a yaml file at `settings_path`
         :param settings: the settings to be stored.
         :return: success of operation
         """
         try:
-            with open(settings_path, mode='w') as f:
-                yaml.dump(settings, f, default_flow_style=False)
-                return True
+            with open(settings_path, 'w') as f:
+                self.config.write(f)
+            return True
         except IOError:
             return False
 
