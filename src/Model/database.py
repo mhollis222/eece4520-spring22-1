@@ -34,15 +34,17 @@ class Database:
     def fetch_data(self):
         self._cursor.execute("SELECT * FROM data")
         data = self._cursor.fetchall()
-        dictionary = {}
+        entry_list = list()
+
         for elem in data:
-            dictionary["username"] = elem[0]
-            dictionary["password"] = elem[1]
-            dictionary["elo"] = elem[2]
-            dictionary["high_score"] = elem[3]
-            dictionary["opponent"] = elem[4]
-            dictionary["active_turn"] = elem[5]
-        return dictionary
+            entry = {"username": elem[0],
+                     "password": elem[1],
+                     "elo": elem[2],
+                     "high_score": elem[3],
+                     "opponent": elem[4],
+                     "active_turn": elem[5]}
+            entry_list.append(entry)
+        return entry_list
 
     def init_table(self):
         try:
@@ -105,6 +107,22 @@ class Database:
     def _clear_data(self):
         self._cursor.execute("DROP TABLE IF EXISTS data;")
 
+    def verify_credentials(self, username, password):
+        for element in self.fetch_data():
+            if element.get("username") == username:
+                if element.get("password") == password:
+                    return True
+                else:
+                    return False
+        return False
+
+    def sorted_leaderboard(self):
+        def by_elo(e: dict):
+            return e.get("elo")
+        leaderboard = self.fetch_data()
+        leaderboard.sort(key=by_elo)
+        return leaderboard
+
     @staticmethod
     def test_db():
         # connection details
@@ -119,10 +137,26 @@ class Database:
 
         # initialization of table
         db.init_table()
+        print("EMPTY DB")
+        print(db.fetch_data())
 
         # sample values for signup
-        username = input("Username (max 20 characters): ")
-        password = input("Password (max 20 characters): ")
+        signup_username = "test"
+        signup_password = "4520"
+
+        # create new user and test login
+        db.write_user(signup_username, signup_password)
+        print("USER ADDED")
+        print(db.fetch_data())
+
+        # login
+        username = input("Username: ")
+        password = input("Password: ")
+        if db.verify_credentials(username, password):
+            print("Login successful")
+        else:
+            print("Invalid credentials")
+            exit()
 
         # sample values for game start
         # note: opponent should be 'AI' or 'local' if not playing online
@@ -135,27 +169,36 @@ class Database:
         # sample values for game state
         active_turn = 0xA5E3
 
-        # create new user
-        db.write_user(username, password)
-
         # start game (called when game is initialized)
         db.write_update_game_start(username, opponent)
+        print("GAME STARTED")
+        print(db.fetch_data())
 
         # update game state (called every time turn resolves)
         # game state is a double that represents game state
         # TODO: method in model for parsing game state from this double
         db.write_update_turn(username, active_turn)
-
-        # fetch and print data
-        print("PRE")
+        print("TURN UPDATED")
         print(db.fetch_data())
 
         # update elo and score when game finishes (called when game is completed)
         db.write_update_game_complete(username, new_elo, new_high_score)
-
-        # fetch and print data
-        print("POST")
+        print("GAME FINISHED")
         print(db.fetch_data())
+
+        # leaderboard test
+        db.write_user("user1", "pass1")
+        db.write_update_game_complete("user1", 1700, 20)
+        db.write_user("user2", "pass2")
+        db.write_update_game_complete("user2", 1800, 25)
+        db.write_user("user3", "pass3")
+        db.write_update_game_complete("user3", 1300, 5)
+        print("LEADERBOARD SORTED BY DATE ADDED")
+        print(db.fetch_data())
+        print("LEADERBOARD SORTED BY ELO")
+        print(db.sorted_leaderboard())
 
         # close db
         db._connection.close()
+
+        print("\nAll operations completed successfully")
