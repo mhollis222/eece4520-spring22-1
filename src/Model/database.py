@@ -2,15 +2,22 @@ import mysql.connector
 
 
 class Database:
-    def __init__(self, host, user, password):
-        self._config = {
-            'host': host,
-            'user': user,
-            'password': password,
-        }
-        self._connection = self._connect()
-        self._cursor = self._connection.cursor()
-        self._init_db()
+
+    _instance = None
+
+    def __new__(cls, host, user, password):
+        if cls._instance is None:
+            print('Creating the object')
+            cls._instance = super(Database, cls).__new__(cls)
+            cls._instance._config = {
+                'host': host,
+                'user': user,
+                'password': password,
+            }
+            cls._instance._connection = cls._instance._connect()
+            cls._instance._cursor = cls._instance._connection.cursor()
+            cls._instance._init_db()
+        return cls._instance
 
     def _connect(self):
         try:
@@ -67,11 +74,13 @@ class Database:
             users = self._cursor.fetchall()
             for user in users:
                 if user == username:  # prevents users from making duplicate usernames
-                    return
+                    return -1
                 if user == 'AI':  # prevents users from signing up as unique AI tag
-                    return
+                    return -1
                 if user == 'local':  # prevents users from signing up as unique local tag
-                    return
+                    return -1
+                if user == 'guest':  # prevents users from signing up as unique guest tag
+                    return -1
         except mysql.connector.errors.InterfaceError as err:
             pass
         add_elements = (

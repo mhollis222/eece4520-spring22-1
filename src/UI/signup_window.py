@@ -1,4 +1,5 @@
 import tkinter as tk
+from Model.database import Database
 
 
 class SignUpWindow(tk.Toplevel):
@@ -45,9 +46,17 @@ class SignUpWindow(tk.Toplevel):
         self.retype_password_entry = tk.Entry(self, show='*', font=("Arial", 18))
         self.retype_password_entry.grid(row=6, column=1, sticky='nw', padx=15, pady=5)
         # login button
-        self.register_button = tk.Button(self, text='Register', width=20, height=2, font=("Arial", 15))
+        self.register_button = tk.Button(self, text='Register', width=20, height=2, font=("Arial", 15),
+                                         command=self.register)
         self.register_button.grid(row=6, columnspan=2, padx=5, pady=50, sticky='s')
 
     def open_login(self):
         self.destroy()
         self.master.deiconify()   # show the root window
+
+    def register(self):
+        db = Database('localhost', 'reversi', 'eece4520')
+        if db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
+            print("registration failed")
+            pass  # error occurred
+        self.open_login()

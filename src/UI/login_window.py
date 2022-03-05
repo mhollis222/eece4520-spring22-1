@@ -1,4 +1,6 @@
 import tkinter as tk
+
+from Model.database import Database
 from signup_window import SignUpWindow
 from guest_play_options_window import GuestOptionsWindow
 from home_window import HomeWindow
@@ -47,12 +49,16 @@ class LoginWindow(tk.Tk):
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
+        db = Database('localhost', 'reversi', 'eece4520')
 
-        # if username == 'test' and password == '123456':
-        home_win = HomeWindow(self)
-        home_win.focus_force()
-        self.withdraw()
-        # else:
+        if db.verify_credentials(username, password):
+            print("login successful")
+            home_win = HomeWindow(self)
+            home_win.focus_force()
+            self.withdraw()
+        else:
+            print("login failed")
+            pass  # username not found or password does not match. can just say "invalid credentials"
         # messagebox.showerror('Login failure', 'Username or password is incorrect')
 
     def close_window(self):

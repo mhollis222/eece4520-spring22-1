@@ -1,5 +1,6 @@
 import tkinter as tk
 from member_play_options_window import MemberPlayOptionsWindow
+from Model.database import Database
 
 
 class HomeWindow(tk.Toplevel):
@@ -34,9 +35,14 @@ class HomeWindow(tk.Toplevel):
         self.frame2.grid(row=1, column=0, rowspan=6, columnspan=2, sticky='w')
         self.frame2.leaderboard_label = tk.Label(self, text='Leaderboard', fg='white', font=("Arial", 25, "bold"),
                                           bg='#066b28', padx=125)
+
+        db = Database('localhost', 'reversi', 'eece4520')
+        lb = db.sorted_leaderboard()
+        # username string = lb[x].get("username")
+        # elo string = lb[x].get("elo")
         self.frame2.leaderboard_label.grid(row=1, column=0)
-        self.frame2.first_player = tk.Label(self, text='1. Bob: 98', fg='white', font=("Arial", 15),
-                                          bg='#066b28')
+        self.frame2.first_player = tk.Label(self, text='1. '+lb[0].get("username")+': '+str(lb[0].get("elo")),
+                                            fg='white', font=("Arial", 15), bg='#066b28')
         self.frame2.first_player.grid(row=2, column=0, sticky='n')
         self.frame2.second_player = tk.Label(self, text='2. Casey: 84', fg='white', font=("Arial", 15),
                                           bg='#066b28')
