@@ -2,7 +2,7 @@ from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from View.textual_view import TextualView
-import yaml
+#import yaml
 
 settings_path = '../../settings.YAML'
 
@@ -71,9 +71,9 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
-    def load_settings(self) -> dict:
-        with open(settings_path) as f:
-            return yaml.safe_load(f)
+    # def load_settings(self) -> dict:
+    #     with open(settings_path) as f:
+    #         return yaml.safe_load(f)
 
     def setup(self, settings: dict) -> None:
         # Make the game object
