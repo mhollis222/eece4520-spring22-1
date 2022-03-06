@@ -14,7 +14,10 @@ def main():
     # control.play_game()
     view = GuiBoard(game)
     view.display_board(control.model.get_valid_moves(player1))
-    # view.display_current_player(player1) #<-- This doesn't work with display_board above, only one can work at a time
+    view.display_current_player(player1)
+    view.display_score()
+    # view.display_end_of_game()
+    # view.display_winner(3)
     view.root.mainloop()
 
 
