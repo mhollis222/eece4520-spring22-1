@@ -5,63 +5,50 @@ import tkinter as tk
 
 
 # Constants
-DEFAULT_BOARD = 8
-BOARD_SIZE = DEFAULT_BOARD * 100
-BACKGROUND_COLOR = 'grey'
-BORDER_COLOR = 'black'
-BOARD_COLOR = 'green'
+# DEFAULT_BOARD = 8
+# BOARD_SIZE = DEFAULT_BOARD * 100
+# BACKGROUND_COLOR = 'grey'
+# BORDER_COLOR = 'black'
+# BOARD_COLOR = 'green'
 
-class gui_board(AbstractView):
+class GuiBoard(AbstractView):
 
     def __init__(self, model: Game):
         super().__init__(model)
         self.model = model
         self.root = tk.Tk()
-        self.root.geometry(str(BOARD_SIZE) + 'x' + str(BOARD_SIZE))
-        self.root.configure(background=BACKGROUND_COLOR)
+        self.root.geometry("1000x1000")
+        self.root.rowconfigure([0, 1, 2, 3, 4, 5], minsize=50, weight=1)
+        self.root.columnconfigure([0, 1, 2], minsize=50, weight=1)
+        self.i = None
+        self.j = None
 
     def display_board(self, valid_moves: list):
-        board_view = self.model.get_board()
-        # main_frame = tk.Frame(self.root, bg='white', width=100, height=100)
-        for i, x in enumerate(board_view):
-            for y in range(DEFAULT_BOARD):
-                if (y, i) in valid_moves:
-                    board_frame = tk.Frame(self.root, relief=tk.RAISED, borderwidth=1, bg=BORDER_COLOR)
-                    board_frame.grid(row=i, column=y)
-                    board_button = tk.Button(master=board_frame, bg=BOARD_COLOR, width=int(BOARD_SIZE / 200),
-                                             height=int(BOARD_SIZE / 400), text=' X')
-                    board_button.pack()
-                elif x[y].value == 0:
-                    board_frame = tk.Frame(self.root, relief=tk.RAISED, borderwidth=1, bg=BORDER_COLOR)
-                    board_frame.grid(row=i, column=y)
-                    board_button = tk.Button(master=board_frame, bg=BOARD_COLOR, width=int(BOARD_SIZE / 200),
-                                             height=int(BOARD_SIZE / 400))
-                    board_button.pack()
-                else:
-                    board_frame = tk.Frame(self.root, relief=tk.RAISED, borderwidth=1, bg=BORDER_COLOR)
-                    board_frame.grid(row=i, column=y)
-                    board_button = tk.Button(master=board_frame, bg=BOARD_COLOR, width=int(BOARD_SIZE / 200),
-                                             height=int(BOARD_SIZE / 400))
-                    board_button.pack()
 
+        self.root.board_frame = tk.Frame(self.root, width=600, height=600)
+        self.root.board_frame.grid(row=1, column=0, columnspan=3)
 
-        # # constants for drawing board borders
-        # horizontal_line = '   +---+---+---+---+---+---+---+---+'
-        #
-        # # nested for loop to draw in board
-        # print('     1   2   3   4   5   6   7   8')
-        # print(horizontal_line)
-        # for i, x in enumerate(board_view):
-        #     print(i + 1, end='  ')
-        #     for y in range(8):
-        #         if (y, i) in valid_moves:
-        #             print('| .', end=' ')
-        #         elif x[y].value == 0:
-        #             print('|  ', end=' ')
-        #         else:
-        #             print('| %s' % x[y].value, end=' ')
-        #     print("|")
-        # print(horizontal_line)
+        for i in range(8):
+            self.root.board_frame.rowconfigure(i, minsize=75)
+            self.root.board_frame.columnconfigure(i, minsize=75)
+
+        for i in range(8):
+            for j in range(8):
+                # if # empty
+
+                # elif # player 1
+
+                # else # player 2
+                # self.black_dot = Image.open('black-circle.png')
+                # self.black_dot = self.black_dot.resize((175, 175))
+                # self.black_dot = ImageTk.PhotoImage(self.black_dot)
+                # self.button = tk.Button(self, bg='green', image=self.black_dot, text=f'({i},{j})',
+                #                    command=lambda arg=(i, j): self.button_clicked(arg))
+                self.root.board_frame.button = tk.Button(self.root, bg='black', text=f'({i},{j})')
+                self.root.board_frame.button.grid(row=i, column=j, sticky='nsew')
+        # game_win = GameWindow(self.master)
+        # game_win.focus_force()
+        # self.destroy()
 
     def display_current_player(self, player: AbstractPlayer):
         """
@@ -70,12 +57,6 @@ class gui_board(AbstractView):
         :return: non
         """
         print("Player " + str(player.identifier) + " (" + str(player) + "'s) turn!")
-
-        player_frame = tk.Frame(self.root, width=BOARD_SIZE, height=50)
-        player_frame.pack(side=tk.BOTTOM)
-
-        player_label = tk.Label(master=player_frame,
-                                text="Player " + str(player.identifier) + " (" + str(player) + "'s) turn!")
 
     def get_move(self):
         """
@@ -92,7 +73,8 @@ class gui_board(AbstractView):
                 break
             except ValueError:
                 print("Could not convert data to an integer.")
-        return x, y
+
+        # return self.i, self.j
 
     def display_invalid_moves(self, player):
         """
