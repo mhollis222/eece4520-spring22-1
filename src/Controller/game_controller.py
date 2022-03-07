@@ -110,7 +110,7 @@ class GameController:
 
         if view_type == 'textual':
             self.view = TextualView(self.model, p1_col, p2_col)
-        elif view_type == 'GUI':
+        elif view_type == 'gui':
             self.view = GuiBoard(self.model, p1_col, p2_col)
 
 
