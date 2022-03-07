@@ -24,8 +24,8 @@ class GuiBoard(AbstractView):
         self.root.geometry("1000x1000")
         self.root.rowconfigure([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], minsize=50, weight=1)
         self.root.columnconfigure([0, 1, 2, 3, 4, 5, 6, 7], minsize=50, weight=1)
-        self.x = None
-        self.y = None
+        self.x = tk.IntVar()
+        self.y = tk.IntVar()
 
     def display_board(self, valid_moves: list):
 
@@ -40,17 +40,23 @@ class GuiBoard(AbstractView):
         for i, x in enumerate(board_view):
             for y in range(8):
                 if (y, i) in valid_moves:
-                    self.root.board_frame.button = tk.Button(self.root, bg='red')
+                    self.root.board_frame.button = tk.Button(self.root, bg='red',
+                                                             command=lambda arg=(i, y): self.set_move(arg))
                     self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
+
+
                 elif x[y].value == 0:
-                    self.root.board_frame.button = tk.Button(self.root, bg='green')
+                    self.root.board_frame.button = tk.Button(self.root, bg='green',
+                                                             command=lambda arg=(i, y): self.set_move(arg))
                     self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
                 else:
                     if x[y].value == 1:
-                        self.root.board_frame.button = tk.Button(self.root, bg='black')
+                        self.root.board_frame.button = tk.Button(self.root, bg='black',
+                                                             command=lambda arg=(i, y): self.set_move(arg))
                         self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
                     else:
-                        self.root.board_frame.button = tk.Button(self.root, bg='white')
+                        self.root.board_frame.button = tk.Button(self.root, bg='white',
+                                                             command=lambda arg=(i, y): self.set_move(arg))
                         self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
 
     def display_current_player(self, player: AbstractPlayer):
@@ -64,26 +70,16 @@ class GuiBoard(AbstractView):
         self.current_player.grid(row=10, column=2, columnspan=3)
 
     def set_move(self, i, j):
-        self.x = i
-        self.y = j
+        self.x.set(i)
+        self.y.set(j)
 
     def get_move(self):
         """
         Takes in user input for x and y
         :return: x and y
         """
-        while True:
-            move = input('Enter your move (row, column): ')
-            move = move.split(',')
-            try:
-                # Flipped since we ask for `row, col`: row -> y, col -> x
-                x = int(move[1]) - 1
-                y = int(move[0]) - 1
-                break
-            except ValueError:
-                print("Could not convert data to an integer.")
 
-        # return self.x, self.y
+        return self.x.get(), self.y.get()
 
     def display_invalid_moves(self, player):
         """
@@ -118,6 +114,7 @@ class GuiBoard(AbstractView):
         :return: none
         """
         messagebox.showerror('Player Skipped!')
+
 
     def display_score(self):
         """
