@@ -12,6 +12,7 @@ import tkinter as tk
 # BORDER_COLOR = 'black'
 # BOARD_COLOR = 'green'
 
+
 class GuiBoard(AbstractView):
 
     def __init__(self, model: Game):
