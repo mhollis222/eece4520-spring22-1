@@ -91,11 +91,7 @@ class GuiBoard(AbstractView):
         :param player: Number representative of the player who made the invalid move (int)
         :return: none
         """
-        print("Invalid move, please pick another spot.")
-        print("Try these instead:")
-        for i in self.model.get_valid_moves(player):
-            print("(", i[1] + 1, ",", i[0] + 1, end=" ) ", )
-        print("\n")
+        messagebox.showerror('Player Skipped!')
 
     def display_winner(self, winner):
         """
@@ -131,12 +127,13 @@ class GuiBoard(AbstractView):
         # print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
         # print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
 
-        self.score_one = tk.Label(text="Jill's Score: 10",
+        self.score_one = tk.Label(text=str(self.model.order[0].name) + ": " + str(self.model.order[0].score),
                                        fg='black', font=('Arial', 20))
         self.score_one.grid(row=9, column=0, columnspan=3)
-        self.score_two = tk.Label(text="Steve's Score: 20",
+        self.score_two = tk.Label(text=str(self.model.order[1].name) + ": " + str(self.model.order[1].score),
                                        fg='black', font=('Arial', 20))
         self.score_two.grid(row=9, column=4, columnspan=3)
+
     def display_end_of_game(self):
         """
         Alerts the players that the game is over
