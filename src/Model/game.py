@@ -121,10 +121,10 @@ class Game:
         """
         self.order = self._coin_flip()
         self.active_player = self.order[0]
-        self.board[3][3] = Cell.WHITE
-        self.board[3][4] = Cell.BLACK
-        self.board[4][3] = Cell.BLACK
-        self.board[4][4] = Cell.WHITE
+        self.board[int(self.y/2) - 1][int(self.x/2) - 1] = Cell.WHITE
+        self.board[int(self.y/2) - 1][int(self.x/2)] = Cell.BLACK
+        self.board[int(self.y/2)][int(self.x/2) - 1] = Cell.BLACK
+        self.board[int(self.y/2)][int(self.x/2)] = Cell.WHITE
 
     def get_board(self) -> [[Cell]]:
         """

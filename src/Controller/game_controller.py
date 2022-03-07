@@ -1,13 +1,23 @@
 from Model.game import Game, Cell
 from Model.move import Move
-from View.abstract_view import AbstractView
+from Model.abstract_player import AbstractPlayer
+from View.textual_view import TextualView
+import configparser
+
+settings_path = '../../settings.ini'
 
 
 class GameController:
 
-    def __init__(self, model: Game, view: AbstractView):
-        self.model = model
-        self.view = view
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer):
+        self.model = None
+        self.view = None
+        self.p1 = p1
+        self.p2 = p2
+        # special options to save comments on writes (i hope)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
+        self.setup()
 
     def play_game(self):
         """
@@ -62,3 +72,46 @@ class GameController:
             else:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
+
+    def save_settings(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        try:
+            with open(settings_path, 'w') as f:
+                self.config.write(f)
+            return True
+        except IOError:
+            return False
+
+    def setup(self) -> None:
+        """
+        Initializes the view and model based on the loaded settings.
+        :param settings: settings loaded from Settings.YAML
+        :return: None
+        """
+        # Make the game object
+        width = self.config.getint('Model', 'board_width')
+        height = self.config.getint('Model', 'board_height')
+
+        # Currently, unused
+        # ai_difficult = self.config.getint('Model', 'AI_difficulty')
+        # start_filled = self.config.getboolean('Model', 'start_filled')
+        # debug = self.config.getboolean('Misc', 'debug')
+
+        self.model = Game(self.p1, self.p2, width, height)
+
+        view_type = self.config['View']['style']
+        p1_col = self.config['View']['p1_color']
+        p2_col = self.config['View']['p2_color']
+
+        if view_type == 'textual':
+            self.view = TextualView(self.model, p1_col, p2_col)
+        elif view_type == 'GUI':
+            # dont have other option yet
+            pass
+
+
+
