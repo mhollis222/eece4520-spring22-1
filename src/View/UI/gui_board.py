@@ -15,9 +15,11 @@ import tkinter as tk
 
 class GuiBoard(AbstractView):
 
-    def __init__(self, model: Game):
+    def __init__(self, model: Game, p1_color: str, p2_color: str):
         super().__init__(model)
         self.model = model
+        self.p1_color = p1_color
+        self.p2_color = p2_color
         self.root = tk.Tk()
         self.root.geometry("1000x1000")
         self.root.rowconfigure([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], minsize=50, weight=1)

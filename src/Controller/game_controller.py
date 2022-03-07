@@ -2,6 +2,7 @@ from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from View.textual_view import TextualView
+from View.UI.gui_board import GuiBoard
 import configparser
 
 settings_path = '../../settings.ini'
@@ -110,8 +111,6 @@ class GameController:
         if view_type == 'textual':
             self.view = TextualView(self.model, p1_col, p2_col)
         elif view_type == 'GUI':
-            # dont have other option yet
-            pass
-
+            self.view = GuiBoard(self.model, p1_col, p2_col)
 
 
