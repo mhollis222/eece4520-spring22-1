@@ -65,25 +65,30 @@ class SettingsWindow(tk.Toplevel):
                                            fg='black', font=("Arial", 15), command=self.start_game)
         self.guest_play_button.grid(row=2, columnspan=4, sticky='n', pady=90)
 
+    # show the root window
     def open_login(self):
         self.destroy()
         self.master.deiconify()
 
+    # function call to change board size 
     def board_size(self):
         board = TempWindow(self)
         board.focus_force()
         self.withdraw()
 
+    # function call to change colors
     def open_colors(self):
         color_win = ChoosePlayerColor(self)
         color_win.focus_force()
         self.withdraw()
 
+    # function call to change board alignment
     def board_alignment(self):
         board = AlignmentWindow(self)
         board.focus_force()
         self.withdraw()
 
+    # function call to start game
     def start_game(self):
         player1 = HumanPlayer(self.config['User']['username'])
         player2 = HumanPlayer("Guest")

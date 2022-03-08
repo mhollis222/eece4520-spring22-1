@@ -34,6 +34,11 @@ class ReversiButton(tk.Button):
         self['command'] = self.command
 
     def change_state(self, event,  state: int):
+        '''
+        Helper function used to change the state of buttons to either disabled or active
+        :param state: int
+        :return:
+        '''
         self.state = state
         self['text'] = str(state)
 
