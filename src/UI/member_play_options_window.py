@@ -1,6 +1,8 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 # from difficulty_window2 import AIDifficultyIIWindow
+from difficulty_window2 import AIDifficultyIIWindow
+from settings_window import SettingsWindow
 
 
 class MemberPlayOptionsWindow(tk.Toplevel):
@@ -28,7 +30,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.person_image = ImageTk.PhotoImage(self.person_image)
         self.person_button = tk.Button(self, width=400, height=250, text="Person vs Person", image=self.person_image,
                                        compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
-                                       font=("Arial", 17))
+                                       font=("Arial", 17), command=self.open_settings_options)
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
         # play computer button
         self.computer_image = Image.open('computer.png')
@@ -59,7 +61,12 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.destroy()
         self.master.deiconify()  # show the root window
 
-    # def open_AI(self):
-    #     ai_win = AIDifficultyIIWindow(self)
-    #     ai_win.focus_force()
-    #     self.withdraw()
+    def open_AI(self):
+        ai_win = AIDifficultyIIWindow(self)
+        ai_win.focus_force()
+        self.withdraw()
+
+    def open_settings_options(self):
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
