@@ -35,7 +35,6 @@ class GuiBoard(AbstractView):
         self.board_frame.grid_forget()
         board_view = self.model.get_board()
 
-
         for x in range(len(board_view)):
             self.board_frame.rowconfigure(x, minsize=75)
             self.board_frame.columnconfigure(x, minsize=75)
@@ -54,6 +53,8 @@ class GuiBoard(AbstractView):
                 else:
                     button = ReversiButton(i, y, 'p2', callback=self.controller.advance, state=tk.DISABLED, color=self.p2_color)
                     button.grid(row=i, column=y, sticky='nsew')
+
+        self.root.re
 
     def display_current_player(self, player: AbstractPlayer):
         """
