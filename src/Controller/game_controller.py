@@ -3,8 +3,10 @@ from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from View.textual_view import TextualView
 #import yaml
+import configparser
 
-settings_path = '../../settings.YAML'
+
+settings_path = '../../settings.ini'
 
 
 class GameController:
@@ -14,8 +16,10 @@ class GameController:
         self.view = None
         self.p1 = p1
         self.p2 = p2
-        self.settings = self.load_settings()
-        self.setup(self.settings)
+        # special options to save comments on writes (i hope)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
+        self.setup()
 
     def play_game(self):
         """
@@ -71,26 +75,41 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
-    # def load_settings(self) -> dict:
-    #     with open(settings_path) as f:
-    #         return yaml.safe_load(f)
 
-    def setup(self, settings: dict) -> None:
+    def save_settings(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        try:
+            with open(settings_path, 'w') as f:
+                self.config.write(f)
+            return True
+        except IOError:
+            return False
+
+    def setup(self) -> None:
+        """
+        Initializes the view and model based on the loaded settings.
+        :param settings: settings loaded from Settings.YAML
+        :return: None
+        """
+
         # Make the game object
-        width = settings['Model']['board_width']
-        height = settings['Model']['board_height']
+        width = self.config.getint('Model', 'board_width')
+        height = self.config.getint('Model', 'board_height')
 
         # Currently, unused
-        # ai_difficult = settings['Model']['AI_difficulty']
-        # start_filled = settings['Model']['start_filled']
-        # debug = settings['Debug']
+        # ai_difficult = self.config.getint('Model', 'AI_difficulty')
+        # start_filled = self.config.getboolean('Model', 'start_filled')
+        # debug = self.config.getboolean('Misc', 'debug')
 
         self.model = Game(self.p1, self.p2, width, height)
 
-        view_type = settings['View']['style']
-        # Currently, unused
-        p1_col = settings['View']['p1_color']
-        p2_col = settings['View']['p2_color']
+        view_type = self.config['View']['style']
+        p1_col = self.config['View']['p1_color']
+        p2_col = self.config['View']['p2_color']
 
         if view_type == 'textual':
             self.view = TextualView(self.model, p1_col, p2_col)
