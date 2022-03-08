@@ -1,6 +1,5 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from home_window import HomeWindow
 
 
 class AIDifficultyIIWindow(tk.Toplevel):

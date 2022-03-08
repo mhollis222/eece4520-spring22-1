@@ -11,7 +11,6 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
         self.configure(bg='green')
 
-
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
                                      activebackground='green', bg='green', fg='white', relief='flat',

@@ -17,6 +17,7 @@ class Database:
             cls._instance._connection = cls._instance._connect()
             cls._instance._cursor = cls._instance._connection.cursor()
             cls._instance._init_db()
+            cls._instance.init_table()
         return cls._instance
 
     def _connect(self):

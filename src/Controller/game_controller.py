@@ -1,8 +1,11 @@
+import tkinter
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from View.textual_view import TextualView
+from View.UI.gui_board import GuiBoard
 import configparser
+
 
 settings_path = '../../settings.ini'
 
@@ -73,10 +76,41 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
+
+    def advance(self, button):
+        # Get the current player
+        player = self.model.get_active_player()
+        # Get the move
+        x, y = button.x, button.y
+        attempt = Move(y, x)
+        self.model.validate_move(attempt, player)
+        # update the model
+        if player == self.model.order[0]:
+            self.model.update_board(attempt, Cell.BLACK)
+        else:
+            self.model.update_board(attempt, Cell.WHITE)
+        # Update the score
+        self.model.update_score()
+        # Checks if the game has ended
+        if self.model.has_game_ended():
+            self.view.display_board([])
+            self.view.display_score()
+            self.view.display_winner(self.model.display_winner())
+        else:
+            self.model.switch_players(player)  # Passes play to the other player
+            # Update the board
+            moves = self.model.get_valid_moves(self.model.get_active_player())
+            if len(moves) == 0:
+                self.model.switch_players(self.model.get_active_player())
+            self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
+            self.view.display_score()
+            self.view.display_current_player(self.model.get_active_player())
+
+        #self.model.debug()
+
     def save_settings(self) -> bool:
         """
-        Stores the desired settings dict as a yaml file at `settings_path`
-        :param settings: the settings to be stored.
+        Stores the internal settings dict as a .ini file at `settings_path`
         :return: success of operation
         """
         try:
@@ -92,6 +126,7 @@ class GameController:
         :param settings: settings loaded from Settings.YAML
         :return: None
         """
+
         # Make the game object
         width = self.config.getint('Model', 'board_width')
         height = self.config.getint('Model', 'board_height')
@@ -109,9 +144,12 @@ class GameController:
 
         if view_type == 'textual':
             self.view = TextualView(self.model, p1_col, p2_col)
-        elif view_type == 'GUI':
-            # dont have other option yet
-            pass
-
+        elif view_type == 'gui':
+            self.view = GuiBoard(self.model, p1_col, p2_col, self)
+            self.model.start()
+            self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
+            self.view.display_score()
+            self.view.display_current_player(self.model.get_active_player())
+            self.view.root.mainloop()
 
 
