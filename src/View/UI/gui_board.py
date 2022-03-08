@@ -51,16 +51,20 @@ class GuiBoard(AbstractView):
         for i, x in enumerate(board_view):
             for y in range(len(board_view[0])):
                 if (y, i) in valid_moves:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.ACTIVE, color=self.valid_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                                           state=tk.ACTIVE, color=self.valid_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 0:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.empty_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                                           state=tk.DISABLED, color=self.empty_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 1:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.p1_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                                           state=tk.DISABLED, color=self.p1_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 else:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.p2_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                                           state=tk.DISABLED, color=self.p2_color)
                     button.grid(row=i, column=y, sticky='nsew')
 
     def display_current_player(self, player: AbstractPlayer):

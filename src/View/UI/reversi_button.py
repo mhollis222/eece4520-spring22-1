@@ -11,6 +11,7 @@ class ReversiButton(tk.Button):
         self.text = text
         self['text'] = self.text
         self['bg'] = color
+        self['activebackground'] = color
         self.command = lambda: callback(self)
         self['command'] = self.command
 
