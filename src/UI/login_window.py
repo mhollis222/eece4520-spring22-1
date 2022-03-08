@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from Model.database import Database
+# from Model.database import Database
 from signup_window import SignUpWindow
 from guest_play_options_window import GuestOptionsWindow
 from home_window import HomeWindow

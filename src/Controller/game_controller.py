@@ -2,7 +2,9 @@ from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from View.textual_view import TextualView
+#import yaml
 import configparser
+
 
 settings_path = '../../settings.ini'
 
@@ -73,6 +75,7 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
+
     def save_settings(self) -> bool:
         """
         Stores the desired settings dict as a yaml file at `settings_path`
@@ -92,6 +95,7 @@ class GameController:
         :param settings: settings loaded from Settings.YAML
         :return: None
         """
+
         # Make the game object
         width = self.config.getint('Model', 'board_width')
         height = self.config.getint('Model', 'board_height')
