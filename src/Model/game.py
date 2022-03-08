@@ -139,6 +139,7 @@ class Game:
         :param c: the type of piece to be placed
         :return: None
         """
+        print("got move: " + str(m.x) + ", " + str(m.y))
         x, y = m.get_coords()
         self.board[y][x] = c
         # Call all 8 directions
@@ -268,3 +269,9 @@ class Game:
             self.active_player = self.order[1]  # Passes play to Player Two
         else:
             self.active_player = self.order[0]  # Passes play to Player One
+
+    def debug(self):
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('It is currently: %s\'s turn', self.active_player)
+        print('The score is currently %i to %i', self.p1.score, self.p2.score)
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')

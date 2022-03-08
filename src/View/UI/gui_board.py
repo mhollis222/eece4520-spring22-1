@@ -3,6 +3,7 @@ from Model.game import Game
 from Model.abstract_player import AbstractPlayer
 from tkinter import messagebox
 import tkinter as tk
+from View.UI.reversi_button import ReversiButton
 
 
 # Constants
@@ -15,17 +16,18 @@ import tkinter as tk
 
 class GuiBoard(AbstractView):
 
-    def __init__(self, model: Game, p1_color: str, p2_color: str):
+    def __init__(self, model: Game, p1_color: str, p2_color: str, controller):
         super().__init__(model)
         self.model = model
+        self.controller = controller
         self.p1_color = p1_color
         self.p2_color = p2_color
+        self.valid_color = 'red'
+        self.empty_color = 'green'
         self.root = tk.Tk()
         self.root.geometry("1000x1000")
         self.root.rowconfigure([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], minsize=50, weight=1)
         self.root.columnconfigure([0, 1, 2, 3, 4, 5, 6, 7], minsize=50, weight=1)
-        self.x = tk.IntVar()
-        self.y = tk.IntVar()
 
     def display_board(self, valid_moves: list):
 
@@ -40,24 +42,18 @@ class GuiBoard(AbstractView):
         for i, x in enumerate(board_view):
             for y in range(8):
                 if (y, i) in valid_moves:
-                    self.root.board_frame.button = tk.Button(self.root, bg='red',
-                                                             command=lambda arg=(i, y): self.set_move(arg))
-                    self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
-
+                    button = ReversiButton(i, y, '0_0', callback=self.controller.advance, state=tk.ACTIVE, color=self.empty_color)
+                    button.grid(row=i, column=y, sticky='nsew')
 
                 elif x[y].value == 0:
-                    self.root.board_frame.button = tk.Button(self.root, bg='green',
-                                                             command=lambda arg=(i, y): self.set_move(arg))
-                    self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
+                    button = ReversiButton(i, y, 'empty', callback=self.controller.advance, state=tk.DISABLED, color=self.valid_color)
+                    button.grid(row=i, column=y, sticky='nsew')
+                elif x[y].value == 1:
+                    button = ReversiButton(i, y, 'p1', callback=self.controller.advance, state=tk.DISABLED, color=self.p1_color)
+                    button.grid(row=i, column=y, sticky='nsew')
                 else:
-                    if x[y].value == 1:
-                        self.root.board_frame.button = tk.Button(self.root, bg='black',
-                                                             command=lambda arg=(i, y): self.set_move(arg))
-                        self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
-                    else:
-                        self.root.board_frame.button = tk.Button(self.root, bg='white',
-                                                             command=lambda arg=(i, y): self.set_move(arg))
-                        self.root.board_frame.button.grid(row=i, column=y, sticky='nsew')
+                    button = ReversiButton(i, y, 'p2', callback=self.controller.advance, state=tk.DISABLED, color=self.p2_color)
+                    button.grid(row=i, column=y, sticky='nsew')
 
     def display_current_player(self, player: AbstractPlayer):
         """
@@ -69,9 +65,6 @@ class GuiBoard(AbstractView):
                                        fg='black', font=('Arial', 20))
         self.current_player.grid(row=10, column=2, columnspan=3)
 
-    def set_move(self, i, j):
-        self.x.set(i)
-        self.y.set(j)
 
     def get_move(self):
         """
@@ -115,7 +108,6 @@ class GuiBoard(AbstractView):
         """
         messagebox.showerror('Player Skipped!')
 
-
     def display_score(self):
         """
         Displays the current score of both players alongside their names
@@ -125,10 +117,10 @@ class GuiBoard(AbstractView):
         # print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
 
         self.score_one = tk.Label(text=str(self.model.order[0].name) + ": " + str(self.model.order[0].score),
-                                       fg='black', font=('Arial', 20))
+                                  fg='black', font=('Arial', 20))
         self.score_one.grid(row=9, column=0, columnspan=3)
         self.score_two = tk.Label(text=str(self.model.order[1].name) + ": " + str(self.model.order[1].score),
-                                       fg='black', font=('Arial', 20))
+                                  fg='black', font=('Arial', 20))
         self.score_two.grid(row=9, column=4, columnspan=3)
 
     def display_end_of_game(self):
