@@ -18,6 +18,7 @@ class ChoosePlayerColor(tk.Toplevel):
                                      activebackground='green', bg='green', fg='white', relief='flat',
                                      command=self.open_login)
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
+        
         # title
         self.guest_title = tk.Label(self, text='Choose your Colors',
                                     font=("Arial", 35, "bold"), bg='green', fg='white')

@@ -33,6 +33,7 @@ class TempWindow(tk.Toplevel):
         self.size_entry = tk.Entry(self, font=("Arial", 20))
         self.size_entry.grid(row=1, column=1, sticky=tk.W, padx=5, pady=5)
 
+        # save board size
         self.save_button = tk.Button(self, text='Save', command=self.save_size,
                                      width=20, height=2, bg='#17850b', fg='white', font=("Arial", 15))
         self.save_button.grid(row=1, column=1, sticky=tk.E, padx=5, pady=5)
