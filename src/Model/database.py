@@ -74,15 +74,16 @@ class Database:
         try:
             users = self._cursor.fetchall()
             for user in users:
-                if user == username:  # prevents users from making duplicate usernames
+                if user[0] == username:  # prevents users from making duplicate usernames
                     return -1
-                if user == 'AI':  # prevents users from signing up as unique AI tag
+                if user[0] == 'AI':  # prevents users from signing up as unique AI tag
                     return -1
-                if user == 'local':  # prevents users from signing up as unique local tag
+                if user[0] == 'local':  # prevents users from signing up as unique local tag
                     return -1
-                if user == 'guest':  # prevents users from signing up as unique guest tag
+                if user[0] == 'guest':  # prevents users from signing up as unique guest tag
                     return -1
-        except mysql.connector.errors.InterfaceError as err:
+        except mysql.connector.errors as err:
+            print("Failed to fetch active users in database: ", err)
             pass
         add_elements = (
             "INSERT INTO data (username, password, elo, highscore, opponent, activeturn) "
