@@ -6,6 +6,13 @@ class Database:
     _instance = None
 
     def __new__(cls, host, user, password):
+        """
+        initializes singleton database manager object
+        :param host: server host, to remain localhost for purposes of project
+        :param user: username for server login, ensure user has DB mgmt privileges
+        :param password: password for server login corresponding to username
+        :return: new instance or original instance if created already
+        """
         if cls._instance is None:
             print('Creating the object')
             cls._instance = super(Database, cls).__new__(cls)
@@ -17,10 +24,14 @@ class Database:
             cls._instance._connection = cls._instance._connect()
             cls._instance._cursor = cls._instance._connection.cursor()
             cls._instance._init_db()
-            cls._instance.init_table()
+            cls._instance._init_table()
         return cls._instance
 
     def _connect(self):
+        """
+        establish connection to mySQL database from parameters enumerated during instantiation
+        :return: mySQL database connection
+        """
         try:
             cnx = mysql.connector.connect(**self._get_config())
         except mysql.connector.Error as err:
@@ -29,9 +40,17 @@ class Database:
         return cnx
 
     def _get_config(self):
+        """
+        getter for server configuration information
+        :return: server config details
+        """
         return self._config
 
     def _init_db(self):
+        """
+        initialize database within mySQL server if not already created, select database for future SQL commands
+        :return: none
+        """
         try:
             self._cursor.execute("CREATE DATABASE IF NOT EXISTS reversi")
         except mysql.connector.DatabaseError as err:
@@ -40,7 +59,11 @@ class Database:
         self._cursor.execute("USE reversi")
 
     def fetch_data(self):
-        self._cursor.execute("SELECT * FROM data")
+        """
+        fetch users table from database and transform raw data into list of dictionary entries for each row/user
+        :return: list of user dictionary entries
+        """
+        self._cursor.execute("SELECT * FROM users")
         data = self._cursor.fetchall()
         entry_list = list()
 
@@ -54,10 +77,14 @@ class Database:
             entry_list.append(entry)
         return entry_list
 
-    def init_table(self):
+    def _init_table(self):
+        """
+        initialize table of users within database if not created already
+        :return: none
+        """
         try:
             self._cursor.execute(
-                "CREATE TABLE IF NOT EXISTS data("
+                "CREATE TABLE IF NOT EXISTS users("
                 " username varchar(20) NOT NULL,"
                 " password varchar(20) NOT NULL,"
                 " elo int NOT NULL,"
@@ -70,7 +97,14 @@ class Database:
             exit()
 
     def write_user(self, username, password):
-        self._cursor.execute("SELECT username FROM data")
+        """
+        check table of current users and add new user to table if not existent already, or otherwise corresponding to
+        a reserved string
+        :param username: username to register
+        :param password: password to register
+        :return: none
+        """
+        self._cursor.execute("SELECT username FROM users")
         try:
             users = self._cursor.fetchall()
             for user in users:
@@ -86,39 +120,71 @@ class Database:
             print("Failed to fetch active users in database: ", err)
             pass
         add_elements = (
-            "INSERT INTO data (username, password, elo, highscore, opponent, activeturn) "
+            "INSERT INTO users (username, password, elo, highscore, opponent, activeturn) "
             "VALUES (%s, %s, %s, %s, %s, %s)"
         )
         self._cursor.execute(add_elements, (username, password, 1500, 0, '', 0))
 
     def write_update_turn(self, user, turn):
+        """
+        update turn attribute in user table to track game state
+        TODO: migrate to new table in database
+        :param PRIMARY KEY user: user whose turn is tracked
+        :param turn: turn data to track - format and datatype for state tracking TBD
+        :return: none
+        """
         update_elements = (
-            "UPDATE data "
+            "UPDATE users "
             "SET activeturn = (%s) "
             "WHERE username = (%s)"
         )
         self._cursor.execute(update_elements, (turn, user))
 
     def write_update_game_complete(self, user, elo, score):
+        """
+        update user data for online multiplayer game, including high score and ELO
+        TODO: split method for new table in database
+        :param user: PRIMARY KEY user whose data will be updated based on game completion
+        :param elo: ELO rating corresponding to user
+        :param score: score to be compared versus user high score and potentially update
+        :return: none
+        """
         update_elements = (
-            "UPDATE data "
+            "UPDATE users "
             "SET elo = (%s), highscore = (%s), opponent = (%s) "
             "WHERE username = (%s)"
         )
         self._cursor.execute(update_elements, (elo, score, '', user))
 
     def write_update_game_start(self, user, opponent):
+        """
+        update user's opponent for ongoing match beginning
+        TODO: migrate to new table in database
+        :param user: PRIMARY KEY user whose match status is being tracked
+        :param opponent: username or preset string corresponding to player user is engaged in a game with
+        :return: none
+        """
         update_elements = (
-            "UPDATE data "
+            "UPDATE users "
             "SET opponent = (%s) "
             "WHERE username = (%s)"
         )
         self._cursor.execute(update_elements, (opponent, user))
 
     def _clear_data(self):
-        self._cursor.execute("DROP TABLE IF EXISTS data;")
+        """
+        clear all user data stored in database
+        :return: none
+        """
+        self._cursor.execute("DROP TABLE IF EXISTS users;")
 
     def verify_credentials(self, username, password):
+        """
+        confirm entered user credentials are valid and that username/password match for that entry in user table
+        :param username: username selected for login
+        :param password: password selected for login, to correspond to entered username
+        :return: valid? (boolean)
+        """
         for element in self.fetch_data():
             if element.get("username") == username:
                 if element.get("password") == password:
@@ -128,6 +194,10 @@ class Database:
         return False
 
     def sorted_leaderboard(self):
+        """
+        return user dictionary entry list sorted by ELO rating
+        :return: sorted user data list
+        """
         def by_elo(e: dict):
             return e.get("elo")
         leaderboard = self.fetch_data()
@@ -136,6 +206,10 @@ class Database:
 
     @staticmethod
     def test_db():
+        """
+        comprehensive test method for verifying functionality of operations within Database class
+        :return: none
+        """
         # connection details
         ipaddr = 'localhost'
         db_user = 'reversi'
@@ -147,7 +221,6 @@ class Database:
         db._clear_data()  # use only for testing db
 
         # initialization of table
-        db.init_table()
         print("EMPTY DB")
         print(db.fetch_data())
 
