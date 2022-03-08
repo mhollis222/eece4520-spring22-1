@@ -135,9 +135,6 @@ class HomeWindow(tk.Toplevel):
         self.destroy()
         self.master.deiconify()  # show the root window
 
-    def open_settings(self):
-        print("You hit settings!")
-
     def open_member_options(self):
         member_options_win = MemberPlayOptionsWindow(self)
         member_options_win.focus_force()

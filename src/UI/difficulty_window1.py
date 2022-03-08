@@ -47,4 +47,4 @@ class AIDifficultyIWindow(tk.Toplevel):
 
     def open_login(self):
         self.destroy()
-        self.master.deiconify()  # show the root window
+        self.master.deiconify()

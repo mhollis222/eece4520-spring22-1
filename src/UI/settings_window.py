@@ -10,7 +10,7 @@ class SettingsWindow(tk.Toplevel):
         super().__init__(parent)
         self.title("Settings Window")
         self.geometry("2000x2000")
-        self.rowconfigure([0, 1, 2], minsize=50, weight=1)
+        self.rowconfigure([0, 1, 2, 3], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
         self.configure(bg='green')
 
@@ -51,6 +51,11 @@ class SettingsWindow(tk.Toplevel):
                                       bg='#41ab24', activebackground='green', compound=tk.TOP, fg='white',
                                       font=("Arial", 17), command=self.board_alignment)
         self.board_button.grid(row=1, column=2, padx=50, sticky='s')
+
+        # Start Game
+        self.guest_play_button = tk.Button(self, text='Start Game', width=30, height=2,
+                                           fg='black', font=("Arial", 15))
+        self.guest_play_button.grid(row=2, columnspan=4, sticky='n', pady=90)
 
     def open_login(self):
         self.destroy()

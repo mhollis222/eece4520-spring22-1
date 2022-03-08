@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from color_options import ColorOptionsWindow
+from p1_color_options import Player1ColorOptionsWindow
+from p2_color_options import Player2ColorOptionsWindow
 
 
 class ChoosePlayerColor(tk.Toplevel):
@@ -42,12 +43,12 @@ class ChoosePlayerColor(tk.Toplevel):
         self.computer_button.grid(row=1, column=1, padx=50, sticky='s')
 
     def player_1(self):
-        player1 = ColorOptionsWindow(self)
+        player1 = Player1ColorOptionsWindow(self)
         player1.focus_force()
         self.withdraw()
 
     def player_2(self):
-        player2 = ColorOptionsWindow(self)
+        player2 = Player2ColorOptionsWindow(self)
         player2.focus_force()
         self.withdraw()
 

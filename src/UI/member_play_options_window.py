@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-# from difficulty_window2 import AIDifficultyIIWindow
+from difficulty_window2 import AIDifficultyIIWindow
 from difficulty_window2 import AIDifficultyIIWindow
 from settings_window import SettingsWindow
 
@@ -38,7 +38,8 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
         self.computer_button = tk.Button(self, width=400, height=250, text="Person vs Computer",
                                          image=self.computer_image, bg='#41ab24',
-                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17))
+                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17),
+                                         command=self.open_ai)
         self.computer_button.grid(row=1, column=1, padx=50, sticky='s')
         # matchmake button
         self.matchmake_image = Image.open('boxing-gloves.png')
@@ -61,7 +62,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.destroy()
         self.master.deiconify()  # show the root window
 
-    def open_AI(self):
+    def open_ai(self):
         ai_win = AIDifficultyIIWindow(self)
         ai_win.focus_force()
         self.withdraw()
