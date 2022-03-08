@@ -1,12 +1,20 @@
 import tkinter as tk
 from tkinter import messagebox
-
 from Model.database import Database
+from home_window import HomeWindow
+import configparser
+
+
+preferences_path = '../../preferences.ini'
 
 
 class SignUpWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        # special options to save comments on writes (i hope)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(preferences_path)
+
         self.title("Registration Page")
         self.geometry("2000x2000")
         self.rowconfigure([0, 1, 2, 3, 4, 5, 6, 7], minsize=50, weight=1)
@@ -37,22 +45,42 @@ class SignUpWindow(tk.Toplevel):
         self.retype_password_label.grid(row=4, column=0, sticky='ne', padx=5, pady=5)
         self.retype_password_entry = tk.Entry(self, show='*', font=("Arial", 18))
         self.retype_password_entry.grid(row=4, column=1, sticky='nw', padx=15, pady=5)
-        # login button
+        # register button
         self.register_button = tk.Button(self, text='Register', width=20, height=2, font=("Arial", 15),
                                          command=self.register)
         self.register_button.grid(row=4, columnspan=2, padx=5, pady=50, sticky='s')
 
     def open_login(self):
         self.destroy()
-        self.master.deiconify()   # show the root window
+        self.master.deiconify()
+
+    def open_home(self, username):
+        self.config['User']['username'] = username
+        self.save_preferences()
+        home_win = HomeWindow(self)
+        home_win.focus_force()
+        self.withdraw()
 
     def register(self):
         db = Database('localhost', 'reversi', 'eece4520')
-        if db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
+        if self.new_username_entry.get() == '' :
+            messagebox.showerror('Register failure', 'Username cannot be empty.')
+        elif self.new_password_entry.get() == '':
+            messagebox.showerror('Register failure', 'Password cannot be empty.')
+        elif db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
             print("registration failed")
             messagebox.showerror('Register failure', 'Username already exists.')
         elif self.new_password_entry.get() != self.retype_password_entry.get():
             print("Password entries do not match.")
             messagebox.showerror('Mismatched Passwords', 'Password entries do not match.')
         else:
-            self.open_login()
+            self.open_home(self.new_username_entry.get())
+
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(preferences_path, 'w') as f:
+            self.config.write(f)

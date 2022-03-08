@@ -111,7 +111,8 @@ class HomeWindow(tk.Toplevel):
         except IndexError:
             pass
         # ELO Rating
-        self.frame3 = tk.Frame(self, width=925, height=350, bg='#343434')
+        self.frame3 = tk.Frame(self, width=925, height=350, bg='#343434',
+                               highlightbackground="#613613", highlightthickness=15)
         self.frame3.grid(row=1, column=1, rowspan=3, columnspan=3, pady=30, padx=40, sticky='e')
         self.frame3.elo_message = tk.Label(self, text='Your current ELO rating is', fg='white',
                                            font=("Arial", 25, "bold"), bg='#343434')
@@ -134,9 +135,6 @@ class HomeWindow(tk.Toplevel):
     def close_window(self):
         self.destroy()
         self.master.deiconify()  # show the root window
-
-    def open_settings(self):
-        print("You hit settings!")
 
     def open_member_options(self):
         member_options_win = MemberPlayOptionsWindow(self)

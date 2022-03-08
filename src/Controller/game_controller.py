@@ -76,7 +76,6 @@ class GameController:
                 self.view.display_player_skipped(player)  # Alerts user that their turn has been skipped
                 self.model.switch_players(player)  # Passes play to the other player
 
-
     def advance(self, button):
         # Get the current player
         player = self.model.get_active_player()
