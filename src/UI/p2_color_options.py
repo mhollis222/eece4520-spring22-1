@@ -77,7 +77,7 @@ class Player2ColorOptionsWindow(tk.Toplevel):
         self.size_image = Image.open('cyan.png')
         self.size_image = self.size_image.resize((150, 150))
         self.size_image = ImageTk.PhotoImage(self.size_image)
-        self.size_button = tk.Button(self, width=200, height=200, text="Green", image=self.size_image,
+        self.size_button = tk.Button(self, width=200, height=200, text="Cyan", image=self.size_image,
                                      compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
                                      font=("Arial", 17), command=self.save_cyan)
         self.size_button.grid(row=2, column=2, padx=50, sticky='s')
@@ -96,31 +96,31 @@ class Player2ColorOptionsWindow(tk.Toplevel):
             self.config.write(f)
 
     def save_black(self):
-        self.config['View']['p1_color'] = 'black'
+        self.config['View']['p2_color'] = 'black'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")
 
     def save_red(self):
-        self.config['View']['p1_color'] = 'red'
+        self.config['View']['p2_color'] = 'red'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")
 
     def save_magenta(self):
-        self.config['View']['p1_color'] = 'magenta'
+        self.config['View']['p2_color'] = 'magenta'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")
 
     def save_blue(self):
-        self.config['View']['p1_color'] = 'blue'
+        self.config['View']['p2_color'] = 'blue'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")
 
     def save_cyan(self):
-        self.config['View']['p1_color'] = 'cyan'
+        self.config['View']['p2_color'] = 'cyan'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")
 
     def save_white(self):
-        self.config['View']['p1_color'] = 'white'
+        self.config['View']['p2_color'] = 'white'
         self.save_preferences()
         messagebox.showerror("", "Player Two's color successfully updated")

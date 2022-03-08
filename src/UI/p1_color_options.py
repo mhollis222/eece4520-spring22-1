@@ -77,7 +77,7 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.size_image = Image.open('cyan.png')
         self.size_image = self.size_image.resize((150, 150))
         self.size_image = ImageTk.PhotoImage(self.size_image)
-        self.size_button = tk.Button(self, width=200, height=200, text="Green", image=self.size_image,
+        self.size_button = tk.Button(self, width=200, height=200, text="Cyan", image=self.size_image,
                                      compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
                                      font=("Arial", 17), command=self.save_cyan)
         self.size_button.grid(row=2, column=2, padx=50, sticky='s')
