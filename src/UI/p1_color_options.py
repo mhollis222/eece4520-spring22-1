@@ -47,12 +47,12 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.size_button.grid(row=1, column=2, padx=50, sticky='s')
 
         # color 3
-        self.color3 = Image.open('yellow.png')
+        self.color3 = Image.open('pink.png')
         self.color3 = self.color3.resize((150, 150))
         self.color3 = ImageTk.PhotoImage(self.color3)
-        self.size_button = tk.Button(self, width=200, height=200, text="Yellow", image=self.color3,
+        self.size_button = tk.Button(self, width=200, height=200, text="Magenta", image=self.color3,
                                      compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
-                                     font=("Arial", 17), command=self.save_yellow)
+                                     font=("Arial", 17), command=self.save_magenta)
         self.size_button.grid(row=1, column=1, padx=50, sticky='s')
 
         # color 4
@@ -74,12 +74,12 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.size_button.grid(row=2, column=0, padx=50, sticky='s')
 
         # color 6
-        self.size_image = Image.open('green.png')
+        self.size_image = Image.open('cyan.png')
         self.size_image = self.size_image.resize((150, 150))
         self.size_image = ImageTk.PhotoImage(self.size_image)
         self.size_button = tk.Button(self, width=200, height=200, text="Green", image=self.size_image,
                                      compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
-                                     font=("Arial", 17), command=self.save_green)
+                                     font=("Arial", 17), command=self.save_cyan)
         self.size_button.grid(row=2, column=2, padx=50, sticky='s')
 
     def open_login(self):
@@ -105,8 +105,8 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
-    def save_yellow(self):
-        self.config['View']['p1_color'] = 'yellow'
+    def save_magenta(self):
+        self.config['View']['p1_color'] = 'magenta'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
@@ -115,8 +115,8 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
-    def save_green(self):
-        self.config['View']['p1_color'] = 'green'
+    def save_cyan(self):
+        self.config['View']['p1_color'] = 'cyan'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 

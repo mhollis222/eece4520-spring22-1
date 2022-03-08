@@ -63,7 +63,11 @@ class SignUpWindow(tk.Toplevel):
 
     def register(self):
         db = Database('localhost', 'reversi', 'eece4520')
-        if db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
+        if self.new_username_entry.get() == '' :
+            messagebox.showerror('Register failure', 'Username cannot be empty.')
+        elif self.new_password_entry.get() == '':
+            messagebox.showerror('Register failure', 'Password cannot be empty.')
+        elif db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
             print("registration failed")
             messagebox.showerror('Register failure', 'Username already exists.')
         elif self.new_password_entry.get() != self.retype_password_entry.get():

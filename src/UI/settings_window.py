@@ -1,5 +1,9 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+
+from game_controller import GameController
+from gui_board import GuiBoard
+from human_player import HumanPlayer
 from player_color import ChoosePlayerColor
 from board_size import TempWindow
 from board_align import AlignmentWindow
@@ -54,7 +58,7 @@ class SettingsWindow(tk.Toplevel):
 
         # Start Game
         self.guest_play_button = tk.Button(self, text='Start Game', width=30, height=2,
-                                           fg='black', font=("Arial", 15))
+                                           fg='black', font=("Arial", 15), command=self.start_game)
         self.guest_play_button.grid(row=2, columnspan=4, sticky='n', pady=90)
 
     def open_login(self):
@@ -74,4 +78,15 @@ class SettingsWindow(tk.Toplevel):
     def board_alignment(self):
         board = AlignmentWindow(self)
         board.focus_force()
+        self.withdraw()
+
+    def start_game(self):
+        player1 = HumanPlayer("Player One")
+        player2 = HumanPlayer("Player Two")
+        controller = GameController(player1, player2)
+        controller.save_settings()
+        controller.setup()
+        controller.play_game()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
         self.withdraw()

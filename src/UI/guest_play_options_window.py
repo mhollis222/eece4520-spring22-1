@@ -26,7 +26,7 @@ class GuestOptionsWindow(tk.Toplevel):
         self.person_image = Image.open('user.png')
         self.person_image = self.person_image.resize((175, 175))
         self.person_image = ImageTk.PhotoImage(self.person_image)
-        self.person_button = tk.Button(self, width=400, height=250, text="Person vs Person", image=self.person_image,
+        self.person_button = tk.Button(self, width=400, height=250, text="Local Player", image=self.person_image,
                                        compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
                                        font=("Arial", 17), command=self.open_settings_options)
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
@@ -34,7 +34,7 @@ class GuestOptionsWindow(tk.Toplevel):
         self.computer_image = Image.open('computer.png')
         self.computer_image = self.computer_image.resize((175, 175))
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
-        self.computer_button = tk.Button(self, width=400, height=250, text="Person vs Computer",
+        self.computer_button = tk.Button(self, width=400, height=250, text="Computer",
                                          image=self.computer_image, bg='#41ab24',
                                          activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17),
                                          command=self.open_AI)
