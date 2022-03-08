@@ -1,3 +1,5 @@
+import math
+
 from View.abstract_view import AbstractView
 from Model.game import Game
 from Model.abstract_player import AbstractPlayer
@@ -45,8 +47,8 @@ class GuiBoard(AbstractView):
         board_view = self.model.get_board()
 
         for x in range(len(board_view)):
-            self.board_frame.rowconfigure(x, minsize=75, weight=1)
-            self.board_frame.columnconfigure(x, minsize=75, weight=1)
+            self.board_frame.rowconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
+            self.board_frame.columnconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
 
         for i, x in enumerate(board_view):
             for y in range(len(board_view[0])):

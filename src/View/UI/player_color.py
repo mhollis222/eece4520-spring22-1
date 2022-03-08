@@ -24,7 +24,7 @@ class ChoosePlayerColor(tk.Toplevel):
         self.guest_title.grid(row=1, column=0, columnspan=2, sticky=tk.N)
 
         # play person button
-        self.person_image = Image.open('user.png')
+        self.person_image = Image.open('../View/UI/images/user.png')
         self.person_image = self.person_image.resize((175, 175))
         self.person_image = ImageTk.PhotoImage(self.person_image)
         self.person_button = tk.Button(self, width=400, height=230, text="Player 1", image=self.person_image,
@@ -33,7 +33,7 @@ class ChoosePlayerColor(tk.Toplevel):
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
 
         # play computer button
-        self.computer_image = Image.open('user.png')
+        self.computer_image = Image.open('../View/UI/images/user.png')
         self.computer_image = self.computer_image.resize((175, 175))
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
         self.computer_button = tk.Button(self, width=400, height=230, text="Player 2",

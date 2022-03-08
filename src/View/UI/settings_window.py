@@ -29,7 +29,7 @@ class SettingsWindow(tk.Toplevel):
         self.label1.grid(row=0, columnspan=3, sticky=tk.S)
 
         # board size
-        self.size_image = Image.open('dimension.png')
+        self.size_image = Image.open('../View/UI/images/dimension.png')
         self.size_image = self.size_image.resize((220, 165))
         self.size_image = ImageTk.PhotoImage(self.size_image)
         self.size_button = tk.Button(self, width=400, height=250, text="Board Size", image=self.size_image,
@@ -38,7 +38,7 @@ class SettingsWindow(tk.Toplevel):
         self.size_button.grid(row=1, column=0, padx=50, sticky='s')
 
         # color button
-        self.color_image = Image.open('color.png')
+        self.color_image = Image.open('../View/UI/images/color.png')
         self.color_image = self.color_image.resize((175, 175))
         self.color_image = ImageTk.PhotoImage(self.color_image)
         self.color_button = tk.Button(self, width=400, height=250, text="Color",
@@ -48,7 +48,7 @@ class SettingsWindow(tk.Toplevel):
         self.color_button.grid(row=1, column=1, padx=50, sticky='s')
 
         # board alignment
-        self.board_image = Image.open('startboard.jpg')
+        self.board_image = Image.open('../View/UI/images/startboard.jpg')
         self.board_image = self.board_image.resize((170, 170))
         self.board_image = ImageTk.PhotoImage(self.board_image)
         self.board_button = tk.Button(self, width=400, height=250, text="Alignment", image=self.board_image,
