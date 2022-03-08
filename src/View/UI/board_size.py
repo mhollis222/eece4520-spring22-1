@@ -23,7 +23,7 @@ class TempWindow(tk.Toplevel):
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
 
         # title
-        self.label1 = tk.Label(self, text='Choose a Board Size (greater than 4)', fg='white',
+        self.label1 = tk.Label(self, text='Choose a Board Size (greater than 2)', fg='white',
                                font=("Arial", 35, "bold"), bg='green')
         self.label1.grid(row=0, columnspan=3, sticky=tk.S)
 
@@ -53,13 +53,13 @@ class TempWindow(tk.Toplevel):
     def save_size(self):
         try:
             converted = int(self.size_entry.get())
-            if converted % 2 == 0 and converted > 4:
+            if converted % 2 == 0 and converted > 2:
                 self.config['Model']['board_height'] = str(converted)
                 self.config['Model']['board_width'] = str(converted)
                 self.save_preferences()
                 messagebox.showerror("", 'Board size successfully updated')
             else:
-                messagebox.showerror('Invalid Size', 'Size needs to be an even number and greater than 4')
+                messagebox.showerror('Invalid Size', 'Size needs to be an even number and greater than 2')
         except ValueError:
             messagebox.showerror('Invalid Size', 'Must be an integer')
 

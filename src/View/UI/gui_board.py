@@ -128,7 +128,7 @@ class GuiBoard(AbstractView):
         :param player: Player whose turn's been skipped
         :return: none
         """
-        messagebox.showerror('Player Skipped!')
+        messagebox.showerror('Player ' + str(player.identifier) + "'s turn was skipped!")
 
     def display_score(self):
         """
