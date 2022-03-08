@@ -2,8 +2,8 @@ import tkinter as tk
 
 
 class ReversiButton(tk.Button):
-    def __init__(self, x: int, y: int, text, callback, state, color, **kwargs):
-        super(ReversiButton, self).__init__(**kwargs)
+    def __init__(self, root,  x: int, y: int, text, callback, state, color, **kwargs):
+        super(ReversiButton, self).__init__(root)
         self.x = x
         self.y = y
         # 0 = empty, 1 = p1, 2 = p2, 3 = potential move

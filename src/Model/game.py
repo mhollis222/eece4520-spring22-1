@@ -139,7 +139,6 @@ class Game:
         :param c: the type of piece to be placed
         :return: None
         """
-        print("got move: " + str(m.x) + ", " + str(m.y))
         x, y = m.get_coords()
         self.board[y][x] = c
         # Call all 8 directions

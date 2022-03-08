@@ -25,46 +25,57 @@ class GuiBoard(AbstractView):
         self.valid_color = 'red'
         self.empty_color = 'green'
         self.root = tk.Tk()
-        self.root.geometry("1000x1000")
-        self.root.rowconfigure(list(range(len(self.model.get_board()) + 3)), minsize=50, weight=1)
-        self.root.columnconfigure(list(range(len(self.model.get_board()[0]))), minsize=50, weight=1)
-        self.board_frame = tk.Frame(self.root, width=600, height=600)
-        self.board_frame.grid(row=0, column=0, columnspan=len(self.model.get_board()[0]), rowspan=len(self.model.get_board()))
+        self.root.title('Reversi')
+        self.root.geometry("600x800")
+        self.root.rowconfigure(0, minsize=600, weight=1)
+        self.root.rowconfigure(1, minsize=100, weight=1)
+        self.root.rowconfigure(2, minsize=100, weight=1)
+        self.root.columnconfigure(0, minsize=600, weight=1)
+        self.board_frame = tk.Frame(self.root)
+        self.board_frame.grid(row=0, column=0, sticky='NWES')
+        self.notice_frame = tk.Frame(self.root)
+        self.notice_frame.grid(row=1, column=0, sticky='NWES')
+        self.score_frame = tk.Frame(self.root)
+        self.score_frame.grid(row=2, column=0, sticky='NWES')
 
     def display_board(self, valid_moves: list):
-        self.board_frame.grid_forget()
+        self.board_frame.destroy()
+        self.board_frame = tk.Frame(self.root)
+        self.board_frame.grid(row=0, column=0, sticky='NWES')
         board_view = self.model.get_board()
 
         for x in range(len(board_view)):
-            self.board_frame.rowconfigure(x, minsize=75)
-            self.board_frame.columnconfigure(x, minsize=75)
+            self.board_frame.rowconfigure(x, minsize=75, weight=1)
+            self.board_frame.columnconfigure(x, minsize=75, weight=1)
 
         for i, x in enumerate(board_view):
             for y in range(len(board_view[0])):
                 if (y, i) in valid_moves:
-                    button = ReversiButton(i, y, '0_0', callback=self.controller.advance, state=tk.ACTIVE, color=self.valid_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.ACTIVE, color=self.valid_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 0:
-                    button = ReversiButton(i, y, 'empty', callback=self.controller.advance, state=tk.DISABLED, color=self.empty_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.empty_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 1:
-                    button = ReversiButton(i, y, 'p1', callback=self.controller.advance, state=tk.DISABLED, color=self.p1_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.p1_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 else:
-                    button = ReversiButton(i, y, 'p2', callback=self.controller.advance, state=tk.DISABLED, color=self.p2_color)
+                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance, state=tk.DISABLED, color=self.p2_color)
                     button.grid(row=i, column=y, sticky='nsew')
-
-        self.root.re
 
     def display_current_player(self, player: AbstractPlayer):
         """
         Prints a message to indicate current player's turn
         :param player: Number representative of the player who is up (int)
-        :return: non
+        :return: none
         """
-        self.current_player = tk.Label(text="Player " + str(player.identifier) + " (" + str(player) + "'s) turn!",
+        self.notice_frame.destroy()
+        self.notice_frame = tk.Frame(self.root)
+        self.notice_frame.grid(row=1, column=0, sticky='NWES')
+        color = self.p1_color if player.identifier == 1 else self.p2_color
+        current_player = tk.Label(self.notice_frame, text=str(player) + "'s turn! (" + color + ')',
                                        fg='black', font=('Arial', 20))
-        self.current_player.grid(row=10, column=2, columnspan=3)
+        current_player.pack()
 
 
     def get_move(self):
@@ -89,17 +100,20 @@ class GuiBoard(AbstractView):
         :param winner: Number representative of the player who won the game (int)
         :return: none
         """
+        self.notice_frame.destroy()
+        self.notice_frame = tk.Frame(self.root)
+        self.notice_frame.grid(row=1, column=0, sticky='NWES')
         if winner == 1:
             # print(str(self.model.order[0].name) + " wins!")
-            self.winner_one = tk.Label(text="STEVE WINS!", fg='black', font=('Arial', 50))
-            self.winner_one.grid(row=3, column=1, columnspan=6)
+            winner_one = tk.Label(self.notice_frame, text=str(self.model.order[0].name) + " wins!", fg='black', font=('Arial', 50))
+            winner_one.pack()
         elif winner == 2:
             # print(str(self.model.order[1].name) + " wins!")  # player O
-            self.winner_two = tk.Label(text="JILL WINS!", fg='black', font=('Arial', 50))
-            self.winner_two.grid(row=3, column=1, columnspan=6)
+            winner_two = tk.Label(self.notice_frame, text=str(self.model.order[1].name) + " wins!", fg='black', font=('Arial', 50))
+            winner_two.pack()
         else:
-            self.winner_tie = tk.Label(text="TIE GAME!", fg='black', font=('Arial', 50))
-            self.winner_tie.grid(row=3, column=1, columnspan=6)
+            winner_tie = tk.Label(self.notice_frame, text="TIE GAME!", fg='black', font=('Arial', 50))
+            winner_tie.pack()
 
     def display_player_skipped(self, player: AbstractPlayer):
         """
@@ -116,18 +130,22 @@ class GuiBoard(AbstractView):
         """
         # print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
         # print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
+        self.score_frame.destroy()
+        self.score_frame = tk.Frame(self.root)
+        self.score_frame.columnconfigure(0, minsize=300, weight=1)
+        self.score_frame.columnconfigure(1, minsize=300, weight=1)
+        self.score_frame.grid(row=2, column=0, sticky='NWES')
 
-        self.score_one = tk.Label(text=str(self.model.order[0].name) + ": " + str(self.model.order[0].score),
+        score_one = tk.Label(self.score_frame, text=str(self.model.order[0].name) + ": " + str(self.model.order[0].score),
                                   fg='black', font=('Arial', 20))
-        self.score_one.grid(row=9, column=0, columnspan=3)
-        self.score_two = tk.Label(text=str(self.model.order[1].name) + ": " + str(self.model.order[1].score),
+        score_one.grid(column=0, sticky='NSEW')
+        score_two = tk.Label(self.score_frame, text=str(self.model.order[1].name) + ": " + str(self.model.order[1].score),
                                   fg='black', font=('Arial', 20))
-        self.score_two.grid(row=9, column=4, columnspan=3)
+        score_two.grid(column=1, sticky='NSEW')
 
     def display_end_of_game(self):
         """
         Alerts the players that the game is over
         :return: none
         """
-        self.game_end = tk.Label(text="GAME SET!", fg='black', font=('Arial', 50))
-        self.game_end.grid(row=3, column=2, columnspan=5)
+        pass
