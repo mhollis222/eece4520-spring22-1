@@ -1,14 +1,21 @@
 import tkinter as tk
+from tkinter import messagebox
 
 from Model.database import Database
 from signup_window import SignUpWindow
 from guest_play_options_window import GuestOptionsWindow
 from home_window import HomeWindow
+import configparser
 
+preferences_path = '../../preferences.ini'
 
 class LoginWindow(tk.Tk):
     def __init__(self):
         super().__init__()
+        # special options to save comments on writes (i hope)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(preferences_path)
+        # self.setup()
 
         self.title('Login Page')
         self.geometry("2000x2000")
@@ -52,14 +59,14 @@ class LoginWindow(tk.Tk):
         db = Database('localhost', 'reversi', 'eece4520')
 
         if db.verify_credentials(username, password):
+            self.config['User']['username'] = username
+            self.save_preferences()
             print("login successful")
             home_win = HomeWindow(self)
             home_win.focus_force()
             self.withdraw()
         else:
-            print("login failed")
-            pass  # username not found or password does not match. can just say "invalid credentials"
-        # messagebox.showerror('Login failure', 'Username or password is incorrect')
+            messagebox.showerror('Login failure', 'Invalid Credentials')
 
     def close_window(self):
         self.destroy()
@@ -75,10 +82,11 @@ class LoginWindow(tk.Tk):
         guest_options_win.focus_force()
         self.withdraw()
 
-
-
-
-
-
-
-
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(preferences_path, 'w') as f:
+            self.config.write(f)
