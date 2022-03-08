@@ -1,6 +1,6 @@
 from human_player import HumanPlayer
 from game import Game
-from View.textual_view import TextualView
+from View.UI.gui_view import GUIView
 from Controller.game_controller import GameController
 from View.UI.gui_board import GuiBoard
 from View.UI.reversi_button import ReversiButton
@@ -10,7 +10,9 @@ import tkinter as tk
 def main():
     player1 = HumanPlayer("Steve")
     player2 = HumanPlayer("Jill")
+
     game = Game(player1, player2)
+
     control = GameController(player1, player2)
     # control.play_game()
     # view = GuiBoard(game, 'white', 'black', GameController.advance)
