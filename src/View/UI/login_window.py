@@ -10,6 +10,7 @@ import configparser
 
 preferences_path = '../../preferences.ini'
 
+
 class LoginWindow(tk.Tk):
     def __init__(self):
         super().__init__()

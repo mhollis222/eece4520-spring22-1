@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class BoardWidget(tk.Frame):
     def __init__(self, parent, board_size=3):
         super().__init__(parent)

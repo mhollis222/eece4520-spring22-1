@@ -1,19 +1,23 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-
 from game_controller import GameController
 from gui_board import GuiBoard
 from human_player import HumanPlayer
 from player_color import ChoosePlayerColor
 from board_size import TempWindow
 from board_align import AlignmentWindow
+import configparser
 
+
+preferences_path = '../../preferences.ini'
 
 class SettingsWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Settings Window")
         self.geometry("2000x2000")
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(preferences_path)
         self.rowconfigure([0, 1, 2, 3], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
         self.configure(bg='green')
@@ -81,8 +85,8 @@ class SettingsWindow(tk.Toplevel):
         self.withdraw()
 
     def start_game(self):
-        player1 = HumanPlayer("Player One")
-        player2 = HumanPlayer("Player Two")
+        player1 = HumanPlayer(self.config['User']['username'])
+        player2 = HumanPlayer("Guest")
         controller = GameController(player1, player2)
         controller.save_settings()
         controller.setup()
