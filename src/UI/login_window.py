@@ -4,6 +4,7 @@ from Model.database import Database
 from signup_window import SignUpWindow
 from guest_play_options_window import GuestOptionsWindow
 from home_window import HomeWindow
+from settings_window import SettingsWindow
 
 
 class LoginWindow(tk.Tk):
@@ -31,7 +32,7 @@ class LoginWindow(tk.Tk):
         self.password_entry.grid(row=2, column=1, sticky=tk.W, padx=15, pady=5)
         # login button
         self.login_button = tk.Button(self, text='Login', width=30, height=2, font=("Arial", 15),
-                                      command=self.login)
+                                      command=self.open_settings_options)
         self.login_button.grid(row=3, columnspan=2, padx=5, pady=5)
         self.login_button.bind(self, '<Enter>', self.login)
         # register link
@@ -75,6 +76,10 @@ class LoginWindow(tk.Tk):
         guest_options_win.focus_force()
         self.withdraw()
 
+    def open_settings_options(self):
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
 
 
 
