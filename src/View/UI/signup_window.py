@@ -51,10 +51,12 @@ class SignUpWindow(tk.Toplevel):
         self.register_button.grid(row=4, columnspan=2, padx=5, pady=50, sticky='s')
 
     def open_login(self):
+        """Navigates to the login page"""
         self.destroy()
         self.master.deiconify()
 
     def open_home(self, username):
+        """Navigates to the home page"""
         self.config['User']['username'] = username
         self.save_preferences()
         home_win = HomeWindow(self)
@@ -62,6 +64,7 @@ class SignUpWindow(tk.Toplevel):
         self.withdraw()
 
     def register(self):
+        """Attempts to write a new user object to the database"""
         db = Database('localhost', 'reversi', 'eece4520')
         if self.new_username_entry.get() == '' :
             messagebox.showerror('Register failure', 'Username cannot be empty.')

@@ -14,7 +14,7 @@ preferences_path = '../../preferences.ini'
 class LoginWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        # special options to save comments on writes (i hope)
+        # special options to save comments on writes
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(preferences_path)
         # self.setup()
@@ -56,6 +56,7 @@ class LoginWindow(tk.Tk):
         self.guest_play_button.grid(row=5, columnspan=2, sticky='n', pady=90)
 
     def login(self):
+        """Attempts to successfully log into the database with the provided username and password"""
         username = self.username_entry.get()
         password = self.password_entry.get()
         db = Database('localhost', 'reversi', 'eece4520')
@@ -71,15 +72,18 @@ class LoginWindow(tk.Tk):
             messagebox.showerror('Login failure', 'Invalid Credentials')
 
     def close_window(self):
+        """Closes the GUI window"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
     def open_signup(self):
+        """Naviagtes to the sign up page"""
         signup_win = SignUpWindow(self)
         signup_win.focus_force()
         self.withdraw()
 
     def open_guest_options(self):
+        """Naviagtes to the game options window for guests"""
         guest_options_win = GuestOptionsWindow(self)
         guest_options_win.focus_force()
         self.withdraw()

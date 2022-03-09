@@ -47,5 +47,6 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.hard_button.grid(row=1, column=2, padx=50, sticky='s')
 
     def open_home_window(self):
+        """Naviagtes to the home page"""
         self.destroy()
         self.master.deiconify()  # show the root window

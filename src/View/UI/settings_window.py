@@ -11,6 +11,7 @@ import configparser
 
 preferences_path = '../../preferences.ini'
 
+
 class SettingsWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -67,11 +68,13 @@ class SettingsWindow(tk.Toplevel):
 
     # show the root window
     def open_login(self):
+        """Navigates to login page"""
         self.destroy()
         self.master.deiconify()
 
     # function call to change board size 
     def board_size(self):
+        """Allows user to change board size"""
         board = TempWindow(self)
         board.focus_force()
         self.withdraw()
@@ -84,12 +87,14 @@ class SettingsWindow(tk.Toplevel):
 
     # function call to change board alignment
     def board_alignment(self):
+        """Allows user to set the rules of game"""
         board = AlignmentWindow(self)
         board.focus_force()
         self.withdraw()
 
     # function call to start game
     def start_game(self):
+        """Starts a game locally for the user"""
         player1 = HumanPlayer(self.config['User']['username'])
         player2 = HumanPlayer("Guest")
         controller = GameController(player1, player2)

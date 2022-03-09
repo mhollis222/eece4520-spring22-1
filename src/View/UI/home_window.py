@@ -7,6 +7,11 @@ preferences_path = '../../preferences.ini'
 
 
 def get_elo(username: str) -> str:
+    """
+    Returns the ELO rating of the desired user
+    :param username: username of the desired username
+    :return: the ELO rating of the desired user
+    """
     db = Database('localhost', 'reversi', 'eece4520')
     for user in db.fetch_data():
         if user.get("username") == username:
@@ -133,10 +138,12 @@ class HomeWindow(tk.Toplevel):
         self.member_play_button.grid(row=4, column=2, pady=0, sticky='s')
 
     def close_window(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
     def open_member_options(self):
+        """Naviagtes to the game options window for members"""
         member_options_win = MemberPlayOptionsWindow(self)
         member_options_win.focus_force()
         self.withdraw()

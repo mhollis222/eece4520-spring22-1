@@ -36,8 +36,8 @@ class AlignmentWindow(tk.Toplevel):
                                            fg='black', font=("Arial", 15), command=self.disagree)
         self.no_button.grid(row=1, column=2, sticky='nw', pady=90)
 
-
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
@@ -51,11 +51,13 @@ class AlignmentWindow(tk.Toplevel):
             self.config.write(f)
 
     def agree(self):
+        """Sets the user's preference to starting the game in the middle"""
         self.config['Model']['start_filled'] = 'True'
         self.save_preferences()
         messagebox.showerror("", "Game rules have successfully been updated")
 
     def disagree(self):
+        """Sets the user's preference to not having to start the game in the middle"""
         self.config['Model']['start_filled'] = 'False'
         self.save_preferences()
         messagebox.showerror("", "Game rules have successfully been updated")

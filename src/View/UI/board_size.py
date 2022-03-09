@@ -7,7 +7,7 @@ settings_path = '../../settings.ini'
 class TempWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        # special options to save comments on writes (i hope)
+        # special options to save comments on writes
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
         self.title("Board Size Window")
@@ -39,6 +39,7 @@ class TempWindow(tk.Toplevel):
         self.save_button.grid(row=1, column=1, sticky=tk.E, padx=5, pady=5)
 
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
@@ -52,6 +53,7 @@ class TempWindow(tk.Toplevel):
             self.config.write(f)
 
     def save_size(self):
+        """Sets user's preference for the size of board"""
         try:
             converted = int(self.size_entry.get())
             if converted % 2 == 0 and converted > 2:
