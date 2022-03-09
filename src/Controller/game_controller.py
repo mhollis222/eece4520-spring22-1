@@ -78,7 +78,7 @@ class GameController:
 
     def advance(self, button):
         """
-        Calls all GUI functions when board is clicked
+        Calls all GUI functions when board is clicked. Steps through one cycle of the game loop with each call.
         :param button:
         :return:
         """
