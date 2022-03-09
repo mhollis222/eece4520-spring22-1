@@ -20,12 +20,19 @@ class GuiBoard(AbstractView):
 
     def __init__(self, model: Game, p1_color: str, p2_color: str, controller):
         super().__init__(model)
+        # model and controller
         self.model = model
         self.controller = controller
+
+        # player colors
         self.p1_color = p1_color
         self.p2_color = p2_color
-        self.valid_color = 'yellow'
+
+        # empty and valid move tile colors
+        self.valid_color = 'red'
         self.empty_color = 'green'
+
+        # initialize main window for board game
         self.root = tk.Tk()
         self.root.title('Reversi')
         self.root.geometry("2000x2000")
@@ -77,8 +84,8 @@ class GuiBoard(AbstractView):
 
     def display_current_player(self, player: AbstractPlayer):
         """
-        Prints a message to indicate current player's turn
-        :param player: Number representative of the player who is up (int)
+        Updates frame with current player
+        :param player: Number representative of the player who is up
         :return: none
         """
         self.notice_frame.destroy()
@@ -90,24 +97,14 @@ class GuiBoard(AbstractView):
         current_player.pack()
 
     def get_move(self):
-        """
-        Takes in user input for x and y
-        :return: x and y
-        """
-
-        return self.x.get(), self.y.get()
+        pass
 
     def display_invalid_moves(self, player):
-        """
-        Prints message indicating that move made was invalid
-        :param player: Number representative of the player who made the invalid move (int)
-        :return: none
-        """
-        messagebox.showerror('Player Skipped!')
+        pass
 
     def display_winner(self, winner):
         """
-        Prints who won the game
+        Updates frame and displays the winner of the game or if it's a tie
         :param winner: Number representative of the player who won the game (int)
         :return: none
         """
@@ -129,12 +126,7 @@ class GuiBoard(AbstractView):
             winner_tie.pack()
 
     def display_player_skipped(self, player: AbstractPlayer):
-        """
-        Alerts player their turn has been skipped via print statement
-        :param player: Player whose turn's been skipped
-        :return: none
-        """
-        messagebox.showerror('Player ' + str(player.identifier) + "'s turn was skipped!")
+        pass
 
     def display_score(self):
         """
@@ -161,8 +153,4 @@ class GuiBoard(AbstractView):
         self.score_frame.score_two.grid(row=2, column=0, columnspan=2, sticky='ne', padx=100)
 
     def display_end_of_game(self):
-        """
-        Alerts the players that the game is over
-        :return: none
-        """
         pass
