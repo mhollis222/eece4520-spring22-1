@@ -3,7 +3,6 @@ import math
 from View.abstract_view import AbstractView
 from Model.game import Game
 from Model.abstract_player import AbstractPlayer
-from tkinter import messagebox
 import tkinter as tk
 from View.UI.reversi_button import ReversiButton
 
@@ -29,7 +28,7 @@ class GuiBoard(AbstractView):
         self.p2_color = p2_color
 
         # empty and valid move tile colors
-        self.valid_color = 'red'
+        self.valid_color = 'yellow'
         self.empty_color = 'green'
 
         # initialize main window for board game
