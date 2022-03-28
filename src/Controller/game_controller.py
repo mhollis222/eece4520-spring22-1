@@ -11,7 +11,7 @@ settings_path = '../../settings.ini'
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -19,6 +19,7 @@ class GameController:
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
+        self.ai = ai
         self.setup()
 
     def play_game(self):
@@ -34,7 +35,6 @@ class GameController:
 
             # Checks if there are any available moves for the current player
             if self.model.valid_moves_avail(player):
-                # TODO: combine into fn
                 self.view.display_board(self.model.get_valid_moves(player))
                 self.view.display_score()
                 self.view.display_current_player(player)
@@ -100,6 +100,7 @@ class GameController:
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
         else:
+
             self.model.switch_players(player)  # Passes play to the other player
             # Update the board
             moves = self.model.get_valid_moves(self.model.get_active_player())
@@ -135,7 +136,7 @@ class GameController:
         height = self.config.getint('Model', 'board_height')
 
         # Currently, unused
-        # ai_difficult = self.config.getint('Model', 'AI_difficulty')
+        ai_difficult = self.config.getint('Model', 'AI_difficulty')
         # start_filled = self.config.getboolean('Model', 'start_filled')
         # debug = self.config.getboolean('Misc', 'debug')
 
@@ -154,5 +155,3 @@ class GameController:
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
             self.view.root.mainloop()
-
-
