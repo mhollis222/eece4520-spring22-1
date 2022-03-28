@@ -101,6 +101,7 @@ class GameController:
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
         else:
+
             self.model.switch_players(player)  # Passes play to the other player
             # Update the board
             moves = self.model.get_valid_moves(self.model.get_active_player())
@@ -155,5 +156,4 @@ class GameController:
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
             self.view.root.mainloop()
-
 
