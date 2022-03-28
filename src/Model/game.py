@@ -2,6 +2,7 @@ from abstract_player import AbstractPlayer
 from enum import Enum
 from random import random
 from move import Move
+from abstract_game import AbstractGame
 
 
 # the more I think about this, the less I think we actually need an enum here.
@@ -14,7 +15,7 @@ class Cell(Enum):
     WHITE = 2  # Player Two's Piece
 
 
-class Game:
+class Game(AbstractGame):
 
     def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, x: int = 8, y: int = 8):
         self.p1 = p1  # Player One
