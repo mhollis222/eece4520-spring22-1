@@ -1,5 +1,8 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import configparser
+
+settings_path = '../../settings.ini'
 
 
 class AIDifficultyIIWindow(tk.Toplevel):
@@ -9,6 +12,8 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.geometry("2000x2000")
         self.rowconfigure([0, 1, 2], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
         self.configure(bg='green')
 
 
@@ -50,3 +55,15 @@ class AIDifficultyIIWindow(tk.Toplevel):
         """Naviagtes to the home page"""
         self.destroy()
         self.master.deiconify()  # show the root window
+
+    def easy_play(self):
+        self.config['Model']['ai_difficulty'] = str(1)
+        self.save_preferences()
+
+    def medium_play(self):
+        self.config['Model']['ai_difficulty'] = str(3)
+        self.save_preferences()
+
+    def hard_play(self):
+        self.config['Model']['ai_difficulty'] = str(5)
+        self.save_preferences()

@@ -1,7 +1,9 @@
 from abstract_game import AbstractGame
 from abstract_game_decorator import GameDecorator
 from abstract_player import AbstractPlayer
+from game import Game, Cell
 from move import Move
+import copy
 
 
 class GameDecoratorAI(GameDecorator):
@@ -43,3 +45,36 @@ class GameDecoratorAI(GameDecorator):
 
     def switch_players(self, player: AbstractPlayer):
         super().switch_players(player)
+
+    def simulate_play(self, moves):
+        sim_game = copy.copy(self.game)
+        original_player = sim_game.get_active_player()
+        old_score = original_player.score
+
+        for move in moves:
+            current_player = sim_game.get_active_player()
+            if sim_game.validate_move(self, move, current_player):
+
+                if sim_game.get_active_player() == sim_game.order[0]:
+                    sim_game.update_board(move, Cell.BLACK)
+                else:
+                    sim_game.update_board(move, Cell.WHITE)
+
+                sim_game.switch_players(self, current_player)
+            else:
+                return None
+
+        new_score = original_player.score
+
+        return new_score - old_score
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,8 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import configparser
 
+settings_path = '../../settings.ini'
 
 class AIDifficultyIWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -9,6 +11,8 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.geometry("2000x2000")
         self.rowconfigure([0, 1, 2], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
         self.configure(bg='green')
 
         # back button
@@ -26,7 +30,7 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.easy_image = ImageTk.PhotoImage(self.easy_image)
         self.easy_button = tk.Button(self, width=400, height=250, text="Easy", image=self.easy_image,
                                        compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
-                                       font=("Arial", 17))
+                                       font=("Arial", 17), command=self.easy_play)
         self.easy_button.grid(row=1, column=0, padx=50, sticky='s')
         # medium button
         self.medium_image = Image.open('../View/UI/images/medium.png')
@@ -34,7 +38,8 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.medium_image = ImageTk.PhotoImage(self.medium_image)
         self.medium_button = tk.Button(self, width=400, height=250, text="Medium",
                                          image=self.medium_image, bg='#41ab24',
-                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17))
+                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17),
+                                       command=self.medium_play)
         self.medium_button.grid(row=1, column=1, padx=50, sticky='s')
         # hard button
         self.hard_image = Image.open('../View/UI/images/hard.png')
@@ -42,10 +47,22 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.hard_image = ImageTk.PhotoImage(self.hard_image)
         self.hard_button = tk.Button(self,  width=400, height=250, text="Hard", image=self.hard_image,
                                           bg='#41ab24', activebackground='green', compound=tk.TOP, fg='white',
-                                          font=("Arial", 17))
+                                          font=("Arial", 17), command=self.hard_play)
         self.hard_button.grid(row=1, column=2, padx=50, sticky='s')
 
     def open_login(self):
         """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()
+
+    def easy_play(self):
+        self.config['Model']['ai_difficulty'] = str(1)
+        self.save_preferences()
+
+    def medium_play(self):
+        self.config['Model']['ai_difficulty'] = str(3)
+        self.save_preferences()
+
+    def hard_play(self):
+        self.config['Model']['ai_difficulty'] = str(5)
+        self.save_preferences()

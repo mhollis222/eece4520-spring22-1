@@ -6,7 +6,6 @@ from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
 
-
 settings_path = '../../settings.ini'
 
 
