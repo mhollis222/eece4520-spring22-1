@@ -35,7 +35,6 @@ class GameController:
 
             # Checks if there are any available moves for the current player
             if self.model.valid_moves_avail(player):
-                # TODO: combine into fn
                 self.view.display_board(self.model.get_valid_moves(player))
                 self.view.display_score()
                 self.view.display_current_player(player)
