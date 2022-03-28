@@ -6,13 +6,12 @@ from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
 
-
 settings_path = '../../settings.ini'
 
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -20,6 +19,7 @@ class GameController:
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
+        self.ai = ai
         self.setup()
 
     def play_game(self):
@@ -136,7 +136,7 @@ class GameController:
         height = self.config.getint('Model', 'board_height')
 
         # Currently, unused
-        # ai_difficult = self.config.getint('Model', 'AI_difficulty')
+        ai_difficult = self.config.getint('Model', 'AI_difficulty')
         # start_filled = self.config.getboolean('Model', 'start_filled')
         # debug = self.config.getboolean('Misc', 'debug')
 
@@ -155,4 +155,3 @@ class GameController:
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
             self.view.root.mainloop()
-
