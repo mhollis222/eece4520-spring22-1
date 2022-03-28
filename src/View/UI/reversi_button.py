@@ -32,11 +32,3 @@ class ReversiButton(tk.Button):
         self['activebackground'] = color
         self.command = lambda: callback(self)
         self['command'] = self.command
-
-    def change_state(self, event,  state: int):
-        self.state = state
-        self['text'] = str(state)
-
-
-def action(x: int, y: int, button: ReversiButton):
-    print(str(x) + str(y))

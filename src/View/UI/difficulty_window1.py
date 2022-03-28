@@ -46,5 +46,6 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.hard_button.grid(row=1, column=2, padx=50, sticky='s')
 
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()

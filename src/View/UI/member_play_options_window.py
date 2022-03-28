@@ -59,15 +59,18 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.online_button.grid(row=1, column=3, padx=50, sticky='s')
 
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
     def open_ai(self):
+        """Naviagtes to the AI settings window"""
         ai_win = AIDifficultyIIWindow(self)
         ai_win.focus_force()
         self.withdraw()
 
     def open_settings_options(self):
+        """Naviagtes to the game settings page"""
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()
         self.withdraw()

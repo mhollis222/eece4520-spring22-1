@@ -83,6 +83,7 @@ class Player1ColorOptionsWindow(tk.Toplevel):
         self.size_button.grid(row=2, column=2, padx=50, sticky='s')
 
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
@@ -96,31 +97,37 @@ class Player1ColorOptionsWindow(tk.Toplevel):
             self.config.write(f)
 
     def save_black(self):
+        """Saves player one's color to black"""
         self.config['View']['p1_color'] = 'black'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
     def save_red(self):
+        """Saves player one's color to red"""
         self.config['View']['p1_color'] = 'red'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
     def save_magenta(self):
+        """Saves player one's color to magenta"""
         self.config['View']['p1_color'] = 'magenta'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
     def save_blue(self):
+        """Saves player one's color to blue"""
         self.config['View']['p1_color'] = 'blue'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
     def save_cyan(self):
+        """Saves player one's color to cyan"""
         self.config['View']['p1_color'] = 'cyan'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")
 
     def save_white(self):
+        """Saves player one's color to white"""
         self.config['View']['p1_color'] = 'white'
         self.save_preferences()
         messagebox.showerror("", "Player One's color successfully updated")

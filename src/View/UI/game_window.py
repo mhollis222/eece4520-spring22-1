@@ -1,6 +1,7 @@
 import tkinter as tk
 from board_widget import BoardWidget
 
+
 class GameWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -15,6 +16,7 @@ class GameWindow(tk.Toplevel):
         self.master.eval(f'tk::PlaceWindow {str(self)} center')
 
     def close_window(self):
+        """Naviagtes to the previous window"""
         self.destroy()
         self.master.deiconify()  # show the root window
 

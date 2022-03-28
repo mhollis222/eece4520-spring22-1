@@ -42,15 +42,18 @@ class GuestOptionsWindow(tk.Toplevel):
 
 
     def open_login(self):
+        """Naviagtes to the login page"""
         self.destroy()
         self.master.deiconify()  # show the root window
 
     def open_AI(self):
+        """Naviagtes to the AI settings window"""
         ai_win = AIDifficultyIWindow(self)
         ai_win.focus_force()
         self.withdraw()
 
     def open_settings_options(self):
+        """Naviagtes to the settings preference window"""
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()
         self.withdraw()

@@ -77,6 +77,11 @@ class GameController:
                 self.model.switch_players(player)  # Passes play to the other player
 
     def advance(self, button):
+        """
+        Calls all GUI functions when board is clicked. Steps through one cycle of the game loop with each call.
+        :param button:
+        :return:
+        """
         # Get the current player
         player = self.model.get_active_player()
         # Get the move
@@ -105,7 +110,7 @@ class GameController:
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
 
-        #self.model.debug()
+        # self.model.debug()
 
     def save_settings(self) -> bool:
         """

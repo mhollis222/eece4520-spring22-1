@@ -18,6 +18,7 @@ class ChoosePlayerColor(tk.Toplevel):
                                      activebackground='green', bg='green', fg='white', relief='flat',
                                      command=self.open_login)
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
+        
         # title
         self.guest_title = tk.Label(self, text='Choose your Colors',
                                     font=("Arial", 35, "bold"), bg='green', fg='white')
@@ -43,15 +44,18 @@ class ChoosePlayerColor(tk.Toplevel):
         self.computer_button.grid(row=1, column=1, padx=50, sticky='s')
 
     def player_1(self):
+        """Navigates to the color options window for player one"""
         player1 = Player1ColorOptionsWindow(self)
         player1.focus_force()
         self.withdraw()
 
     def player_2(self):
+        """Navigates to the color options window for player two"""
         player2 = Player2ColorOptionsWindow(self)
         player2.focus_force()
         self.withdraw()
 
     def open_login(self):
+        """Navigates to the login window"""
         self.destroy()
         self.master.deiconify()  # show the root window
