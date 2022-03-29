@@ -278,3 +278,6 @@ class Game(AbstractGame):
         else:
             self.active_player = self.order[0]  # Passes play to Player One
 
+    def get_moves_sim(self, moves, player):
+        pass
+

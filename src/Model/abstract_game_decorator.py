@@ -7,6 +7,9 @@ class GameDecorator(AbstractGame):
     def __init__(self, game: AbstractGame):
         self.game = game
 
+    def get_game(self):
+        return self.game
+
     def get_order(self):
         return self.game.get_order
 
@@ -21,7 +24,8 @@ class GameDecorator(AbstractGame):
 
     def valid_moves_avail(self, moves, play: AbstractPlayer):
         if moves is not None:
-            self.game.valid_moves_avail(moves, play)
+            # self.game.valid_moves_avail(moves, play)
+            pass
         else:
             self.game.valid_moves_avail(play)
 
@@ -51,3 +55,6 @@ class GameDecorator(AbstractGame):
 
     def switch_players(self, player: AbstractPlayer):
         self.game.switch_players(player)
+
+    def get_moves_sim(self, moves, play):
+        pass

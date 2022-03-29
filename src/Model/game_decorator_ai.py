@@ -22,7 +22,7 @@ class GameDecoratorAI(GameDecorator):
     def search(self, move: tuple, identity: int):
         super().search(move, identity)
 
-    def valid_moves_avail(self, moves, play: AbstractPlayer):
+    def get_moves_sim(self, moves: list[Move], play: AbstractPlayer):
         sim_game = copy.deepcopy(self.game)
         for move in moves:
             current_player = sim_game.get_active_player()

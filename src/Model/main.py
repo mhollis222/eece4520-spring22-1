@@ -25,7 +25,7 @@ def main():
     # view.display_board(moves)
     # #print(game.board)
 
-    control = GameController(player1, player2)
+    control = GameController(player1, player2, True)
 
 if __name__ == "__main__":
     main()

@@ -114,12 +114,12 @@ class GuiBoard(AbstractView):
         self.notice_frame.grid(row=1, column=0, sticky='NWES')
         if winner == 1:
             # print(str(self.model.order[0].name) + " wins!")
-            winner_one = tk.Label(self.notice_frame, text=str(self.model.get_order()()[0].name) + " wins!", fg='yellow',
+            winner_one = tk.Label(self.notice_frame, text=str(self.model.get_order()[0].name) + " wins!", fg='yellow',
                                   bg='#343434', font=('Arial', 50), pady=30)
             winner_one.pack()
         elif winner == 2:
             # print(str(self.model.order[1].name) + " wins!")  # player O
-            winner_two = tk.Label(self.notice_frame, text=str(self.model.get_order()()[1].name) + " wins!",
+            winner_two = tk.Label(self.notice_frame, text=str(self.model.get_order()[1].name) + " wins!",
                                   bg='#343434', fg='yellow', font=('Arial', 50), pady=30)
             winner_two.pack()
         else:

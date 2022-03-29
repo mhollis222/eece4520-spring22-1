@@ -1,6 +1,5 @@
 import tkinter
 
-import ai_player
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
@@ -28,7 +27,7 @@ class GameFactory:
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = True):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -173,13 +172,12 @@ class GameController:
 
         if self.ai:
             game_type = 'AI'
+            decorator = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+            self.model = decorator.get_game()
+            self.p2.add_simulator(decorator)
         else:
             game_type = 'local'
-
-        self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
-
-        if self.ai:
-            self.p2.add_simulator(self.model)
+            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']

@@ -33,9 +33,9 @@ class AIPLayer(AbstractPlayer):
             return self.simulator.simulate_play(moves) # utility function for this list of moves
 
         if max:
-            possible_moves = self.simulator.valid_moves_avail(moves, self)
+            possible_moves = self.simulator.get_moves_sim(moves, self)
         else:
-            possible_moves = self.simulator.valid_moves_avail(moves, self.opp)
+            possible_moves = self.simulator.get_moves_sim(moves, self.opp)
 
         if maximize:
             best_val = float('-inf')

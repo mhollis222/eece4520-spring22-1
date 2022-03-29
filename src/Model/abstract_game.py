@@ -59,3 +59,7 @@ class AbstractGame(ABC):
     @abstractmethod
     def switch_players(self, player: AbstractPlayer):
         pass
+
+    @abstractmethod
+    def get_moves_sim(self, moves, player):
+        pass
