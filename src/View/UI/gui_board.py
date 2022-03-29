@@ -75,11 +75,11 @@ class GuiBoard(AbstractView):
                                            state=tk.DISABLED, color=self.empty_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 1:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                    button = ReversiButton(self.board_frame, i, y, '1', callback=self.controller.advance,
                                            state=tk.DISABLED, color=self.p1_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 else:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                    button = ReversiButton(self.board_frame, i, y, '2', callback=self.controller.advance,
                                            state=tk.DISABLED, color=self.p2_color)
                     button.grid(row=i, column=y, sticky='nsew')
 

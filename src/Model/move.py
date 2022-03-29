@@ -9,3 +9,6 @@ class Move:
         :return: the x and y coordinates representative of the location of the desired cell (int, int)
         """
         return self.x, self.y
+
+    def __str__(self):
+        return '(' + str(self.x) + ', ' + str(self.y) + ')'

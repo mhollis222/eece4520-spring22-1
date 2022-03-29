@@ -21,8 +21,8 @@ def main():
     view = TextualView(game, 'red', 'blue')
     # print(dec.valid_moves_avail([Move(5,4)], player2))
     # print(game.get_active_player())
-    # print(player2.make_move(0,0))
-    # view.display_board(moves)
+    #print(player2.make_move(0,0))
+    view.display_board(moves)
     # #print(game.board)
 
     control = GameController(player1, player2, True)

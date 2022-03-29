@@ -1,6 +1,6 @@
 from View.abstract_view import AbstractView
 from Model.abstract_player import AbstractPlayer
-# from termcolor import colored
+from termcolor import colored
 from abstract_game import AbstractGame
 
 

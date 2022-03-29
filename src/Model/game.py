@@ -130,10 +130,10 @@ class Game(AbstractGame):
         """
         self.order = self._coin_flip()
         self.active_player = self.order[0]
-        self.board[int(self.y/2) - 1][int(self.x/2) - 1] = Cell.WHITE
-        self.board[int(self.y/2) - 1][int(self.x/2)] = Cell.BLACK
-        self.board[int(self.y/2)][int(self.x/2) - 1] = Cell.BLACK
-        self.board[int(self.y/2)][int(self.x/2)] = Cell.WHITE
+        self.board[int(self.y/2) - 1][int(self.x/2) - 1] = Cell.BLACK
+        self.board[int(self.y/2) - 1][int(self.x/2)] = Cell.WHITE
+        self.board[int(self.y/2)][int(self.x/2) - 1] = Cell.WHITE
+        self.board[int(self.y/2)][int(self.x/2)] = Cell.BLACK
 
     def get_board(self) -> [[Cell]]:
         """

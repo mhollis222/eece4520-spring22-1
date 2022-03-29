@@ -23,7 +23,7 @@ class AIPLayer(AbstractPlayer):
         # get the current possible moves
         moves = self.simulator.get_valid_moves(self)
 
-        index = np.argmax([self.minmax(0, [Move(move[0], move[1])], True, -100, 100) for move in moves])
+        index = np.argmax([self.minmax(1, [Move(move[0], move[1])], True, -100, 100) for move in moves])
 
         return moves[index]
 
@@ -43,7 +43,8 @@ class AIPLayer(AbstractPlayer):
                 val = self.minmax(level + 1, moves + [Move(move[0], move[1])], not maximize, alpha, beta)
                 best_val = max(best_val, val)
                 alpha = max(alpha, best_val)
-                if beta <= alpha:
+                if val >= beta:
+                    print('PRUNING')
                     break
             return best_val
         else:
@@ -52,7 +53,8 @@ class AIPLayer(AbstractPlayer):
                 val = self.minmax(level + 1, moves + [Move(move[0], move[1])], not maximize, alpha, beta)
                 best_val = min(best_val, val)
                 beta = min(beta, best_val)
-                if beta <= alpha:
+                if val <= alpha:
+                    print('PRUNING')
                     break
             return best_val
 
