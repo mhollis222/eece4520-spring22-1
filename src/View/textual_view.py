@@ -85,9 +85,9 @@ class TextualView(AbstractView):
         :return: none
         """
         if winner == 1:
-            print(str(self.model.order[0].name) + " wins!")  # player X
+            print(str(self.model.get_order()()[0].name) + " wins!")  # player X
         elif winner == 2:
-            print(str(self.model.order[1].name) + " wins!")  # player O
+            print(str(self.model.get_order()()[1].name) + " wins!")  # player O
         else:
             print("Tie Game!")
 
@@ -105,8 +105,8 @@ class TextualView(AbstractView):
         Displays the current score of both players alongside their names
         :return: none
         """
-        print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
-        print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
+        print(str(self.model.get_order()()[0].name) + ": " + str(self.model.get_order()()[0].score))
+        print(str(self.model.get_order()()[1].name) + ": " + str(self.model.get_order()()[1].score))
 
     def display_end_of_game(self):
         """

@@ -46,6 +46,8 @@ class GuiBoard(AbstractView):
         self.score_frame = tk.Frame(self.root)
         self.score_frame.grid(row=2, column=0, sticky='NWES')
 
+        self.order = self.model.get_order()
+
     def display_board(self, valid_moves: list):
         '''
         Creates a frame of the game board and populates the grid with buttons respective to the moves already made, the
@@ -112,12 +114,12 @@ class GuiBoard(AbstractView):
         self.notice_frame.grid(row=1, column=0, sticky='NWES')
         if winner == 1:
             # print(str(self.model.order[0].name) + " wins!")
-            winner_one = tk.Label(self.notice_frame, text=str(self.model.order[0].name) + " wins!", fg='yellow',
+            winner_one = tk.Label(self.notice_frame, text=str(self.model.get_order()()[0].name) + " wins!", fg='yellow',
                                   bg='#343434', font=('Arial', 50), pady=30)
             winner_one.pack()
         elif winner == 2:
             # print(str(self.model.order[1].name) + " wins!")  # player O
-            winner_two = tk.Label(self.notice_frame, text=str(self.model.order[1].name) + " wins!",
+            winner_two = tk.Label(self.notice_frame, text=str(self.model.get_order()()[1].name) + " wins!",
                                   bg='#343434', fg='yellow', font=('Arial', 50), pady=30)
             winner_two.pack()
         else:
@@ -141,13 +143,13 @@ class GuiBoard(AbstractView):
         self.score_frame.grid(row=2, column=0, sticky='NWES')
 
         self.score_frame.score_one = tk.Label(self.score_frame,
-                                              text=str(self.model.order[0].name) + ": " +
-                                                   str(self.model.order[0].score), bg='#343434',
+                                              text=str(self.model.get_order()()[0].name) + ": " +
+                                                   str(self.model.get_order()()[0].score), bg='#343434',
                                               fg='white', font=('Arial', 20))
         self.score_frame.score_one.grid(row=2, column=0, columnspan=2, sticky='w', padx=75)
         self.score_frame.score_two = tk.Label(self.score_frame,
-                                              text=str(self.model.order[1].name) + ": " +
-                                                   str(self.model.order[1].score), fg='white', font=('Arial', 20),
+                                              text=str(self.model.get_order()()[1].name) + ": " +
+                                                   str(self.model.get_order()()[1].score), fg='white', font=('Arial', 20),
                                               bg='#343434')
         self.score_frame.score_two.grid(row=2, column=0, columnspan=2, sticky='ne', padx=100)
 

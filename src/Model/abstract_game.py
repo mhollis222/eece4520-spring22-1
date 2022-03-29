@@ -4,9 +4,8 @@ from Model.abstract_player import AbstractPlayer
 
 
 class AbstractGame(ABC):
-    @property
     @abstractmethod
-    def order(self):
+    def get_order(self):
         pass
 
     @abstractmethod

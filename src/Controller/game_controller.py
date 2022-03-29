@@ -1,4 +1,6 @@
 import tkinter
+
+import ai_player
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
@@ -18,7 +20,6 @@ class GameFactory:
         if game_type == 'local':
             return Game(p1, p2, width, height)
         elif game_type == 'AI':
-            from game_decorator_ai import GameDecoratorAI
             return GameDecoratorAI(Game(p1, p2, width, height))
         # elif game_type == 'online':
         #     return GameDecoratorOnline(Game(p1, p2, width, height))
@@ -68,7 +69,7 @@ class GameController:
                     attempt = Move(x, y)
 
                 # Checks whose turn it is and updates the board with their corresponding piece
-                if self.model.get_active_player() == self.model.order[0]:
+                if self.model.get_active_player() == self.model.get_order()()[0]:
                     self.model.update_board(attempt, Cell.BLACK)
                 else:
                     self.model.update_board(attempt, Cell.WHITE)
@@ -105,7 +106,7 @@ class GameController:
         attempt = Move(y, x)
         self.model.validate_move(attempt, player)
         # update the model
-        if player == self.model.order[0]:
+        if player == self.model.get_order()()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -129,7 +130,7 @@ class GameController:
                 actual_move = Move(move[0], move[1])
                 print("ai played " + str(actual_move.x) + ", " + str(actual_move.y))
                 self.model.validate_move(actual_move, ai_player)
-                if ai_player == self.model.order[0]:
+                if ai_player == self.model.get_order()()[0]:
                     self.model.update_board(actual_move, Cell.BLACK)
                 else:
                     self.model.update_board(actual_move, Cell.WHITE)
@@ -180,8 +181,7 @@ class GameController:
         self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
 
         if self.ai:
-            self.simulator = GameDecoratorAI(self.model)
-            self.p2.add_simulator(self.simulator)
+            self.p2.add_simulator(self.model)
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']

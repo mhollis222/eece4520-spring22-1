@@ -1,5 +1,4 @@
 import copy
-from abc import ABC
 from abstract_game import AbstractGame
 from abstract_game_decorator import GameDecorator
 from abstract_player import AbstractPlayer
@@ -7,9 +6,12 @@ from game import Cell
 from move import Move
 
 
-class GameDecoratorAI(GameDecorator, ABC):
+class GameDecoratorAI(GameDecorator):
     def __init__(self, game: AbstractGame):
         super().__init__(game)
+
+    def get_order(self):
+        return super().get_order()
 
     def validate_move(self, move: Move, play: AbstractPlayer):
         super().validate_move(move, play)
@@ -26,7 +28,7 @@ class GameDecoratorAI(GameDecorator, ABC):
             current_player = sim_game.get_active_player()
             if sim_game.validate_move(move, current_player):
 
-                if sim_game.get_active_player() == sim_game.order[0]:
+                if sim_game.get_active_player() == sim_game.get_order()[0]:
                     sim_game.update_board(move, Cell.BLACK)
                 else:
                     sim_game.update_board(move, Cell.WHITE)
@@ -36,6 +38,9 @@ class GameDecoratorAI(GameDecorator, ABC):
 
     def start(self) -> None:
         super().start()
+
+    def get_board(self):
+        return super().get_board()
 
     def update_board(self, m: Move, c) -> None:
         super().update_board(m, c)
@@ -67,7 +72,7 @@ class GameDecoratorAI(GameDecorator, ABC):
             current_player = sim_game.get_active_player()
             if sim_game.validate_move(move, current_player):
 
-                if sim_game.get_active_player() == sim_game.order[0]:
+                if sim_game.get_active_player() == sim_game.get_order()[0]:
                     sim_game.update_board(move, Cell.BLACK)
                 else:
                     sim_game.update_board(move, Cell.WHITE)
