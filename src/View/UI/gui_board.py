@@ -1,10 +1,10 @@
 import math
 
 from View.abstract_view import AbstractView
-from Model.game import Game
 from Model.abstract_player import AbstractPlayer
 import tkinter as tk
 from View.UI.reversi_button import ReversiButton
+from abstract_game import AbstractGame
 
 
 # Constants
@@ -17,7 +17,7 @@ from View.UI.reversi_button import ReversiButton
 
 class GuiBoard(AbstractView):
 
-    def __init__(self, model: Game, p1_color: str, p2_color: str, controller):
+    def __init__(self, model: AbstractGame, p1_color: str, p2_color: str, controller):
         super().__init__(model)
         # model and controller
         self.model = model
@@ -59,8 +59,8 @@ class GuiBoard(AbstractView):
         board_view = self.model.get_board()
 
         for x in range(len(board_view)):
-            self.board_frame.rowconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
-            self.board_frame.columnconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
+            self.board_frame.rowconfigure(x, minsize=math.ceil(75 / (len(board_view))), weight=1)
+            self.board_frame.columnconfigure(x, minsize=math.ceil(75 / (len(board_view))), weight=1)
 
         for i, x in enumerate(board_view):
             for y in range(len(board_view[0])):
@@ -92,7 +92,7 @@ class GuiBoard(AbstractView):
         self.notice_frame.grid(row=1, column=0, sticky='NWES')
         color = self.p1_color if player.identifier == 1 else self.p2_color
         current_player = tk.Label(self.notice_frame, text=str(player) + "'s turn! (" + color + ')',
-                                       bg='#343434', fg='white', font=('Arial', 20), pady=30)
+                                  bg='#343434', fg='white', font=('Arial', 20), pady=30)
         current_player.pack()
 
     def get_move(self):

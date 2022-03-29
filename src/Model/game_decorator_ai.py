@@ -1,14 +1,14 @@
 import copy
-
-from game import Game
+from abc import ABC
+from abstract_game import AbstractGame
 from abstract_game_decorator import GameDecorator
 from abstract_player import AbstractPlayer
 from game import Cell
 from move import Move
 
 
-class GameDecoratorAI(GameDecorator):
-    def __init__(self, game: Game):
+class GameDecoratorAI(GameDecorator, ABC):
+    def __init__(self, game: AbstractGame):
         super().__init__(game)
 
     def validate_move(self, move: Move, play: AbstractPlayer):
@@ -78,4 +78,3 @@ class GameDecoratorAI(GameDecorator):
         new_score = original_player.score
 
         return new_score - old_score
-

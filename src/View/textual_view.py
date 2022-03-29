@@ -1,12 +1,12 @@
 from View.abstract_view import AbstractView
-from Model.game import Game
 from Model.abstract_player import AbstractPlayer
 from termcolor import colored
+from abstract_game import AbstractGame
 
 
 class TextualView(AbstractView):
 
-    def __init__(self, model: Game, p1_color: str, p2_color: str):
+    def __init__(self, model: AbstractGame, p1_color: str, p2_color: str):
         super().__init__(model)
         self.model = model
         self.p1_color = p1_color

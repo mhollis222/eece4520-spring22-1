@@ -10,6 +10,21 @@ import configparser
 settings_path = '../../settings.ini'
 
 
+class GameFactory:
+    from abstract_game import AbstractGame
+
+    @staticmethod
+    def get_game(game_type: str, p1: AbstractPlayer, p2: AbstractPlayer, width: int, height: int) -> AbstractGame:
+        if game_type == 'local':
+            return Game(p1, p2, width, height)
+        elif game_type == 'AI':
+            from game_decorator_ai import GameDecoratorAI
+            return GameDecoratorAI(Game(p1, p2, width, height))
+        # elif game_type == 'online':
+        #     return GameDecoratorOnline(Game(p1, p2, width, height))
+        raise ValueError('Unknown game type')
+
+
 class GameController:
 
     def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = True):
@@ -157,7 +172,12 @@ class GameController:
         # start_filled = self.config.getboolean('Model', 'start_filled')
         # debug = self.config.getboolean('Misc', 'debug')
 
-        self.model = Game(self.p1, self.p2, width, height)
+        if self.ai:
+            game_type = 'AI'
+        else:
+            game_type = 'local'
+
+        self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
 
         if self.ai:
             self.simulator = GameDecoratorAI(self.model)
