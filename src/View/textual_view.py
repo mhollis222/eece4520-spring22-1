@@ -1,12 +1,12 @@
 from View.abstract_view import AbstractView
-from Model.game import Game
 from Model.abstract_player import AbstractPlayer
-# from termcolor import colored
+from termcolor import colored
+from abstract_game import AbstractGame
 
 
 class TextualView(AbstractView):
 
-    def __init__(self, model: Game, p1_color: str, p2_color: str):
+    def __init__(self, model: AbstractGame, p1_color: str, p2_color: str):
         super().__init__(model)
         self.model = model
         self.p1_color = p1_color
@@ -85,9 +85,9 @@ class TextualView(AbstractView):
         :return: none
         """
         if winner == 1:
-            print(str(self.model.order[0].name) + " wins!")  # player X
+            print(str(self.model.get_order()()[0].name) + " wins!")  # player X
         elif winner == 2:
-            print(str(self.model.order[1].name) + " wins!")  # player O
+            print(str(self.model.get_order()()[1].name) + " wins!")  # player O
         else:
             print("Tie Game!")
 
@@ -105,8 +105,8 @@ class TextualView(AbstractView):
         Displays the current score of both players alongside their names
         :return: none
         """
-        print(str(self.model.order[0].name) + ": " + str(self.model.order[0].score))
-        print(str(self.model.order[1].name) + ": " + str(self.model.order[1].score))
+        print(str(self.model.get_order()()[0].name) + ": " + str(self.model.get_order()()[0].score))
+        print(str(self.model.get_order()()[1].name) + ": " + str(self.model.get_order()()[1].score))
 
     def display_end_of_game(self):
         """

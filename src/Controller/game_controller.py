@@ -1,7 +1,10 @@
 import tkinter
+
+import ai_player
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
+from Model.game_decorator_ai import GameDecoratorAI
 from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
@@ -9,9 +12,23 @@ import configparser
 settings_path = '../../settings.ini'
 
 
+class GameFactory:
+    from abstract_game import AbstractGame
+
+    @staticmethod
+    def get_game(game_type: str, p1: AbstractPlayer, p2: AbstractPlayer, width: int, height: int) -> AbstractGame:
+        if game_type == 'local':
+            return Game(p1, p2, width, height)
+        elif game_type == 'AI':
+            return GameDecoratorAI(Game(p1, p2, width, height))
+        # elif game_type == 'online':
+        #     return GameDecoratorOnline(Game(p1, p2, width, height))
+        raise ValueError('Unknown game type')
+
+
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = True):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -19,6 +36,8 @@ class GameController:
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
+        self.ai = ai
+        self.simulator = None
         self.setup()
 
     def play_game(self):
@@ -34,7 +53,6 @@ class GameController:
 
             # Checks if there are any available moves for the current player
             if self.model.valid_moves_avail(player):
-                # TODO: combine into fn
                 self.view.display_board(self.model.get_valid_moves(player))
                 self.view.display_score()
                 self.view.display_current_player(player)
@@ -51,7 +69,7 @@ class GameController:
                     attempt = Move(x, y)
 
                 # Checks whose turn it is and updates the board with their corresponding piece
-                if self.model.get_active_player() == self.model.order[0]:
+                if self.model.get_active_player() == self.model.get_order()()[0]:
                     self.model.update_board(attempt, Cell.BLACK)
                 else:
                     self.model.update_board(attempt, Cell.WHITE)
@@ -88,7 +106,7 @@ class GameController:
         attempt = Move(y, x)
         self.model.validate_move(attempt, player)
         # update the model
-        if player == self.model.order[0]:
+        if player == self.model.get_order()()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -105,6 +123,20 @@ class GameController:
             moves = self.model.get_valid_moves(self.model.get_active_player())
             if len(moves) == 0:
                 self.model.switch_players(self.model.get_active_player())
+            if self.model.get_active_player().type() == 'AI':
+                ai_player = self.model.get_active_player()
+                move = ai_player.make_move(0, 0)
+                actual_move = Move(move[0], move[1])
+                self.model.validate_move(actual_move, ai_player)
+                if ai_player == self.model.get_order()()[0]:
+                    self.model.update_board(actual_move, Cell.BLACK)
+                else:
+                    self.model.update_board(actual_move, Cell.WHITE)
+                if self.model.has_game_ended():
+                    self.view.display_board([])
+                    self.view.display_score()
+                    self.view.display_winner(self.model.display_winner())
+                self.model.switch_players(ai_player)
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
@@ -135,11 +167,19 @@ class GameController:
         height = self.config.getint('Model', 'board_height')
 
         # Currently, unused
-        # ai_difficult = self.config.getint('Model', 'AI_difficulty')
+        ai_difficult = self.config.getint('Model', 'AI_difficulty')
         # start_filled = self.config.getboolean('Model', 'start_filled')
         # debug = self.config.getboolean('Misc', 'debug')
 
-        self.model = Game(self.p1, self.p2, width, height)
+        if self.ai:
+            game_type = 'AI'
+        else:
+            game_type = 'local'
+
+        self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+
+        if self.ai:
+            self.p2.add_simulator(self.model)
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']
@@ -154,5 +194,3 @@ class GameController:
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
             self.view.root.mainloop()
-
-

@@ -1,10 +1,10 @@
 from abc import abstractmethod, ABC
-from Model.game import Game
 from Model import abstract_player
+from abstract_game import AbstractGame
 
 
 class AbstractView(ABC):
-    def __init__(self, model: Game):
+    def __init__(self, model: AbstractGame):
         self.model = model
 
     def __init__(self, board_view):

@@ -5,6 +5,10 @@ from Model.abstract_player import AbstractPlayer
 
 class AbstractGame(ABC):
     @abstractmethod
+    def get_order(self):
+        pass
+
+    @abstractmethod
     def validate_move(self, move: Move, play: AbstractPlayer):
         pass
 

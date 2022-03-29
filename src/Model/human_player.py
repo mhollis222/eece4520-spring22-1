@@ -9,3 +9,6 @@ class HumanPlayer(AbstractPlayer):
 
     def add_move(self, move: Move):
         self.history.append(move)
+
+    def type(self):
+        return 'Human'

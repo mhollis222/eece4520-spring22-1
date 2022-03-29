@@ -22,3 +22,7 @@ class AbstractPlayer(ABC):
 
     def add_move(self, move: Move) -> None:
         self.history.append(move)
+
+    @abstractmethod
+    def type(self):
+        pass

@@ -26,11 +26,18 @@ class Game(AbstractGame):
         self.order = []  # order of players
         self.active_player = None  # Player whose turn it currently is
 
+    def get_order(self):
+        return self.order
+
     def _coin_flip(self) -> [AbstractPlayer, AbstractPlayer]:
         """
         simulates a coin flip to decide which player goes first
         :return: the player to go first
         """
+        if self.p2.type() == 'AI':
+            self.p1.identifier = 1
+            self.p2.identifier = 2
+            return [self.p1, self.p2]
         if random() > 0.5:
             self.p1.identifier = 1
             self.p2.identifier = 2
@@ -109,6 +116,7 @@ class Game(AbstractGame):
     def valid_moves_avail(self, play: AbstractPlayer) -> bool:
         """
         determine if active player has moves available
+        :param moves: empty for local play
         :param play: Player making move
         :return: moves available? (boolean)
         """
@@ -269,3 +277,4 @@ class Game(AbstractGame):
             self.active_player = self.order[1]  # Passes play to Player Two
         else:
             self.active_player = self.order[0]  # Passes play to Player One
+

@@ -1,10 +1,10 @@
 import math
 
 from View.abstract_view import AbstractView
-from Model.game import Game
 from Model.abstract_player import AbstractPlayer
 import tkinter as tk
 from View.UI.reversi_button import ReversiButton
+from abstract_game import AbstractGame
 
 
 # Constants
@@ -17,7 +17,7 @@ from View.UI.reversi_button import ReversiButton
 
 class GuiBoard(AbstractView):
 
-    def __init__(self, model: Game, p1_color: str, p2_color: str, controller):
+    def __init__(self, model: AbstractGame, p1_color: str, p2_color: str, controller):
         super().__init__(model)
         # model and controller
         self.model = model
@@ -46,6 +46,8 @@ class GuiBoard(AbstractView):
         self.score_frame = tk.Frame(self.root)
         self.score_frame.grid(row=2, column=0, sticky='NWES')
 
+        self.order = self.model.get_order()
+
     def display_board(self, valid_moves: list):
         '''
         Creates a frame of the game board and populates the grid with buttons respective to the moves already made, the
@@ -59,8 +61,8 @@ class GuiBoard(AbstractView):
         board_view = self.model.get_board()
 
         for x in range(len(board_view)):
-            self.board_frame.rowconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
-            self.board_frame.columnconfigure(x, minsize=math.ceil(75/(len(board_view))), weight=1)
+            self.board_frame.rowconfigure(x, minsize=math.ceil(75 / (len(board_view))), weight=1)
+            self.board_frame.columnconfigure(x, minsize=math.ceil(75 / (len(board_view))), weight=1)
 
         for i, x in enumerate(board_view):
             for y in range(len(board_view[0])):
@@ -73,11 +75,11 @@ class GuiBoard(AbstractView):
                                            state=tk.DISABLED, color=self.empty_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 elif x[y].value == 1:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                    button = ReversiButton(self.board_frame, i, y, '1', callback=self.controller.advance,
                                            state=tk.DISABLED, color=self.p1_color)
                     button.grid(row=i, column=y, sticky='nsew')
                 else:
-                    button = ReversiButton(self.board_frame, i, y, '', callback=self.controller.advance,
+                    button = ReversiButton(self.board_frame, i, y, '2', callback=self.controller.advance,
                                            state=tk.DISABLED, color=self.p2_color)
                     button.grid(row=i, column=y, sticky='nsew')
 
@@ -92,7 +94,7 @@ class GuiBoard(AbstractView):
         self.notice_frame.grid(row=1, column=0, sticky='NWES')
         color = self.p1_color if player.identifier == 1 else self.p2_color
         current_player = tk.Label(self.notice_frame, text=str(player) + "'s turn! (" + color + ')',
-                                       bg='#343434', fg='white', font=('Arial', 20), pady=30)
+                                  bg='#343434', fg='white', font=('Arial', 20), pady=30)
         current_player.pack()
 
     def get_move(self):
@@ -112,12 +114,12 @@ class GuiBoard(AbstractView):
         self.notice_frame.grid(row=1, column=0, sticky='NWES')
         if winner == 1:
             # print(str(self.model.order[0].name) + " wins!")
-            winner_one = tk.Label(self.notice_frame, text=str(self.model.order[0].name) + " wins!", fg='yellow',
+            winner_one = tk.Label(self.notice_frame, text=str(self.model.get_order()()[0].name) + " wins!", fg='yellow',
                                   bg='#343434', font=('Arial', 50), pady=30)
             winner_one.pack()
         elif winner == 2:
             # print(str(self.model.order[1].name) + " wins!")  # player O
-            winner_two = tk.Label(self.notice_frame, text=str(self.model.order[1].name) + " wins!",
+            winner_two = tk.Label(self.notice_frame, text=str(self.model.get_order()()[1].name) + " wins!",
                                   bg='#343434', fg='yellow', font=('Arial', 50), pady=30)
             winner_two.pack()
         else:
@@ -141,13 +143,13 @@ class GuiBoard(AbstractView):
         self.score_frame.grid(row=2, column=0, sticky='NWES')
 
         self.score_frame.score_one = tk.Label(self.score_frame,
-                                              text=str(self.model.order[0].name) + ": " +
-                                                   str(self.model.order[0].score), bg='#343434',
+                                              text=str(self.model.get_order()()[0].name) + ": " +
+                                                   str(self.model.get_order()()[0].score), bg='#343434',
                                               fg='white', font=('Arial', 20))
         self.score_frame.score_one.grid(row=2, column=0, columnspan=2, sticky='w', padx=75)
         self.score_frame.score_two = tk.Label(self.score_frame,
-                                              text=str(self.model.order[1].name) + ": " +
-                                                   str(self.model.order[1].score), fg='white', font=('Arial', 20),
+                                              text=str(self.model.get_order()()[1].name) + ": " +
+                                                   str(self.model.get_order()()[1].score), fg='white', font=('Arial', 20),
                                               bg='#343434')
         self.score_frame.score_two.grid(row=2, column=0, columnspan=2, sticky='ne', padx=100)
 
