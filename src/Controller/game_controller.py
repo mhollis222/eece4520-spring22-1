@@ -106,7 +106,7 @@ class GameController:
         attempt = Move(y, x)
         self.model.validate_move(attempt, player)
         # update the model
-        if player == self.model.get_order()()[0]:
+        if player == self.model.get_order()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -128,7 +128,7 @@ class GameController:
                 move = ai_player.make_move(0, 0)
                 actual_move = Move(move[0], move[1])
                 self.model.validate_move(actual_move, ai_player)
-                if ai_player == self.model.get_order()()[0]:
+                if ai_player == self.model.get_order()[0]:
                     self.model.update_board(actual_move, Cell.BLACK)
                 else:
                     self.model.update_board(actual_move, Cell.WHITE)

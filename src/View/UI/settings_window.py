@@ -100,16 +100,16 @@ class SettingsWindow(tk.Toplevel):
 
     # function call to start game
     def start_game(self):
-        if self.config_settings['Model']['ai']:
-            self.play_ai()
-        else:
+        if self.config_settings['Model']['ai'] == 'False':
             self.play_local()
+        else:
+            self.play_ai()
 
     def play_local(self):
         """Starts a game locally for the user"""
         player1 = HumanPlayer(self.config['User']['username'])
         player2 = HumanPlayer("Guest")
-        controller = GameController(player1, player2)
+        controller = GameController(player1, player2, False)
         controller.save_settings()
         controller.setup()
         controller.play_game()

@@ -3,6 +3,9 @@ from PIL import Image, ImageTk
 from difficulty_window2 import AIDifficultyIIWindow
 from difficulty_window2 import AIDifficultyIIWindow
 from settings_window import SettingsWindow
+import configparser
+
+settings_path = '../../settings.ini'
 
 
 class MemberPlayOptionsWindow(tk.Toplevel):
@@ -13,6 +16,8 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.rowconfigure([0, 1, 2], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2, 3], minsize=50, weight=1)
         self.configure(bg='green')
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
 
 
         # back button
@@ -65,12 +70,16 @@ class MemberPlayOptionsWindow(tk.Toplevel):
 
     def open_ai(self):
         """Naviagtes to the AI settings window"""
+        self.config['Model']['ai'] = str(True)
+        self.save_preferences()
         ai_win = AIDifficultyIIWindow(self)
         ai_win.focus_force()
         self.withdraw()
 
     def open_settings_options(self):
         """Naviagtes to the game settings page"""
+        self.config['Model']['ai'] = str(False)
+        self.save_preferences()
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()
         self.withdraw()

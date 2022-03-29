@@ -2,6 +2,9 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from difficulty_window1 import AIDifficultyIWindow
 from settings_window import SettingsWindow
+import configparser
+
+settings_path = '../../settings.ini'
 
 
 class GuestOptionsWindow(tk.Toplevel):
@@ -12,6 +15,8 @@ class GuestOptionsWindow(tk.Toplevel):
         self.rowconfigure([0, 1, 2], minsize=50, weight=1)
         self.columnconfigure([0, 1], minsize=50, weight=1)
         self.configure(bg='green')
+        self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config.read(settings_path)
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
@@ -40,7 +45,6 @@ class GuestOptionsWindow(tk.Toplevel):
                                          command=self.open_AI)
         self.computer_button.grid(row=1, column=1, padx=50, sticky='s')
 
-
     def open_login(self):
         """Naviagtes to the login page"""
         self.destroy()
@@ -48,12 +52,25 @@ class GuestOptionsWindow(tk.Toplevel):
 
     def open_AI(self):
         """Naviagtes to the AI settings window"""
+        self.config['Model']['ai'] = str(True)
+        self.save_preferences()
         ai_win = AIDifficultyIWindow(self)
         ai_win.focus_force()
         self.withdraw()
 
     def open_settings_options(self):
         """Naviagtes to the settings preference window"""
+        self.config['Model']['ai'] = str(False)
+        self.save_preferences()
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()
         self.withdraw()
+
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(settings_path, 'w') as f:
+            self.config.write(f)
