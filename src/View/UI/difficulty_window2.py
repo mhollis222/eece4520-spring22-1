@@ -2,7 +2,10 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import configparser
 
+from settings_window import SettingsWindow
+
 settings_path = '../../settings.ini'
+preference_path = '../../preferences.ini'
 
 
 class AIDifficultyIIWindow(tk.Toplevel):
@@ -15,7 +18,8 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
         self.configure(bg='green')
-
+        self.preference_config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.preference_config.read(preference_path)
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
@@ -32,7 +36,7 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.easy_image = ImageTk.PhotoImage(self.easy_image)
         self.easy_button = tk.Button(self, width=400, height=250, text="Easy", image=self.easy_image,
                                        compound=tk.TOP, activebackground='green', bg='#41ab24', fg='white',
-                                       font=("Arial", 17))
+                                       font=("Arial", 17), command=self.easy_play)
         self.easy_button.grid(row=1, column=0, padx=50, sticky='s')
         # medium button
         self.medium_image = Image.open('../View/UI/images/medium.png')
@@ -40,7 +44,8 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.medium_image = ImageTk.PhotoImage(self.medium_image)
         self.medium_button = tk.Button(self, width=400, height=250, text="Medium",
                                          image=self.medium_image, bg='#41ab24',
-                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17))
+                                         activebackground='green', compound=tk.TOP, fg='white', font=("Arial", 17),
+                                       command=self.medium_play)
         self.medium_button.grid(row=1, column=1, padx=50, sticky='s')
         # hard button
         self.hard_image = Image.open('../View/UI/images/hard.png')
@@ -48,7 +53,7 @@ class AIDifficultyIIWindow(tk.Toplevel):
         self.hard_image = ImageTk.PhotoImage(self.hard_image)
         self.hard_button = tk.Button(self,  width=400, height=250, text="Hard", image=self.hard_image,
                                           bg='#41ab24', activebackground='green', compound=tk.TOP, fg='white',
-                                          font=("Arial", 17))
+                                          font=("Arial", 17),  command=self.hard_play)
         self.hard_button.grid(row=1, column=2, padx=50, sticky='s')
 
     def open_home_window(self):
@@ -59,11 +64,29 @@ class AIDifficultyIIWindow(tk.Toplevel):
     def easy_play(self):
         self.config['Model']['ai_difficulty'] = str(1)
         self.save_preferences()
+        self.open_settings()
 
     def medium_play(self):
         self.config['Model']['ai_difficulty'] = str(3)
         self.save_preferences()
+        self.open_settings()
 
     def hard_play(self):
         self.config['Model']['ai_difficulty'] = str(5)
         self.save_preferences()
+        self.open_settings()
+
+    def open_settings(self):
+        """Naviagtes to the settings preference window"""
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
+
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(settings_path, 'w') as f:
+            self.config.write(f)

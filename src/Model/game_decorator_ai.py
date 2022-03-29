@@ -22,7 +22,7 @@ class GameDecoratorAI(GameDecorator):
     def search(self, move: tuple, identity: int):
         super().search(move, identity)
 
-    def valid_moves_avail(self, moves: list[Move], play: AbstractPlayer):
+    def valid_moves_avail(self, moves, play: AbstractPlayer):
         sim_game = copy.deepcopy(self.game)
         for move in moves:
             current_player = sim_game.get_active_player()
@@ -69,34 +69,20 @@ class GameDecoratorAI(GameDecorator):
         old_score = original_player.score
 
         for move in moves:
-<<<<<<< HEAD
             if not sim_game.has_game_ended():
                 current_player = sim_game.get_active_player()
-                if sim_game.validate_move(self, move, current_player):
+                if sim_game.validate_move(move, current_player):
 
-                    if sim_game.get_active_player() == sim_game.order[0]:
+                    if sim_game.get_active_player() == sim_game.get_order()[0]:
                         sim_game.update_board(move, Cell.BLACK)
                     else:
                         sim_game.update_board(move, Cell.WHITE)
 
-                    sim_game.switch_players(self, current_player)
-                else:
-                    return None
+                    sim_game.switch_players(current_player)
             else:
                 break
-=======
-            current_player = sim_game.get_active_player()
-            if sim_game.validate_move(move, current_player):
 
-                if sim_game.get_active_player() == sim_game.get_order()[0]:
-                    sim_game.update_board(move, Cell.BLACK)
-                else:
-                    sim_game.update_board(move, Cell.WHITE)
-
-                sim_game.switch_players(current_player)
         sim_game.update_score()
->>>>>>> 3b0705693dd6c6f1a999d6effa4884b57b6e57c8
-
         new_score = original_player.score
 
         return new_score - old_score

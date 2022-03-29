@@ -27,7 +27,7 @@ class AIPLayer(AbstractPlayer):
 
         return moves[index]
 
-    def minmax(self, level: int, moves: list[Move], maximize: bool, alpha: int, beta: int) -> int:
+    def minmax(self, level: int, moves, maximize: bool, alpha: int, beta: int) -> int:
         if level == self.depth:
             # print(self.simulator.simulate_play(moves))
             return self.simulator.simulate_play(moves) # utility function for this list of moves

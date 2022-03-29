@@ -1,8 +1,11 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import configparser
+from settings_window import SettingsWindow
 
 settings_path = '../../settings.ini'
+preference_path = '../../preferences.ini'
+
 
 class AIDifficultyIWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -14,6 +17,8 @@ class AIDifficultyIWindow(tk.Toplevel):
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
         self.configure(bg='green')
+        self.preference_config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.preference_config.read(preference_path)
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
@@ -58,11 +63,29 @@ class AIDifficultyIWindow(tk.Toplevel):
     def easy_play(self):
         self.config['Model']['ai_difficulty'] = str(1)
         self.save_preferences()
+        self.open_settings()
 
     def medium_play(self):
         self.config['Model']['ai_difficulty'] = str(3)
         self.save_preferences()
+        self.open_settings()
 
     def hard_play(self):
         self.config['Model']['ai_difficulty'] = str(5)
         self.save_preferences()
+        self.open_settings()
+
+    def open_settings(self):
+        """Naviagtes to the settings preference window"""
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
+
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(settings_path, 'w') as f:
+            self.config.write(f)

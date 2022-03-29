@@ -1,6 +1,10 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+
+from ai_player import AIPLayer
+from game import Game
 from game_controller import GameController
+from game_decorator_ai import GameDecoratorAI
 from gui_board import GuiBoard
 from human_player import HumanPlayer
 from player_color import ChoosePlayerColor
@@ -8,7 +12,7 @@ from board_size import TempWindow
 from board_align import AlignmentWindow
 import configparser
 
-
+settings_path = '../../settings.ini'
 preferences_path = '../../preferences.ini'
 
 
@@ -22,6 +26,8 @@ class SettingsWindow(tk.Toplevel):
         self.rowconfigure([0, 1, 2, 3], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
         self.configure(bg='green')
+        self.config_settings = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.config_settings.read(settings_path)
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
@@ -94,10 +100,33 @@ class SettingsWindow(tk.Toplevel):
 
     # function call to start game
     def start_game(self):
+        if self.config_settings['Model']['ai']:
+            self.play_ai()
+        else:
+            self.play_local()
+
+    def play_local(self):
         """Starts a game locally for the user"""
         player1 = HumanPlayer(self.config['User']['username'])
         player2 = HumanPlayer("Guest")
         controller = GameController(player1, player2)
+        controller.save_settings()
+        controller.setup()
+        controller.play_game()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
+        self.withdraw()
+
+    def play_ai(self):
+        player1 = HumanPlayer(self.config['User']['username'])
+        player2 = AIPLayer("Computer", self.config_settings['Model']['ai_difficulty'])
+
+        game = Game(player1, player2)
+        dec = GameDecoratorAI(game)
+        game.start()
+        player2.add_simulator(dec)
+        player2.add_opp(player1)
+        controller = GameController(player1, player2, True)
         controller.save_settings()
         controller.setup()
         controller.play_game()
