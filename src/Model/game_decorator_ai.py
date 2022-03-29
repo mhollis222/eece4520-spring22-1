@@ -23,7 +23,7 @@ class GameDecoratorAI(GameDecorator):
         super().search(move, identity)
 
     def valid_moves_avail(self, moves: list[Move], play: AbstractPlayer):
-        sim_game = copy.copy(self.game)
+        sim_game = copy.deepcopy(self.game)
         for move in moves:
             current_player = sim_game.get_active_player()
             if sim_game.validate_move(move, current_player):
@@ -64,7 +64,7 @@ class GameDecoratorAI(GameDecorator):
         super().switch_players(player)
 
     def simulate_play(self, moves):
-        sim_game = copy.copy(self.game)
+        sim_game = copy.deepcopy(self.game)
         original_player = sim_game.get_active_player()
         old_score = original_player.score
 
