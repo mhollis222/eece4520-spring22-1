@@ -108,21 +108,19 @@ class GameController:
             if len(moves) == 0:
                 self.model.switch_players(self.model.get_active_player())
             if self.model.get_active_player().type() == 'AI':
-                print('AI Turn')
                 ai_player = self.model.get_active_player()
-                move = ai_player.make_move(0,0)
+                move = ai_player.make_move(0, 0)
                 actual_move = Move(move[0], move[1])
-                print("ai played " + str(actual_move.x) + ", " + str(actual_move.y))
                 self.model.validate_move(actual_move, ai_player)
                 if ai_player == self.model.order[0]:
                     self.model.update_board(actual_move, Cell.BLACK)
                 else:
                     self.model.update_board(actual_move, Cell.WHITE)
-                self.model.switch_players(ai_player)
                 if self.model.has_game_ended():
                     self.view.display_board([])
                     self.view.display_score()
                     self.view.display_winner(self.model.display_winner())
+                self.model.switch_players(ai_player)
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
