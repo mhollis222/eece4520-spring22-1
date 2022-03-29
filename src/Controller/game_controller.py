@@ -2,6 +2,7 @@ import tkinter
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
+from Model.game_decorator_ai import GameDecoratorAI
 from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
@@ -11,7 +12,7 @@ settings_path = '../../settings.ini'
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = True):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -20,6 +21,7 @@ class GameController:
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
         self.ai = ai
+        self.simulator = None
         self.setup()
 
     def play_game(self):
@@ -100,12 +102,27 @@ class GameController:
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
         else:
-
             self.model.switch_players(player)  # Passes play to the other player
             # Update the board
             moves = self.model.get_valid_moves(self.model.get_active_player())
             if len(moves) == 0:
                 self.model.switch_players(self.model.get_active_player())
+            if self.model.get_active_player().type() == 'AI':
+                print('AI Turn')
+                ai_player = self.model.get_active_player()
+                move = ai_player.make_move(0,0)
+                actual_move = Move(move[0], move[1])
+                print("ai played " + str(actual_move.x) + ", " + str(actual_move.y))
+                self.model.validate_move(actual_move, ai_player)
+                if ai_player == self.model.order[0]:
+                    self.model.update_board(actual_move, Cell.BLACK)
+                else:
+                    self.model.update_board(actual_move, Cell.WHITE)
+                self.model.switch_players(ai_player)
+                if self.model.has_game_ended():
+                    self.view.display_board([])
+                    self.view.display_score()
+                    self.view.display_winner(self.model.display_winner())
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
@@ -141,6 +158,10 @@ class GameController:
         # debug = self.config.getboolean('Misc', 'debug')
 
         self.model = Game(self.p1, self.p2, width, height)
+
+        if self.ai:
+            self.simulator = GameDecoratorAI(self.model)
+            self.p2.add_simulator(self.simulator)
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']

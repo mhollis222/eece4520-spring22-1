@@ -31,6 +31,10 @@ class Game(AbstractGame):
         simulates a coin flip to decide which player goes first
         :return: the player to go first
         """
+        if self.p2.type() == 'AI':
+            self.p1.identifier = 1
+            self.p2.identifier = 2
+            return [self.p1, self.p2]
         if random() > 0.5:
             self.p1.identifier = 1
             self.p2.identifier = 2

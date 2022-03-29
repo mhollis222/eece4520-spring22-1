@@ -16,7 +16,7 @@ class GameDecorator(AbstractGame):
     def search(self, move: tuple, identity: int):
         self.game.search(move, identity)
 
-    def valid_moves_avail(self, play: AbstractPlayer):
+    def valid_moves_avail(self, moves: list[Move], play: AbstractPlayer):
         self.game.valid_moves_avail(play)
 
     def start(self) -> None:
