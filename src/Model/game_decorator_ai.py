@@ -23,18 +23,22 @@ class GameDecoratorAI(GameDecorator):
         super().search(move, identity)
 
     def get_moves_sim(self, moves: list[Move], play: AbstractPlayer):
-        sim_game = copy.deepcopy(self.game)
+        old_save = self.game.get_board()
+        sim = copy.deepcopy(old_save)
+        self.game.board = sim
         for move in moves:
-            current_player = sim_game.get_active_player()
-            if sim_game.validate_move(move, current_player):
+            current_player = self.game.get_active_player()
+            if self.game.validate_move(move, current_player):
 
-                if sim_game.get_active_player() == sim_game.get_order()[0]:
-                    sim_game.update_board(move, Cell.BLACK)
+                if self.game.get_active_player() == self.game.get_order()[0]:
+                    self.game.update_board(move, Cell.BLACK)
                 else:
-                    sim_game.update_board(move, Cell.WHITE)
+                    self.game.update_board(move, Cell.WHITE)
 
-                sim_game.switch_players(current_player)
-        return sim_game.get_valid_moves(play)
+                self.game.switch_players(current_player)
+        moves = self.game.get_valid_moves(play)
+        self.game.board = old_save
+        return moves
 
     def start(self) -> None:
         super().start()
@@ -64,25 +68,29 @@ class GameDecoratorAI(GameDecorator):
         super().switch_players(player)
 
     def simulate_play(self, moves):
-        sim_game = copy.deepcopy(self.game)
-        original_player = sim_game.get_active_player()
+        old_save = self.game.get_board()
+        sim = copy.deepcopy(old_save)
+        self.game.board = sim
+        original_player = self.game.get_active_player()
         old_score = original_player.score
 
         for move in moves:
-            if not sim_game.has_game_ended():
-                current_player = sim_game.get_active_player()
-                if sim_game.validate_move(move, current_player):
+            if not self.game.has_game_ended():
+                current_player = self.game.get_active_player()
+                if self.game.validate_move(move, current_player):
 
-                    if sim_game.get_active_player() == sim_game.get_order()[0]:
-                        sim_game.update_board(move, Cell.BLACK)
+                    if self.game.get_active_player() == self.game.get_order()[0]:
+                        self.game.update_board(move, Cell.BLACK)
                     else:
-                        sim_game.update_board(move, Cell.WHITE)
+                        self.game.update_board(move, Cell.WHITE)
 
-                    sim_game.switch_players(current_player)
+                    self.game.switch_players(current_player)
             else:
                 break
 
-        sim_game.update_score()
+        self.game.update_score()
         new_score = original_player.score
+
+        self.game.board = old_save
 
         return new_score - old_score
