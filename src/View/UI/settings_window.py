@@ -1,12 +1,12 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from ai_player import AIPLayer
-from game import Game
-from game_controller import GameController
+from Model.ai_player import AIPLayer
+from Model.game import Game
+from Controller.game_controller import GameController
 from game_decorator_ai import GameDecoratorAI
 from gui_board import GuiBoard
-from human_player import HumanPlayer
+from Model.human_player import HumanPlayer
 from player_color import ChoosePlayerColor
 from board_size import TempWindow
 from board_align import AlignmentWindow
