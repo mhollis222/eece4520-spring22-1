@@ -52,17 +52,20 @@ class GameDecoratorAI(GameDecorator):
         old_score = original_player.score
 
         for move in moves:
-            current_player = sim_game.get_active_player()
-            if sim_game.validate_move(self, move, current_player):
+            if not sim_game.has_game_ended():
+                current_player = sim_game.get_active_player()
+                if sim_game.validate_move(self, move, current_player):
 
-                if sim_game.get_active_player() == sim_game.order[0]:
-                    sim_game.update_board(move, Cell.BLACK)
+                    if sim_game.get_active_player() == sim_game.order[0]:
+                        sim_game.update_board(move, Cell.BLACK)
+                    else:
+                        sim_game.update_board(move, Cell.WHITE)
+
+                    sim_game.switch_players(self, current_player)
                 else:
-                    sim_game.update_board(move, Cell.WHITE)
-
-                sim_game.switch_players(self, current_player)
+                    return None
             else:
-                return None
+                break
 
         new_score = original_player.score
 
