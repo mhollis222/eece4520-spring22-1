@@ -1,10 +1,12 @@
+import os
 import tkinter as tk
 from PIL import Image, ImageTk
 from difficulty_window1 import AIDifficultyIWindow
 from settings_window import SettingsWindow
 import configparser
-
-settings_path = '../../settings.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
 
 
 class GuestOptionsWindow(tk.Toplevel):
@@ -18,16 +20,14 @@ class GuestOptionsWindow(tk.Toplevel):
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
 
-        # a_file = open(settings_path)
-        # file_contents = a_file.read()
-        # print(file_contents)
+
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
                                      activebackground='green', bg='green', fg='white', relief='flat',
                                      command=self.open_login)
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
-        #title
+        # title
         self.guest_title = tk.Label(self, text='Who do you want to play?',
                                     font=("Arial", 35, "bold"), bg='green', fg='white')
         self.guest_title.grid(row=1, column=0, columnspan=2, sticky=tk.N)

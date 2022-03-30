@@ -2,8 +2,9 @@ import tkinter as tk
 from member_play_options_window import MemberPlayOptionsWindow
 from Model.database import Database
 import configparser
-
-preferences_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 def get_elo(username: str) -> str:
@@ -23,7 +24,7 @@ class HomeWindow(tk.Toplevel):
         super().__init__(parent)
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        self.config.read(preferences_path)
+        self.config.read(preference_path)
 
         self.title('Home Page')
         self.geometry("2000x2000")

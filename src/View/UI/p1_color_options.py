@@ -4,7 +4,9 @@ from PIL import Image, ImageTk
 import configparser
 
 
-settings_path = '../../settings.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
 
 
 class Player1ColorOptionsWindow(tk.Toplevel):

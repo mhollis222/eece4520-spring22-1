@@ -8,7 +8,9 @@ from home_window import HomeWindow
 import configparser
 
 
-preferences_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class LoginWindow(tk.Tk):
@@ -16,7 +18,7 @@ class LoginWindow(tk.Tk):
         super().__init__()
         # special options to save comments on writes
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        self.config.read(preferences_path)
+        self.config.read(preference_path)
         # self.setup()
 
         self.title('Login Page')
@@ -94,5 +96,5 @@ class LoginWindow(tk.Tk):
         :param settings: the settings to be stored.
         :return: success of operation
         """
-        with open(preferences_path, 'w') as f:
+        with open(preference_path, 'w') as f:
             self.config.write(f)

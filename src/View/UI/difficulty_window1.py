@@ -3,8 +3,10 @@ from PIL import Image, ImageTk
 import configparser
 from settings_window import SettingsWindow
 
-settings_path = '../../settings.ini'
-preference_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class AIDifficultyIWindow(tk.Toplevel):
@@ -30,7 +32,7 @@ class AIDifficultyIWindow(tk.Toplevel):
                                     font=("Arial", 35, "bold"), bg='green', fg='white')
         self.guest_title.grid(row=1, column=0, columnspan=3, sticky=tk.N)
         # easy button
-        self.easy_image = Image.open('../View/UI/images/easy.png')
+        self.easy_image = Image.open('images/easy.png')
         self.easy_image = self.easy_image.resize((175, 175))
         self.easy_image = ImageTk.PhotoImage(self.easy_image)
         self.easy_button = tk.Button(self, width=400, height=250, text="Easy", image=self.easy_image,
@@ -38,7 +40,7 @@ class AIDifficultyIWindow(tk.Toplevel):
                                        font=("Arial", 17), command=self.easy_play)
         self.easy_button.grid(row=1, column=0, padx=50, sticky='s')
         # medium button
-        self.medium_image = Image.open('../View/UI/images/medium.png')
+        self.medium_image = Image.open('images/medium.png')
         self.medium_image = self.medium_image.resize((175, 175))
         self.medium_image = ImageTk.PhotoImage(self.medium_image)
         self.medium_button = tk.Button(self, width=400, height=250, text="Medium",
@@ -47,7 +49,7 @@ class AIDifficultyIWindow(tk.Toplevel):
                                        command=self.medium_play)
         self.medium_button.grid(row=1, column=1, padx=50, sticky='s')
         # hard button
-        self.hard_image = Image.open('../View/UI/images/hard.png')
+        self.hard_image = Image.open('images/hard.png')
         self.hard_image = self.hard_image.resize((175, 175))
         self.hard_image = ImageTk.PhotoImage(self.hard_image)
         self.hard_button = tk.Button(self,  width=400, height=250, text="Hard", image=self.hard_image,

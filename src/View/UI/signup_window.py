@@ -5,7 +5,9 @@ from home_window import HomeWindow
 import configparser
 
 
-preferences_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class SignUpWindow(tk.Toplevel):
@@ -13,7 +15,7 @@ class SignUpWindow(tk.Toplevel):
         super().__init__(parent)
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        self.config.read(preferences_path)
+        self.config.read(preference_path)
 
         self.title("Registration Page")
         self.geometry("2000x2000")
@@ -85,5 +87,5 @@ class SignUpWindow(tk.Toplevel):
         :param settings: the settings to be stored.
         :return: success of operation
         """
-        with open(preferences_path, 'w') as f:
+        with open(preference_path, 'w') as f:
             self.config.write(f)

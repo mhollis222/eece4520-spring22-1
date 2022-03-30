@@ -4,8 +4,10 @@ import configparser
 
 from settings_window import SettingsWindow
 
-settings_path = '../../settings.ini'
-preference_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class AIDifficultyIIWindow(tk.Toplevel):

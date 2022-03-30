@@ -12,8 +12,10 @@ from board_size import TempWindow
 from board_align import AlignmentWindow
 import configparser
 
-settings_path = '../../settings.ini'
-preferences_path = '../../preferences.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[3]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
+preference_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class SettingsWindow(tk.Toplevel):
@@ -22,7 +24,7 @@ class SettingsWindow(tk.Toplevel):
         self.title("Settings Window")
         self.geometry("2000x2000")
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        self.config.read(preferences_path)
+        self.config.read(preference_path)
         self.rowconfigure([0, 1, 2, 3], minsize=50, weight=1)
         self.columnconfigure([0, 1, 2], minsize=50, weight=1)
         self.configure(bg='green')

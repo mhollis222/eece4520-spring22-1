@@ -8,7 +8,9 @@ from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
 
-settings_path = '../../settings.ini'
+from pathlib import Path
+path_parent = Path(__file__).resolve().parents[2]
+settings_path = path_parent.joinpath('settings.ini').as_posix()
 
 
 class GameFactory:
@@ -105,7 +107,7 @@ class GameController:
         attempt = Move(y, x)
         self.model.validate_move(attempt, player)
         # update the model
-        if player == self.model.get_order()[0]:
+        if player == self.model.get_order()()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -129,7 +131,7 @@ class GameController:
                 actual_move = Move(move[0], move[1])
                 print('ai made move ' + str(move))
                 self.model.validate_move(actual_move, ai_player)
-                if ai_player == self.model.get_order()[0]:
+                if ai_player == self.model.get_order()()[0]:
                     self.model.update_board(actual_move, Cell.BLACK)
                 else:
                     self.model.update_board(actual_move, Cell.WHITE)
