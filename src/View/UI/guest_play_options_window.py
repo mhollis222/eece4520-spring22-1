@@ -18,6 +18,10 @@ class GuestOptionsWindow(tk.Toplevel):
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
 
+        # a_file = open(settings_path)
+        # file_contents = a_file.read()
+        # print(file_contents)
+
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
                                      activebackground='green', bg='green', fg='white', relief='flat',
@@ -28,7 +32,7 @@ class GuestOptionsWindow(tk.Toplevel):
                                     font=("Arial", 35, "bold"), bg='green', fg='white')
         self.guest_title.grid(row=1, column=0, columnspan=2, sticky=tk.N)
         # play person button
-        self.person_image = Image.open('../View/UI/images/user.png')
+        self.person_image = Image.open('images/user.png')
         self.person_image = self.person_image.resize((175, 175))
         self.person_image = ImageTk.PhotoImage(self.person_image)
         self.person_button = tk.Button(self, width=400, height=250, text="Local Player", image=self.person_image,
@@ -36,7 +40,7 @@ class GuestOptionsWindow(tk.Toplevel):
                                        font=("Arial", 17), command=self.open_settings_options)
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
         # play computer button
-        self.computer_image = Image.open('../View/UI/images/computer.png')
+        self.computer_image = Image.open('images/computer.png')
         self.computer_image = self.computer_image.resize((175, 175))
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
         self.computer_button = tk.Button(self, width=400, height=250, text="Computer",
@@ -74,3 +78,4 @@ class GuestOptionsWindow(tk.Toplevel):
         """
         with open(settings_path, 'w') as f:
             self.config.write(f)
+            return True
