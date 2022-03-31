@@ -32,7 +32,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
                                     font=("Arial", 35, "bold"), bg='green', fg='white')
         self.guest_title.grid(row=1, column=1, columnspan=2, sticky=tk.N)
         # play person button
-        self.person_image = Image.open('../View/UI/images/user.png')
+        self.person_image = Image.open('images/user.png')
         self.person_image = self.person_image.resize((175, 175))
         self.person_image = ImageTk.PhotoImage(self.person_image)
         self.person_button = tk.Button(self, width=400, height=250, text="Local Player", image=self.person_image,
@@ -40,7 +40,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
                                        font=("Arial", 17), command=self.open_settings_options)
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
         # play computer button
-        self.computer_image = Image.open('../View/UI/images/computer.png')
+        self.computer_image = Image.open('images/computer.png')
         self.computer_image = self.computer_image.resize((175, 175))
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
         self.computer_button = tk.Button(self, width=400, height=250, text="Computer",
@@ -49,7 +49,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
                                          command=self.open_ai)
         self.computer_button.grid(row=1, column=1, padx=50, sticky='s')
         # matchmake button
-        self.matchmake_image = Image.open('../View/UI/images/boxing-gloves.png')
+        self.matchmake_image = Image.open('images/boxing-gloves.png')
         self.matchmake_image = self.matchmake_image.resize((175, 175))
         self.matchmake_image = ImageTk.PhotoImage(self.matchmake_image)
         self.matchmake_button = tk.Button(self,  width=400, height=250, text="Matchmake", image=self.matchmake_image,
@@ -57,7 +57,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
                                           font=("Arial", 17))
         self.matchmake_button.grid(row=1, column=2, padx=50, sticky='s')
         # challenge player online button
-        self.online_image = Image.open('../View/UI/images/online.png')
+        self.online_image = Image.open('images/online.png')
         self.online_image = self.online_image.resize((175, 175))
         self.online_image = ImageTk.PhotoImage(self.online_image)
         self.online_button = tk.Button(self,  width=400, height=250, text="Online Player", image=self.online_image,
@@ -85,3 +85,12 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()
         self.withdraw()
+
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :return: success of operation
+        """
+        with open(settings_path, 'w') as f:
+            self.config.write(f)
+            return True

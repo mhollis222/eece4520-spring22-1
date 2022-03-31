@@ -73,7 +73,6 @@ class GuestOptionsWindow(tk.Toplevel):
     def save_preferences(self) -> bool:
         """
         Stores the desired settings dict as a yaml file at `settings_path`
-        :param settings: the settings to be stored.
         :return: success of operation
         """
         with open(settings_path, 'w') as f:
