@@ -1,8 +1,8 @@
-from abstract_player import AbstractPlayer
+from Model.abstract_player import AbstractPlayer
 from enum import Enum
 from random import random
-from move import Move
-from abstract_game import AbstractGame
+from Model.move import Move
+from Model.abstract_game import AbstractGame
 
 
 # the more I think about this, the less I think we actually need an enum here.

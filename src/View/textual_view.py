@@ -1,7 +1,7 @@
 from View.abstract_view import AbstractView
 from Model.abstract_player import AbstractPlayer
 from termcolor import colored
-from abstract_game import AbstractGame
+from Model.abstract_game import AbstractGame
 
 
 class TextualView(AbstractView):

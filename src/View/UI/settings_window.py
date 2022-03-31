@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from Model.ai_player import AIPLayer
 from Model.game import Game
 from Controller.game_controller import GameController
-from game_decorator_ai import GameDecoratorAI
+from Model.game_decorator_ai import GameDecoratorAI
 from gui_board import GuiBoard
 from Model.human_player import HumanPlayer
 from player_color import ChoosePlayerColor
@@ -121,7 +121,7 @@ class SettingsWindow(tk.Toplevel):
 
     def play_ai(self):
         player1 = HumanPlayer(self.config['User']['username'])
-        player2 = AIPLayer("Computer", self.config_settings['Model']['ai_difficulty'])
+        player2 = AIPLayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
 
         # game = Game(player1, player2)
         # dec = GameDecoratorAI(game)

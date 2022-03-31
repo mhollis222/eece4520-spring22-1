@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 from Model import abstract_player
-from abstract_game import AbstractGame
+from Model.abstract_game import AbstractGame
 
 
 class AbstractView(ABC):

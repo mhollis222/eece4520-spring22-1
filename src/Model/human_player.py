@@ -1,4 +1,4 @@
-from abstract_player import AbstractPlayer
+from Model.abstract_player import AbstractPlayer
 from Model.move import Move
 
 

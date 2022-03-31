@@ -1,9 +1,9 @@
 import copy
-from abstract_game import AbstractGame
-from abstract_game_decorator import GameDecorator
-from abstract_player import AbstractPlayer
-from game import Cell
-from move import Move
+from Model.abstract_game import AbstractGame
+from Model.abstract_game_decorator import GameDecorator
+from Model.abstract_player import AbstractPlayer
+from Model.game import Cell
+from Model.move import Move
 
 
 class GameDecoratorAI(GameDecorator):

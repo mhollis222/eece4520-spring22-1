@@ -1,6 +1,6 @@
 from Model.abstract_game import AbstractGame
-from abstract_player import AbstractPlayer
-from move import Move
+from Model.abstract_player import AbstractPlayer
+from Model.move import Move
 
 
 class GameDecorator(AbstractGame):

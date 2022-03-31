@@ -44,7 +44,6 @@ class AIPLayer(AbstractPlayer):
                 best_val = max(best_val, val)
                 alpha = max(alpha, best_val)
                 if val >= beta:
-                    print('PRUNING')
                     break
             return best_val
         else:
@@ -54,7 +53,6 @@ class AIPLayer(AbstractPlayer):
                 best_val = min(best_val, val)
                 beta = min(beta, best_val)
                 if val <= alpha:
-                    print('PRUNING')
                     break
             return best_val
 

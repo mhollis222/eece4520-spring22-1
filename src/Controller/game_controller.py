@@ -14,7 +14,7 @@ settings_path = path_parent.joinpath('settings.ini').as_posix()
 
 
 class GameFactory:
-    from abstract_game import AbstractGame
+    from Model.abstract_game import AbstractGame
 
     @staticmethod
     def get_game(game_type: str, p1: AbstractPlayer, p2: AbstractPlayer, width: int, height: int) -> AbstractGame:
@@ -107,7 +107,7 @@ class GameController:
         attempt = Move(y, x)
         self.model.validate_move(attempt, player)
         # update the model
-        if player == self.model.get_order()()[0]:
+        if player == self.model.get_order()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -129,15 +129,15 @@ class GameController:
                 ai_player = self.model.get_active_player()
                 move = ai_player.make_move(0, 0)
                 actual_move = Move(move[0], move[1])
-                print('ai made move ' + str(move))
+                # print('ai made move ' + str(move))
                 self.model.validate_move(actual_move, ai_player)
-                if ai_player == self.model.get_order()()[0]:
+                if ai_player == self.model.get_order()[0]:
                     self.model.update_board(actual_move, Cell.BLACK)
                 else:
                     self.model.update_board(actual_move, Cell.WHITE)
                 self.model.update_score()
                 if self.model.has_game_ended():
-                    print("Game ended")
+                    # print("Game ended")
                     self.view.display_board([])
                     self.view.display_score()
                     self.view.display_winner(self.model.display_winner())
