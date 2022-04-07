@@ -7,6 +7,7 @@ from Model.game_decorator_ai import GameDecoratorAI
 from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
 import configparser
+from time import sleep
 
 from pathlib import Path
 path_parent = Path(__file__).resolve().parents[2]
@@ -100,20 +101,26 @@ class GameController:
         :param button:
         :return:
         """
+        ai_turn = False
+        attempt = None
         # Get the current player
         player = self.model.get_active_player()
         # Get the move
-        x, y = button.x, button.y
-        attempt = Move(y, x)
-        self.model.validate_move(attempt, player)
-        # update the model
+        if player.type() == 'AI':
+            ai_turn = True
+            move = player.make_move(0, 0)
+            attempt = Move(move[0], move[1])
+        else:
+            x, y = button.x, button.y
+            attempt = Move(y, x)
+
         if player == self.model.get_order()[0]:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
-        # Update the score
+
         self.model.update_score()
-        # Checks if the game has ended
+
         if self.model.has_game_ended():
             print("Game ended")
             self.view.display_board([])
@@ -121,33 +128,18 @@ class GameController:
             self.view.display_winner(self.model.display_winner())
         else:
             self.model.switch_players(player)  # Passes play to the other player
+            new_player = self.model.get_active_player()
             # Update the board
-            moves = self.model.get_valid_moves(self.model.get_active_player())
+            moves = self.model.get_valid_moves(new_player)
             if len(moves) == 0:
-                self.model.switch_players(self.model.get_active_player())
-            if self.model.get_active_player().type() == 'AI':
-                ai_player = self.model.get_active_player()
-                move = ai_player.make_move(0, 0)
-                actual_move = Move(move[0], move[1])
-                # print('ai made move ' + str(move))
-                self.model.validate_move(actual_move, ai_player)
-                if ai_player == self.model.get_order()[0]:
-                    self.model.update_board(actual_move, Cell.BLACK)
-                else:
-                    self.model.update_board(actual_move, Cell.WHITE)
-                self.model.update_score()
-                if self.model.has_game_ended():
-                    # print("Game ended")
-                    self.view.display_board([])
-                    self.view.display_score()
-                    self.view.display_winner(self.model.display_winner())
-                    return
-                self.model.switch_players(ai_player)
-            self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
+                self.model.switch_players(new_player)
+            self.view.display_board(moves)
             self.view.display_score()
-            self.view.display_current_player(self.model.get_active_player())
+            self.view.display_current_player(new_player)
+            if not ai_turn:
+                # figure out some way to get it to pause...
+                self.advance(None)
 
-        # self.model.debug()
 
     def save_settings(self) -> bool:
         """

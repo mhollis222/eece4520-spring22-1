@@ -2,6 +2,7 @@ from Model.abstract_player import AbstractPlayer
 from Model.game_decorator_ai import GameDecoratorAI
 from Model.move import Move
 import numpy as np
+from time import sleep
 
 
 class AIPLayer(AbstractPlayer):
