@@ -102,11 +102,11 @@ class GameController:
         :return:
         """
         ai_turn = False
-        attempt = None
         # Get the current player
         player = self.model.get_active_player()
         # Get the move
         if player.type() == 'AI':
+            print("AI TURN")
             ai_turn = True
             move = player.make_move(0, 0)
             attempt = Move(move[0], move[1])
@@ -190,4 +190,6 @@ class GameController:
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
+            if self.model.get_active_player().type() == 'AI':
+                self.advance(None)
             self.view.root.mainloop()
