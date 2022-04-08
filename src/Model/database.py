@@ -69,16 +69,18 @@ class Database:
             entry = {"username": elem[0],
                      "password": elem[1],
                      "elo": elem[2],
-                     "high_score": elem[3]}
+                     "high_score": elem[3],
+                     "wins": elem[4],
+                     "losses": elem[5]}
             entry_list.append(entry)
         return entry_list
 
     def fetch_game_data(self, game_id: int):
-        self._cursor.execute("SELECT * FROM games WHERE gameid = (%i)", game_id)
+        self._cursor.execute("SELECT * FROM games WHERE gameid = (%s)", game_id)
         elem = self._cursor.fetchone()
         game = {"gameid": elem[0],
-                 "lastactiveplayer": elem[1],
-                 "gamestate": elem[2]}
+                "lastactiveplayer": elem[1],
+                "gamestate": elem[2]}
         return game
 
     def _init_table(self):
@@ -92,7 +94,9 @@ class Database:
                 " username varchar(20) NOT NULL,"
                 " password varchar(20) NOT NULL,"
                 " elo int NOT NULL,"
-                " highscore int NOT NULL);"
+                " highscore int NOT NULL,"
+                " wins int NOT NULL,"
+                " losses int NOT NULL);"
             )
             self._cursor.execute(
                 "CREATE TABLE IF NOT EXISTS games("
@@ -128,10 +132,10 @@ class Database:
             print("Failed to fetch active users in database: ", err)
             pass
         add_elements = (
-            "INSERT INTO users (username, password, elo, highscore) "
-            "VALUES (%s, %s, %s, %s)"
+            "INSERT INTO users (username, password, elo, highscore, wins, losses) "
+            "VALUES (%s, %s, %s, %s, %s, %s)"
         )
-        self._cursor.execute(add_elements, (username, password, 1500, 0))
+        self._cursor.execute(add_elements, (username, password, 1500, 0, 0, 0))
 
     def write_update_turn(self, game_id: int, last_player, last_move: Model.move.Move):
         """
@@ -143,29 +147,51 @@ class Database:
         """
         update_elements = (
             "UPDATE games "
-            "SET lastactiveplayer = (%s), gamestate = JSON_ARRAY_APPEND(gamestate, '$', (%i)), "
-            "gamestate = JSON_ARRAY_APPEND(gamestate, '$[last]', (%i)), gameid = (%i)"
+            "SET lastactiveplayer = (%s), gamestate = JSON_ARRAY_APPEND(gamestate, '$', (%s)), "
+            "gamestate = JSON_ARRAY_APPEND(gamestate, '$[last]', (%s)), gameid = (%s)"
         )
         self._cursor.execute(update_elements, (last_player, last_move.get_coords()[0], last_move.get_coords()[1],
                                                game_id))
 
-    def write_update_game_complete(self, user, elo, score, game_id):
+    def write_update_game_complete(self, game_id):
         """
-        update user data for online multiplayer game, including high score and ELO
         remove game instance from database
-        :param user: PRIMARY KEY user whose data will be updated based on game completion
-        :param elo: ELO rating corresponding to user
-        :param score: score to be compared versus user high score and potentially update
         :param game_id: game to be removed from database
         :return: none
         """
-        update_elements = (
+        self._cursor.execute("DELETE FROM games WHERE gameid = (%s)", game_id)
+
+    def write_update_users_complete(self, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs):
+        """
+        update user data for online multiplayer game, including high score and ELO
+        :param winner: PRIMARY KEY user whose data will be updated based on game completion
+        :param winner_elo: ELO rating corresponding to user
+        :param winner_hs: score to be compared versus user high score and potentially update
+        :param loser: PRIMARY KEY user whose data will be updated based on game completion
+        :param loser_elo: ELO rating corresponding to user
+        :param loser_hs: score to be compared versus user high score and potentially update
+        :return: none
+        """
+        winner_hs_og = self._cursor.execute("SELECT * FROM users WHERE username = (%s)", winner)
+        for hs in winner_hs_og:
+            if winner_hs < hs[3]:
+                winner_hs = winner_hs_og[3]
+        loser_hs_og = self._cursor.execute("SELECT * FROM users WHERE username = (%s)", loser)
+        for hs in loser_hs_og:
+            if loser_hs < hs[3]:
+                loser_hs = loser_hs_og[3]
+        update_winner = (
             "UPDATE users "
-            "SET elo = (%s), highscore = (%s) "
+            "SET elo = (%s), highscore = (%s), wins = wins + 1 "
             "WHERE username = (%s)"
         )
-        self._cursor.execute(update_elements, (elo, score, user))
-        self._cursor.execute("DELETE FROM games WHERE gameid = (%i)", game_id)
+        update_loser = (
+            "UPDATE users "
+            "SET elo = (%s), highscore = (%s), losses = losses + 1 "
+            "WHERE username = (%s)"
+        )
+        self._cursor.execute(update_winner, winner_elo, winner_hs, winner)
+        self._cursor.execute(update_loser, loser_elo, loser_hs, loser)
 
     def write_update_game_start(self, player_one):
         """
@@ -246,6 +272,7 @@ class Database:
 
         # create new user and test login
         db.write_user(signup_username, signup_password)
+        db.write_user("opp", "xxx")
         print("USER ADDED")
         print(db.fetch_user_data())
 
@@ -259,8 +286,10 @@ class Database:
             exit()
 
         # sample values for game completion
-        new_elo = 1600
-        new_high_score = 15
+        win_elo = 1600
+        lose_elo = 1400
+        win_high_score = 15
+        lose_high_score = 14
 
         # start game (called when game is initialized)
         game_id = db.write_update_game_start(username)
@@ -274,22 +303,23 @@ class Database:
         print(db.fetch_game_data(game_id))
 
         # update elo and score when game finishes (called when game is completed)
-        db.write_update_game_complete(username, new_elo, new_high_score, game_id)
+        db.write_update_game_complete(game_id)
+        db.write_update_users_complete(username, win_elo, win_high_score, "opp", lose_elo, lose_high_score)
         print("GAME FINISHED")
         print(db.fetch_user_data())
         print(db.fetch_game_data(game_id))
 
         # leaderboard test
-        db.write_user("user1", "pass1")
-        db.write_update_game_complete("user1", 1700, 20, game_id)
-        db.write_user("user2", "pass2")
-        db.write_update_game_complete("user2", 1800, 25, game_id)
-        db.write_user("user3", "pass3")
-        db.write_update_game_complete("user3", 1300, 5, game_id)
-        print("LEADERBOARD SORTED BY DATE ADDED")
-        print(db.fetch_user_data())
-        print("LEADERBOARD SORTED BY ELO")
-        print(db.sorted_leaderboard())
+        # db.write_user("user1", "pass1")
+        # db.write_update_game_complete("user1", 1700, 20, game_id)
+        # db.write_user("user2", "pass2")
+        # db.write_update_game_complete("user2", 1800, 25, game_id)
+        # db.write_user("user3", "pass3")
+        # db.write_update_game_complete("user3", 1300, 5, game_id)
+        # print("LEADERBOARD SORTED BY DATE ADDED")
+        # print(db.fetch_user_data())
+        # print("LEADERBOARD SORTED BY ELO")
+        # print(db.sorted_leaderboard())
 
         # close db
         db._connection.close()
