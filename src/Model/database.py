@@ -310,16 +310,16 @@ class Database:
         print(db.fetch_game_data(game_id))
 
         # leaderboard test
-        # db.write_user("user1", "pass1")
-        # db.write_update_game_complete("user1", 1700, 20, game_id)
-        # db.write_user("user2", "pass2")
-        # db.write_update_game_complete("user2", 1800, 25, game_id)
-        # db.write_user("user3", "pass3")
-        # db.write_update_game_complete("user3", 1300, 5, game_id)
-        # print("LEADERBOARD SORTED BY DATE ADDED")
-        # print(db.fetch_user_data())
-        # print("LEADERBOARD SORTED BY ELO")
-        # print(db.sorted_leaderboard())
+        db.write_user("user1", "pass1")
+        db.write_user("user2", "pass2")
+        db.write_update_users_complete("user1", 1700, 20, "user2", 1800, 25)
+        db.write_user("user3", "pass3")
+        db.write_user("user4", "pass4")
+        db.write_update_users_complete("user3", 1300, 5, "user4", 1900, 30)
+        print("LEADERBOARD SORTED BY DATE ADDED")
+        print(db.fetch_user_data())
+        print("LEADERBOARD SORTED BY ELO")
+        print(db.sorted_leaderboard())
 
         # close db
         db._connection.close()
