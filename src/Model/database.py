@@ -1,5 +1,7 @@
 import mysql.connector
 
+import Model.move
+
 
 class Database:
 
@@ -58,11 +60,7 @@ class Database:
             return exit()
         self._cursor.execute("USE reversi")
 
-    def fetch_data(self):
-        """
-        fetch users table from database and transform raw data into list of dictionary entries for each row/user
-        :return: list of user dictionary entries
-        """
+    def fetch_user_data(self):
         self._cursor.execute("SELECT * FROM users")
         data = self._cursor.fetchall()
         entry_list = list()
@@ -71,11 +69,17 @@ class Database:
             entry = {"username": elem[0],
                      "password": elem[1],
                      "elo": elem[2],
-                     "high_score": elem[3],
-                     "opponent": elem[4],
-                     "active_turn": elem[5]}
+                     "high_score": elem[3]}
             entry_list.append(entry)
         return entry_list
+
+    def fetch_game_data(self, game_id: int):
+        self._cursor.execute("SELECT * FROM games WHERE gameid = (%i)", game_id)
+        elem = self._cursor.fetchone()
+        game = {"gameid": elem[0],
+                 "lastactiveplayer": elem[1],
+                 "gamestate": elem[2]}
+        return game
 
     def _init_table(self):
         """
@@ -88,9 +92,13 @@ class Database:
                 " username varchar(20) NOT NULL,"
                 " password varchar(20) NOT NULL,"
                 " elo int NOT NULL,"
-                " highscore int NOT NULL,"
-                " opponent varchar(20) NOT NULL,"
-                " activeturn double NOT NULL);"
+                " highscore int NOT NULL);"
+            )
+            self._cursor.execute(
+                "CREATE TABLE IF NOT EXISTS games("
+                " gameid int NOT NULL,"
+                " lastactiveplayer varchar(20) NOT NULL,"
+                " gamestate JSON);"
             )
         except mysql.connector.ProgrammingError as err:
             print("Failed to create table: ", err)
@@ -120,56 +128,63 @@ class Database:
             print("Failed to fetch active users in database: ", err)
             pass
         add_elements = (
-            "INSERT INTO users (username, password, elo, highscore, opponent, activeturn) "
-            "VALUES (%s, %s, %s, %s, %s, %s)"
+            "INSERT INTO users (username, password, elo, highscore) "
+            "VALUES (%s, %s, %s, %s)"
         )
-        self._cursor.execute(add_elements, (username, password, 1500, 0, '', 0))
+        self._cursor.execute(add_elements, (username, password, 1500, 0))
 
-    def write_update_turn(self, user, turn):
+    def write_update_turn(self, game_id: int, last_player, last_move: Model.move.Move):
         """
-        update turn attribute in user table to track game state
-        TODO: migrate to new table in database
-        :param PRIMARY KEY user: user whose turn is tracked
-        :param turn: turn data to track - format and datatype for state tracking TBD
+        update game state in game instance table
+        :param PRIMARY KEY game_id: game to update state information
+        :param last_player: last active player (to determine turn order on restore)
+        :param last_move: turn data to track - appended to JSON list
         :return: none
         """
         update_elements = (
-            "UPDATE users "
-            "SET activeturn = (%s) "
-            "WHERE username = (%s)"
+            "UPDATE games "
+            "SET lastactiveplayer = (%s), gamestate = JSON_ARRAY_APPEND(gamestate, '$', (%i)), "
+            "gamestate = JSON_ARRAY_APPEND(gamestate, '$[last]', (%i)), gameid = (%i)"
         )
-        self._cursor.execute(update_elements, (turn, user))
+        self._cursor.execute(update_elements, (last_player, last_move.get_coords()[0], last_move.get_coords()[1],
+                                               game_id))
 
-    def write_update_game_complete(self, user, elo, score):
+    def write_update_game_complete(self, user, elo, score, game_id):
         """
         update user data for online multiplayer game, including high score and ELO
-        TODO: split method for new table in database
+        remove game instance from database
         :param user: PRIMARY KEY user whose data will be updated based on game completion
         :param elo: ELO rating corresponding to user
         :param score: score to be compared versus user high score and potentially update
+        :param game_id: game to be removed from database
         :return: none
         """
         update_elements = (
             "UPDATE users "
-            "SET elo = (%s), highscore = (%s), opponent = (%s) "
+            "SET elo = (%s), highscore = (%s) "
             "WHERE username = (%s)"
         )
-        self._cursor.execute(update_elements, (elo, score, '', user))
+        self._cursor.execute(update_elements, (elo, score, user))
+        self._cursor.execute("DELETE FROM games WHERE gameid = (%i)", game_id)
 
-    def write_update_game_start(self, user, opponent):
+    def write_update_game_start(self, player_one):
         """
-        update user's opponent for ongoing match beginning
-        TODO: migrate to new table in database
-        :param user: PRIMARY KEY user whose match status is being tracked
-        :param opponent: username or preset string corresponding to player user is engaged in a game with
+        add game instance to database
+        :param player_one: user who goes first ("last player" for a new game)
         :return: none
         """
         update_elements = (
-            "UPDATE users "
-            "SET opponent = (%s) "
-            "WHERE username = (%s)"
+            "INSERT INTO games (gameid, lastactiveplayer, gamestate) "
+            "VALUES (%i, %s, JSON_ARRAY())"
         )
-        self._cursor.execute(update_elements, (opponent, user))
+        self._cursor.execute("SELECT * FROM games")
+        data = self._cursor.fetchall()
+        id_max = 0
+        for row in data:
+            if row[0] > id_max:
+                id_max = row[0]
+        self._cursor.execute(update_elements, (id_max + 1, player_one))
+        return id_max + 1
 
     def _clear_data(self):
         """
@@ -177,6 +192,7 @@ class Database:
         :return: none
         """
         self._cursor.execute("DROP TABLE IF EXISTS users;")
+        self._cursor.exeute("DROP TABLE IF EXISTS games;")
 
     def verify_credentials(self, username, password):
         """
@@ -185,7 +201,7 @@ class Database:
         :param password: password selected for login, to correspond to entered username
         :return: valid? (boolean)
         """
-        for element in self.fetch_data():
+        for element in self.fetch_user_data():
             if element.get("username") == username:
                 if element.get("password") == password:
                     return True
@@ -200,7 +216,7 @@ class Database:
         """
         def by_elo(e: dict):
             return e.get("elo")
-        leaderboard = self.fetch_data()
+        leaderboard = self.fetch_user_data()
         leaderboard.sort(key=by_elo)
         return leaderboard
 
@@ -222,7 +238,7 @@ class Database:
 
         # initialization of table
         print("EMPTY DB")
-        print(db.fetch_data())
+        print(db.fetch_user_data())
 
         # sample values for signup
         signup_username = "test"
@@ -231,7 +247,7 @@ class Database:
         # create new user and test login
         db.write_user(signup_username, signup_password)
         print("USER ADDED")
-        print(db.fetch_data())
+        print(db.fetch_user_data())
 
         # login
         username = input("Username: ")
@@ -242,43 +258,36 @@ class Database:
             print("Invalid credentials")
             exit()
 
-        # sample values for game start
-        # note: opponent should be 'AI' or 'local' if not playing online
-        opponent = 'sample_opponent'
-
         # sample values for game completion
         new_elo = 1600
         new_high_score = 15
 
-        # sample values for game state
-        active_turn = 0xA5E3
-
         # start game (called when game is initialized)
-        db.write_update_game_start(username, opponent)
+        game_id = db.write_update_game_start(username)
         print("GAME STARTED")
-        print(db.fetch_data())
+        print(db.fetch_game_data(game_id))
 
         # update game state (called every time turn resolves)
         # game state is a double that represents game state
-        # TODO: method in model for parsing game state from this double
-        db.write_update_turn(username, active_turn)
+        db.write_update_turn(game_id, username, Model.move.Move(4, 5))
         print("TURN UPDATED")
-        print(db.fetch_data())
+        print(db.fetch_game_data(game_id))
 
         # update elo and score when game finishes (called when game is completed)
-        db.write_update_game_complete(username, new_elo, new_high_score)
+        db.write_update_game_complete(username, new_elo, new_high_score, game_id)
         print("GAME FINISHED")
-        print(db.fetch_data())
+        print(db.fetch_user_data())
+        print(db.fetch_game_data(game_id))
 
         # leaderboard test
         db.write_user("user1", "pass1")
-        db.write_update_game_complete("user1", 1700, 20)
+        db.write_update_game_complete("user1", 1700, 20, game_id)
         db.write_user("user2", "pass2")
-        db.write_update_game_complete("user2", 1800, 25)
+        db.write_update_game_complete("user2", 1800, 25, game_id)
         db.write_user("user3", "pass3")
-        db.write_update_game_complete("user3", 1300, 5)
+        db.write_update_game_complete("user3", 1300, 5, game_id)
         print("LEADERBOARD SORTED BY DATE ADDED")
-        print(db.fetch_data())
+        print(db.fetch_user_data())
         print("LEADERBOARD SORTED BY ELO")
         print(db.sorted_leaderboard())
 
