@@ -1,6 +1,7 @@
 import socket
 import pickle
 import threading
+import uuid
 from queue import Queue
 from msg import ReversiMessage as msg
 
@@ -11,6 +12,7 @@ class ReversiServer:
         self.port = port
         self.buffer_size = buffer_size
         self.occupants = []
+        self.move_queues = {}
 
     def start(self):
         with socket.socket() as my_socket:
@@ -20,51 +22,77 @@ class ReversiServer:
 
             while True:
                 conn, address = my_socket.accept()
-                i_buff = Queue()
-                o_buff = Queue()
+                uid = uuid.uuid4()
+                queue = Queue(5)
+                self.move_queues[uid] = queue
                 print(f'Connected by {address}')
-                thread = threading.Thread(target=self.handle_client, args=(conn, i_buff, o_buff,))
+                thread = threading.Thread(target=self.handle_client, args=(conn, uid, queue))
                 thread.start()
 
     # do we need queues???
-    def handle_client(self, conn, i_buff: Queue, o_buff: Queue):
+    def handle_client(self, conn, uid, move_queue: Queue):
         with conn:
+            id_message = msg('send_uid', [uid])
+            id_binary = pickle.dumps(id_message)
+            conn.sendall(id_binary)
+
             while True:
+                if not move_queue.empty():
+                    move = move_queue.get()
+                    rsp = pickle.dumps(move)
+                    conn.sendall(rsp)
+                    print('sent a move to client')
+
                 ex_binary = conn.recv(self.buffer_size)
                 if not ex_binary:
                     break
                 ex = pickle.loads(ex_binary)
-                rsp = self.parse_msg(ex)
+                rsp = self.parse_msg(ex, move_queue)
                 rsp_binary = pickle.dumps(rsp)
                 conn.sendall(rsp_binary)
+                print('sent a message to client')
             print('Client Disconnected')
 
-    def parse_msg(self, msg: msg):
-        msg_type = msg.get_type()
-        params = msg.get_params()
+    def parse_msg(self, message: msg, move_queue):
+        msg_type = message.get_type()
+        params = message.get_params()
         return {
-            'get_elo': self.get_elo(params),
-            'set_elo': self.set_elo(params),
-            'get_players': self.get_players(params),
-            'add_player': self.add_player(params),
-            'rcv_move': self.rcv_move(params)
+            'get_elo': self.get_elo,
+            'set_elo': self.set_elo,
+            'get_players': self.get_players,
+            'send_move': self.send_move,
+        }.get(msg_type)(params, move_queue)
 
-        }.get(msg_type)
+    def get_elo(self, params: list, move_queue: Queue):
+        # query db for elo rating
+        return msg('send_elo', [0])
 
-    def get_elo(self, params: list):
-        return 'getting_elo'
+    def set_elo(self, params: list, move_queue: Queue):
+        # update elo rating after game
+        if True: #if sucessful
+            return msg('ack', [True])
+        return msg('ack', [False])
 
-    def set_elo(self, params: list):
-        return 'setting_elo'
+    def get_players(self, params: list, move_queue: Queue):
+        return msg('send_players', [self.occupants])
 
-    def get_players(self, params: list):
-        return 'getting_players'
+    def send_move(self, params: list, move_queue: Queue):
+        try:
+            q = self.move_queues.get(params[0])
+            q.put(msg('send_move', params))
+            return msg('ack', [True])
+        except:
+            return msg('ack', [False])
 
-    def add_player(self, params: list):
-        return 'adding_player'
 
-    def rcv_move(self, params: list):
-        return 'receiving_move'
+    def log_in_request(self, params: list, move_queue: Queue):
+        username, password, uid = params
+
+        # check db with username and password
+        #if successful
+        self.occupants.append((username, uid))
+        return msg('ack', [True])
+
 
 
 if __name__ == '__main__':
