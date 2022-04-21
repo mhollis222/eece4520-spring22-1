@@ -22,11 +22,6 @@ class ReversiClient:
             uid = pickle.loads(uid_binary)
             self.parse_response(uid)
 
-            test1 = msg('send_move', [1234, 5])
-            test2 = msg('send_move', [self.uid, 6])
-
-            self.out_queue.put(test1)
-            self.out_queue.put(test2)
             # start main loop
             while True:
                 if not self.out_queue.empty():
