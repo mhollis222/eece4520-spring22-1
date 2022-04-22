@@ -6,7 +6,7 @@ class ReversiMessage:
     # get_players: params = [None]
     # send_move: params = [opponent_uid, move]
     # rcv_move: params = [None]
-    # log_in: params = [username, password]
+    # log_in: params = [username, password, uid]
     # request_game: params = [local username, local uid, elo]
     # challenge_player: params = [opposing player uid]
     #####################################################
@@ -18,6 +18,7 @@ class ReversiMessage:
     # ack: params  = [success?]
     # send_uid: params = [uid]
     # mm_resp: params = [success?, opposing_uid?]
+    # log_in_resp: ???? could just use an ack
 
     requests = ['get_elo', 'set_elo', 'get_players', 'send_move', 'log_in', 'request_game']
     responses = ['send_elo', 'send_leaderboard', 'send_players', 'send_move', 'ack', 'send_uid', 'mm_resp']
