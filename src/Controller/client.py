@@ -1,7 +1,9 @@
+import random
 import socket
 import pickle
 from msg import ReversiMessage as msg
 from queue import Queue
+import time
 
 
 class ReversiClient:
@@ -21,6 +23,10 @@ class ReversiClient:
             uid_binary = my_socket.recv(self.buffer_size)
             uid = pickle.loads(uid_binary)
             self.parse_response(uid)
+            print(self.uid)
+
+            test = msg('request_game', ['jim', self.uid, random.randint(20, 40)])
+            self.out_queue.put(test)
 
             # start main loop
             while True:
@@ -36,6 +42,7 @@ class ReversiClient:
                 self.parse_response(result)
 
     def parse_response(self, rsp: msg):
+        print('response received')
         msg_type = rsp.get_type()
         params = rsp.params
         return {
@@ -46,6 +53,7 @@ class ReversiClient:
             'ack': self.ack,
             'log_in_resp': self.log_in_resp,
             'send_uid': self.send_uid,
+            'mm_resp': self.mm_resp,
         }.get(msg_type)(params)
 
     def send_elo(self, params: list):
@@ -68,6 +76,12 @@ class ReversiClient:
 
     def send_uid(self, params: list):
         self.uid = params[0]
+
+    def mm_resp(self, params: list):
+        if params[0]:
+            print(f'Received match with {params[1]}')
+        else:
+            print(f'matchmaking failed')
 
 
 if __name__ == '__main__':
