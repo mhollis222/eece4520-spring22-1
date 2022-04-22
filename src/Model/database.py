@@ -1,5 +1,5 @@
 import mysql.connector
-
+import json
 import Model.move
 
 
@@ -80,7 +80,7 @@ class Database:
         elem = self._cursor.fetchone()
         game = {"gameid": elem[0],
                 "lastactiveplayer": elem[1],
-                "gamestate": elem[2]}
+                "gamestate": (json.dumps(elem[2][0]), json.dumps(elem[2][1]))}
         return game
 
     def _init_table(self):
