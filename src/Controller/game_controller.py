@@ -4,14 +4,19 @@ from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
 from Model.game_decorator_ai import GameDecoratorAI
+from Model.game_decorator_online import GameDecoratorOnline
 from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
+from client import ReversiClient
+from message import ReversiMessage as msg
 import configparser
 from time import sleep
 
 from pathlib import Path
+
 path_parent = Path(__file__).resolve().parents[2]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
+preferences_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class GameFactory:
@@ -23,8 +28,8 @@ class GameFactory:
             return Game(p1, p2, width, height)
         elif game_type == 'AI':
             return GameDecoratorAI(Game(p1, p2, width, height))
-        # elif game_type == 'online':
-        #     return GameDecoratorOnline(Game(p1, p2, width, height))
+        elif game_type == 'online':
+            return GameDecoratorOnline(Game(p1, p2, width, height))
         raise ValueError('Unknown game type')
 
 
@@ -38,9 +43,12 @@ class GameController:
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
+        self.pref = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+        self.pref.read(preferences_path)
         self.ai = ai
         self.simulator = None
         self.setup()
+        self.client = None
 
     def play_game(self):
         """
@@ -121,11 +129,21 @@ class GameController:
 
         self.model.update_score()
 
+        # TODO: determine if active player == client, and only then do we execute this code
+        # TODO: determine game id from clientside
+        if self.model is GameDecoratorOnline:
+            user = self.config.get('User', 'username')
+            self.client.send_request(msg('update_game_state', [game_id, user, attempt]))
+
         if self.model.has_game_ended():
             print("Game ended")
             self.view.display_board([])
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
+            # TODO: determine winner/loser/draw
+            if self.model is GameDecoratorOnline:
+                self.client.send_request(msg('update_game_complete', [game_id, winner, winner_elo, winner_hs,
+                                                                      loser, loser_elo, loser_hs]))
         else:
             self.model.switch_players(player)  # Passes play to the other player
             new_player = self.model.get_active_player()
@@ -139,7 +157,6 @@ class GameController:
             if not ai_turn:
                 # figure out some way to get it to pause...
                 self.advance(None)
-
 
     def save_settings(self) -> bool:
         """
@@ -177,6 +194,10 @@ class GameController:
         else:
             game_type = 'local'
             self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+
+        # TODO: implement way to determine whether local or online
+        if self.model is GameDecoratorOnline:
+            self.client = ReversiClient()
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']

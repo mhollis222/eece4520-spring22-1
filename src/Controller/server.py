@@ -132,7 +132,7 @@ class ReversiServer:
                         queue.remove(opp)
                         self.move_queues[player[0]] = None
                         self.move_queues[opp[0]] = None
-
+                        self.db.write_update_game_start()
             event.wait(5)
 
     def parse_msg(self, request: msg, msg_queue):
@@ -201,6 +201,23 @@ class ReversiServer:
         :return: a 'send_players' message with param [[(username, uid, elo)]] (param[0] is the list of players)
         """
         return [self.occupants]
+
+    def update_game_state(self, params: list, msg_queue: Queue):
+        """
+        Updates database with last played move to corresponding game
+        :param params: [game_id, last_player, move]
+        """
+        self.db.write_update_turn(params[0], params[1], params[2])
+
+    def update_game_complete(self, params: list, msg_queue: Queue):
+        """
+        Removes game instance from database if not done so already
+        :param params: [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
+        """
+        if self.db.fetch_game_data(params[0]):
+            self.db.write_update_game_complete(game_id=params[0])
+            self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
+                                                loser=params[4], loser_elo=params[5], loser_hs=params[6])
 
     # Unfinished
     def send_move(self, params: list, msg_queue: Queue):
