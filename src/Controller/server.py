@@ -1,9 +1,7 @@
 import copy
-import random
 import socket
 import pickle
 import threading
-import uuid
 from queue import Queue
 from Controller.message import ReversiMessage as msg
 import time
@@ -52,11 +50,6 @@ class ReversiServer:
         :return: Nothing
         """
         with conn:
-            # if not self.move_queues[address]:
-            #     id_binary = pickle.dumps([address])
-            #     conn.sendall(id_binary)
-            #     print('sent address')
-
             while True:
                 # Check if we have received any messages to transmit
                 if not move_queue.empty():
@@ -64,7 +57,6 @@ class ReversiServer:
                     rsp = pickle.dumps(move)
                     conn.sendall(rsp)
                     print('sent a message to client')
-
                 try:
                     # Check the buffer to see if there has been any received messages
                     ex_binary = conn.recv(self.buffer_size)
@@ -73,9 +65,10 @@ class ReversiServer:
                         break
                     ex = pickle.loads(ex_binary)
                     rsp = self.parse_msg(ex, move_queue)
-                    rsp_binary = pickle.dumps(rsp)
-                    conn.sendall(rsp_binary)
-                    print('sent a message to client')
+                    if rsp:
+                        rsp_binary = pickle.dumps(rsp)
+                        conn.sendall(rsp_binary)
+                        print('sent a message to client')
                 # If no messages are received for 5 seconds, loop
                 except socket.timeout:
                     pass
@@ -211,10 +204,9 @@ class ReversiServer:
         """
         try:
             q = self.move_queues.get(params[0])
-            q.put(msg('send_move', params))
-            return msg('ack', [True])
+            q.put(msg(params))
         except:
-            return msg('ack', [False])
+            pass
 
     def log_in_request(self, params: list, msg_queue: Queue):
         """
