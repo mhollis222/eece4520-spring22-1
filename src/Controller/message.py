@@ -1,8 +1,8 @@
 class ReversiMessage:
     #####################################################
     # Requests
-    # get_elo: params = [current player]
-    # set_elo: params = [current player, elo]
+    # get_elo: params = [username]
+    # set_elo: params = [username, elo]
     # get_players: params = [None]
     # send_move: params = [opponent_uid, move]
     # rcv_move: params = [None]
@@ -12,7 +12,7 @@ class ReversiMessage:
     #####################################################
     # Responses
 
-    requests = ['get_elo', 'set_elo', 'get_players', 'send_move', 'log_in', 'request_game', 'test']
+    requests = ['get_elo', 'leaderboard', 'get_players', 'send_move', 'log_in', 'request_game', 'register']
 
     def __init__(self, msg_type: str, params: list):
         assert(msg_type in ReversiMessage.requests)

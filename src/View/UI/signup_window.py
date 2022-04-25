@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-from Model.database import Database
-from home_window import HomeWindow
+from View.UI.home_window import HomeWindow
+from Controller.client import ReversiClient
+from Controller.message import ReversiMessage as msg
 import configparser
 
 
@@ -16,6 +17,7 @@ class SignUpWindow(tk.Toplevel):
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(preference_path)
+        self.client = ReversiClient()
 
         self.title("Registration Page")
         self.geometry("2000x2000")
@@ -67,12 +69,13 @@ class SignUpWindow(tk.Toplevel):
 
     def register(self):
         """Attempts to write a new user object to the database"""
-        db = Database('localhost', 'reversi', 'eece4520')
+
         if self.new_username_entry.get() == '' :
             messagebox.showerror('Register failure', 'Username cannot be empty.')
         elif self.new_password_entry.get() == '':
             messagebox.showerror('Register failure', 'Password cannot be empty.')
-        elif db.write_user(self.new_username_entry.get(), self.new_password_entry.get()) == -1:
+        elif self.client.send_request(msg('register', [self.new_username_entry.get(),
+                                                       self.new_password_entry.get()])) == -1:
             print("registration failed")
             messagebox.showerror('Register failure', 'Username already exists.')
         elif self.new_password_entry.get() != self.retype_password_entry.get():

@@ -119,6 +119,7 @@ class Database:
         self._cursor.execute("SELECT username FROM users")
         try:
             users = self._cursor.fetchall()
+            # realistically this line should be: `if username in users or username in ['AI', 'local', 'guest']:`
             for user in users:
                 if user[0] == username:  # prevents users from making duplicate usernames
                     return -1
@@ -136,6 +137,7 @@ class Database:
             "VALUES (%s, %s, %s, %s, %s, %s)"
         )
         self._cursor.execute(add_elements, (username, password, 1500, 0, 0, 0))
+        return 1
 
     def write_update_turn(self, game_id: int, last_player, last_move: Model.move.Move):
         """

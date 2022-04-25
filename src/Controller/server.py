@@ -7,6 +7,7 @@ import uuid
 from queue import Queue
 from Controller.message import ReversiMessage as msg
 import time
+from Model.database import Database
 
 TIMEOUT = 60
 TOLERANCE = 20  # not sure what this should actually be but i'll figure it out
@@ -21,6 +22,7 @@ class ReversiServer:
         self.occupants = []
         self.move_queues = dict()
         self.queueing = []
+        self.db = Database('localhost', 'reversi', 'eece4520')
 
     def start(self):
         with socket.socket() as my_socket:
@@ -35,17 +37,7 @@ class ReversiServer:
                 conn, address = my_socket.accept()
                 conn.settimeout(5)
                 print(f'Connected by {address}')
-                # Client sends something.. username?
-                # ex_binary = conn.recv(self.buffer_size)
-                # ex = pickle.loads(ex_binary)
-
-                # if a buffer already exists then return it
-                # slight issue, they never get cleared, maybe add a logout
-                # check if log_in vs handshake?
-                # doesn't matter until a game occurs?
-                # but then matchmaking
                 queue = Queue(5)
-
                 thread = threading.Thread(target=self.handle_client, args=(conn, queue))
                 thread.start()
                 thread.join()
@@ -154,11 +146,13 @@ class ReversiServer:
         msg_type = request.get_type()
         params = request.get_params()
         return {
-            'test': self.get_elo,
-            'set_elo': self.set_elo,
+            'get_elo': self.get_elo,
+            'leaderboard': self.leaderboard,
             'get_players': self.get_players,
             'send_move': self.send_move,
             'request_game': self.match_make,
+            'register': self.register,
+            'log_in': self.log_in_request,
         }.get(msg_type)(params, msg_queue)
 
     """
@@ -168,7 +162,7 @@ class ReversiServer:
     If no information needs to be returned, an ack: `msg('ack', [success?])` works.
     `params` can be unused, but bust be a parameter.
     """
-
+    # Done
     def get_elo(self, params: list, msg_queue: Queue):
         """
         Returns the current user's elo
@@ -176,9 +170,10 @@ class ReversiServer:
         :return: a 'send_elo' message with param [user elo]
         """
         # query db for elo rating
-        return ["HELLO WORLD"]
+        username = params[0]
+        return [self.db.fetch_user_data()[username].get('elo')]
 
-    def set_elo(self, params: list, msg_queue: Queue):
+    def leaderboard(self, params: list, msg_queue: Queue):
         """
         Potentially unneeded.
         Meant to update the elo ranking for a player.
@@ -187,9 +182,16 @@ class ReversiServer:
         :return: an ack with param [success?]
         """
         # update elo rating after game
-        if True:  # if sucessful
-            return msg('ack', [True])
-        return msg('ack', [False])
+        return [self.db.sorted_leaderboard()]
+
+    def register(self, params: list, msg_queue: Queue):
+        """
+        Handles registration for an account
+        :param params: [username, password]
+        :return:
+        """
+        username, password = params
+        return [self.db.write_user(username, password)]
 
     # Finished
     def get_players(self, params: list, msg_queue: Queue):
@@ -222,19 +224,16 @@ class ReversiServer:
         :return: ack on success
         """
         username, password, uid = params
-
-        # check db with username and password
-        # if successful
-        # get their elo
-        elo = random.randint(0, 100)
-        self.occupants.append((username, uid, elo))
-        # should return 'log_in_resp'
-        return msg('ack', [True])
+        if self.db.verify_credentials(username, password):
+            self.occupants.append(username)
+            return [True]
+        return [False]
 
     # Finished (kinda)
     def match_make(self, params: list, msg_queue: Queue):
         """
         Initiates matchmaking for a player
+        :param msg_queue: message queue used to return the message
         :param params: [username, uid, elo]
         :return: ack
         """
@@ -242,7 +241,7 @@ class ReversiServer:
         curr_time = time.time()
         self.move_queues[curr_username] = msg_queue
         self.queueing.append((curr_username, elo, curr_time))
-        return msg('ack', [True])
+
 
 
 if __name__ == '__main__':

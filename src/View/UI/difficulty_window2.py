@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import configparser
 
-from settings_window import SettingsWindow
+from View.UI.settings_window import SettingsWindow
 
 from pathlib import Path
 path_parent = Path(__file__).resolve().parents[3]

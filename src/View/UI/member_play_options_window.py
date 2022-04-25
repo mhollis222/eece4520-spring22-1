@@ -1,8 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from difficulty_window2 import AIDifficultyIIWindow
-from difficulty_window2 import AIDifficultyIIWindow
-from settings_window import SettingsWindow
+from View.UI.difficulty_window2 import AIDifficultyIIWindow
+from View.UI.settings_window import SettingsWindow
 import configparser
 
 from pathlib import Path
@@ -79,7 +78,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.withdraw()
 
     def open_settings_options(self):
-        """Naviagtes to the game settings page"""
+        """Navigates to the game settings page"""
         self.config['Model']['ai'] = str(False)
         self.save_preferences()
         settings_options_win = SettingsWindow(self)

@@ -2,14 +2,12 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 from Model.ai_player import AIPLayer
-from Model.game import Game
 from Controller.game_controller import GameController
-from Model.game_decorator_ai import GameDecoratorAI
-from gui_board import GuiBoard
+from View.UI.gui_board import GuiBoard
 from Model.human_player import HumanPlayer
-from player_color import ChoosePlayerColor
-from board_size import TempWindow
-from board_align import AlignmentWindow
+from View.UI.player_color import ChoosePlayerColor
+from View.UI.board_size import TempWindow
+from View.UI.board_align import AlignmentWindow
 import configparser
 
 from pathlib import Path

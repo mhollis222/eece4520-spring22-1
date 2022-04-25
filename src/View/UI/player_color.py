@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from p1_color_options import Player1ColorOptionsWindow
-from p2_color_options import Player2ColorOptionsWindow
+from View.UI.p1_color_options import Player1ColorOptionsWindow
+from View.UI.p2_color_options import Player2ColorOptionsWindow
 
 
 class ChoosePlayerColor(tk.Toplevel):
