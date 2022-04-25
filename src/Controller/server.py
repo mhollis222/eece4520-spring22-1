@@ -112,11 +112,12 @@ class ReversiServer:
                     if abs(player[1] - opp[1]) < TOLERANCE:
                         print('found match')
                         # send mm_resp
+                        game_id = self.db.write_update_game_start()
                         q = self.move_queues.get(player[0])
-                        q.put(msg('mm_resp', [True, opp[0]]))
+                        q.put(msg('mm_resp', [True, opp[0], game_id]))
                         print(f'queue size player {q.qsize()}')
                         q = self.move_queues.get(opp[0])
-                        q.put(msg('mm_resp', [True, player[0]]))
+                        q.put(msg('mm_resp', [True, player[0], game_id]))
                         print(f'queue size opp {q.qsize()}')
                         # remove from queue
                         self.queueing.remove(player)
@@ -125,7 +126,6 @@ class ReversiServer:
                         queue.remove(opp)
                         self.move_queues[player[0]] = None
                         self.move_queues[opp[0]] = None
-                        self.db.write_update_game_start()
             event.wait(5)
 
     def parse_msg(self, request: msg, msg_queue):
@@ -253,9 +253,10 @@ class ReversiServer:
         """
         try:
             q = self.move_queues.get(params[0])
-            q.put(msg(params))
+            q.put(params[1])
+
         except:
-            pass
+            return [-1]
 
     def log_in_request(self, params: list, msg_queue: Queue):
         """
