@@ -125,7 +125,7 @@ class ReversiServer:
                         queue.remove(opp)
                         self.move_queues[player[0]] = None
                         self.move_queues[opp[0]] = None
-
+                        self.db.write_update_game_start()
             event.wait(5)
 
     def parse_msg(self, request: msg, msg_queue):
@@ -166,6 +166,38 @@ class ReversiServer:
         username = params[0]
         return [self.db.fetch_user_data()[username].get('elo')]
 
+    """
+    Temporary functions for calculating elo
+    """
+    def expected_win(self, opponent):
+        """
+        Calculates the expected win rate of player (self) against the opponent
+        :param opponent: opponent's name
+        :return: player's expected win rate
+        """
+        playerELO = self.db.fetch_data(self).get("elo")
+        opponentELO = self.db.fetch_data(opponent).get("elo")
+        exponent = (opponentELO - playerELO) / 400
+        probability = 1 / (1 + pow(10, exponent))
+        return probability
+
+    """
+    expected in the parameter is the probability from the above functions
+    maybe we can add another thing to the database that shows the expected_win rate of that player
+    not sure if it's "safe" to have a variable in the server that keeps track of that instead
+    """
+    def updated_elo(self, result, expected):
+        """
+        Calculates change in ELO rating
+        :param result: Result of game (0 = lose; 0.5 = draw; 1 = win)
+        :param expected: Expected probability to win (from expected_win)
+        :return: updated ELO rating
+        """
+        playerELO = self.db.fetch_data(self).get("elo")
+        k = 32
+        newELO = k * (result - expected)
+        return playerELO + newELO
+
     def leaderboard(self, params: list, msg_queue: Queue):
         """
         Potentially unneeded.
@@ -194,6 +226,23 @@ class ReversiServer:
         :return: a 'send_players' message with param [[(username, uid, elo)]] (param[0] is the list of players)
         """
         return [self.occupants]
+
+    def update_game_state(self, params: list, msg_queue: Queue):
+        """
+        Updates database with last played move to corresponding game
+        :param params: [game_id, last_player, move]
+        """
+        self.db.write_update_turn(params[0], params[1], params[2])
+
+    def update_game_complete(self, params: list, msg_queue: Queue):
+        """
+        Removes game instance from database if not done so already
+        :param params: [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
+        """
+        if self.db.fetch_game_data(params[0]):
+            self.db.write_update_game_complete(game_id=params[0])
+            self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
+                                                loser=params[4], loser_elo=params[5], loser_hs=params[6])
 
     # Unfinished
     def send_move(self, params: list, msg_queue: Queue):
