@@ -9,8 +9,13 @@ from View.UI.player_color import ChoosePlayerColor
 from View.UI.board_size import TempWindow
 from View.UI.board_align import AlignmentWindow
 import configparser
+from client import ReversiClient
+from message import ReversiMessage as msg
 
 from pathlib import Path
+
+from online_player import OnlinePlayer
+
 path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
 preference_path = path_parent.joinpath('preferences.ini').as_posix()
@@ -19,6 +24,7 @@ preference_path = path_parent.joinpath('preferences.ini').as_posix()
 class SettingsWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.client = ReversiClient()
         self.title("Settings Window")
         self.geometry("2000x2000")
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
@@ -131,4 +137,12 @@ class SettingsWindow(tk.Toplevel):
         # controller.setup()
         # game_win = GuiBoard(self)
         # game_win.focus_force()
+        self.withdraw()
+
+    def play_online(self):
+        player1 = HumanPlayer(self.config['User']['username'])
+        # TODO: implement get_opponent() in server.py
+        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', []))[0])
+        controller = GameController(player1, player2, False)
+        # TODO: not sure what else is needed here
         self.withdraw()

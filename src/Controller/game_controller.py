@@ -1,5 +1,3 @@
-import tkinter
-
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
@@ -10,7 +8,6 @@ from View.UI.gui_board import GuiBoard
 from client import ReversiClient
 from message import ReversiMessage as msg
 import configparser
-from time import sleep
 
 from pathlib import Path
 
@@ -45,6 +42,7 @@ class GameController:
         self.config.read(settings_path)
         self.pref = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.pref.read(preferences_path)
+        self.client_uid = self.pref.get('User', 'username')
         self.ai = ai
         self.simulator = None
         self.setup()
@@ -118,6 +116,10 @@ class GameController:
             ai_turn = True
             move = player.make_move(0, 0)
             attempt = Move(move[0], move[1])
+        elif player.type() == 'Online':
+            # TODO: rcv_move() needs implementation in server.py
+            move = self.client.send_request(msg('rcv_move', []))
+            attempt = Move(move[0], move[1])
         else:
             x, y = button.x, button.y
             attempt = Move(y, x)
@@ -129,19 +131,57 @@ class GameController:
 
         self.model.update_score()
 
-        # TODO: determine if active player == client, and only then do we execute this code
-        # TODO: determine game id from clientside
-        if self.model is GameDecoratorOnline:
-            user = self.config.get('User', 'username')
-            self.client.send_request(msg('update_game_state', [game_id, user, attempt]))
+        # the following code should only execute during the client player's turn
+        if self.model is GameDecoratorOnline and player.type() == 'Human':
+            # TODO: implement get_game_id() in server.py
+            game_id = self.client.send_request(msg('get_game_id', [self.client_uid]))[0]
+
+            self.client.send_request(msg('update_game_state', [game_id, self.client_uid, attempt]))
 
         if self.model.has_game_ended():
             print("Game ended")
             self.view.display_board([])
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
-            # TODO: determine winner/loser/draw
+
+            # the following code should execute on both clients BUT the database should only be updated once
             if self.model is GameDecoratorOnline:
+                players = [self.model.get_order()[0], self.model.get_order()[1]]
+                if players[0].score > players[1].score:
+                    hs = players[0]
+                    ls = players[1]
+                else:
+                    hs = players[1]
+                    ls = players[0]
+
+                # TODO: implement get_opponent() in server.py
+                opponent = self.client.send_request(msg('get_opponent', [self.client_uid]))[0]
+
+                if hs.type() == 'Human':
+                    winner = self.client_uid
+                    loser = opponent
+                else:
+                    winner = opponent
+                    loser = self.client_uid
+
+                opponent_expected_win = self.client.send_request(msg('expected_win', [opponent]))[0]
+                client_expected_win = self.client.send_request(msg('expected_win', [self.client_uid]))[0]
+
+                if winner == self.client_uid:
+                    winner_expected_win = client_expected_win
+                    loser_expected_win = opponent_expected_win
+                else:
+                    winner_expected_win = opponent_expected_win
+                    loser_expected_win = client_expected_win
+
+                winner_elo = self.client.send_request(msg('updated_elo', [1, winner_expected_win]))[0]
+                loser_elo = self.client.send_request(msg('updated_elo', [1, loser_expected_win]))[0]
+                winner_hs = hs.score
+                loser_hs = ls.score
+
+                # TODO: implement get_game_id() in server.py
+                game_id = self.client.send_request(msg('get_game_id', [self.client_uid]))[0]
+
                 self.client.send_request(msg('update_game_complete', [game_id, winner, winner_elo, winner_hs,
                                                                       loser, loser_elo, loser_hs]))
         else:
@@ -191,13 +231,13 @@ class GameController:
             decorator = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
             self.model = decorator.get_game()
             self.p2.add_simulator(decorator)
+        elif self.p2.type() == 'Online':
+            game_type = 'online'
+            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+            self.client = ReversiClient()
         else:
             game_type = 'local'
             self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
-
-        # TODO: implement way to determine whether local or online
-        if self.model is GameDecoratorOnline:
-            self.client = ReversiClient()
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']
