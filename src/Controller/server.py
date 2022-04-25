@@ -1,20 +1,20 @@
 import copy
 import random
 import socket
-from socket import MSG_DONTWAIT
 import pickle
 import threading
 import uuid
 from queue import Queue
-from msg import ReversiMessage as msg
+from Controller.message import ReversiMessage as msg
 import time
 
-TIMEOUT = 30
+TIMEOUT = 60
 TOLERANCE = 20  # not sure what this should actually be but i'll figure it out
 event = threading.Event()
 
+
 class ReversiServer:
-    def __init__(self, host='127.0.0.1', port=1234, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1235, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -31,21 +31,27 @@ class ReversiServer:
             mm_thread = threading.Thread(target=self.match_making)
             mm_thread.start()
 
-            threads = []
-
             while True:
                 conn, address = my_socket.accept()
                 conn.settimeout(5)
-                uid = uuid.uuid4()
-                queue = Queue(5)
-                self.move_queues[uid] = queue
                 print(f'Connected by {address}')
-                thread = threading.Thread(target=self.handle_client, args=(conn, uid, queue))
-                threads.append(thread)
+                # Client sends something.. username?
+                # ex_binary = conn.recv(self.buffer_size)
+                # ex = pickle.loads(ex_binary)
+
+                # if a buffer already exists then return it
+                # slight issue, they never get cleared, maybe add a logout
+                # check if log_in vs handshake?
+                # doesn't matter until a game occurs?
+                # but then matchmaking
+                queue = Queue(5)
+
+                thread = threading.Thread(target=self.handle_client, args=(conn, queue))
                 thread.start()
+                thread.join()
 
     # do we need queues???
-    def handle_client(self, conn, uid, move_queue: Queue):
+    def handle_client(self, conn, move_queue: Queue):
         """
         Handles sending and receiving messages to/from the client.
         :param conn: The client connection.
@@ -54,9 +60,10 @@ class ReversiServer:
         :return: Nothing
         """
         with conn:
-            id_message = msg('send_uid', [uid])
-            id_binary = pickle.dumps(id_message)
-            conn.sendall(id_binary)
+            # if not self.move_queues[address]:
+            #     id_binary = pickle.dumps([address])
+            #     conn.sendall(id_binary)
+            #     print('sent address')
 
             while True:
                 # Check if we have received any messages to transmit
@@ -69,6 +76,7 @@ class ReversiServer:
                 try:
                     # Check the buffer to see if there has been any received messages
                     ex_binary = conn.recv(self.buffer_size)
+                    print('received message')
                     if not ex_binary:
                         break
                     ex = pickle.loads(ex_binary)
@@ -100,39 +108,42 @@ class ReversiServer:
                 print('checking for matches')
                 # we don't want to modify the server copy.
                 queue = copy.deepcopy(self.queueing)
-                queue.sort(key=lambda e: e[2])
+                queue.sort(key=lambda e: e[1])
 
                 # boot anyone queueing for more than TIMEOUT seconds
                 for p in queue:
                     if time.time() - p[3] > TIMEOUT:
-                        q = self.move_queues.get(p[1])
+                        q = self.move_queues.get(p[0])
                         q.put(msg('mm_resp', [False]))
-
+                        self.move_queues[p[0]] = None
 
                 # attempt to pair players
                 for i in range(1, len(queue) - 1, 2):
                     player = queue[i]
                     # pairs with neighbor with smallest elo difference (while less than TOLERANCE)
-                    opp = queue[i - 1] if abs(player[2] - queue[i - 1][2]) < abs(player[2] - queue[i + 1][2]) else queue[
-                        i + 1]
-                    if abs(player[2] - opp[2]) < TOLERANCE:
+                    opp = queue[i - 1] if abs(player[1] - queue[i - 1][1]) < abs(player[1] - queue[i + 1][1]) else \
+                        queue[
+                            i + 1]
+                    if abs(player[1] - opp[1]) < TOLERANCE:
                         print('found match')
                         # send mm_resp
-                        q = self.move_queues.get(player[1])
-                        q.put(msg('mm_resp', [True, opp[1]]))
+                        q = self.move_queues.get(player[0])
+                        q.put(msg('mm_resp', [True, opp[0]]))
                         print(f'queue size player {q.qsize()}')
-                        q = self.move_queues.get(opp[1])
-                        q.put(msg('mm_resp', [True, player[1]]))
+                        q = self.move_queues.get(opp[0])
+                        q.put(msg('mm_resp', [True, player[0]]))
                         print(f'queue size opp {q.qsize()}')
                         # remove from queue
                         self.queueing.remove(player)
                         self.queueing.remove(opp)
                         queue.remove(player)
                         queue.remove(opp)
+                        self.move_queues[player[0]] = None
+                        self.move_queues[opp[0]] = None
 
             event.wait(5)
 
-    def parse_msg(self, request: msg, move_queue):
+    def parse_msg(self, request: msg, msg_queue):
         """
         Handles how client requests are handled by the server.
         It matches the request type to its appropriate callback.
@@ -143,12 +154,12 @@ class ReversiServer:
         msg_type = request.get_type()
         params = request.get_params()
         return {
-            'get_elo': self.get_elo,
+            'test': self.get_elo,
             'set_elo': self.set_elo,
             'get_players': self.get_players,
             'send_move': self.send_move,
             'request_game': self.match_make,
-        }.get(msg_type)(params)
+        }.get(msg_type)(params, msg_queue)
 
     """
     Defining a request callback:
@@ -158,16 +169,16 @@ class ReversiServer:
     `params` can be unused, but bust be a parameter.
     """
 
-    def get_elo(self, params: list):
+    def get_elo(self, params: list, msg_queue: Queue):
         """
         Returns the current user's elo
         :param params: [the player's username]
         :return: a 'send_elo' message with param [user elo]
         """
         # query db for elo rating
-        return msg('send_elo', [0])
+        return ["HELLO WORLD"]
 
-    def set_elo(self, params: list):
+    def set_elo(self, params: list, msg_queue: Queue):
         """
         Potentially unneeded.
         Meant to update the elo ranking for a player.
@@ -181,16 +192,16 @@ class ReversiServer:
         return msg('ack', [False])
 
     # Finished
-    def get_players(self, params: list):
+    def get_players(self, params: list, msg_queue: Queue):
         """
         Returns the players currently online, along with their UID, elo, and username
         :param params: []
         :return: a 'send_players' message with param [[(username, uid, elo)]] (param[0] is the list of players)
         """
-        return msg('send_players', [self.occupants])
+        return [self.occupants]
 
-    # Finished
-    def send_move(self, params: list):
+    # Unfinished
+    def send_move(self, params: list, msg_queue: Queue):
         """
         Receives a move from a player and routes it to their opponent.
         :param params: [opponent_uid, move]
@@ -203,7 +214,7 @@ class ReversiServer:
         except:
             return msg('ack', [False])
 
-    def log_in_request(self, params: list):
+    def log_in_request(self, params: list, msg_queue: Queue):
         """
         Handles a client request to log in.
         On success adds players to the online roster.
@@ -221,15 +232,16 @@ class ReversiServer:
         return msg('ack', [True])
 
     # Finished (kinda)
-    def match_make(self, params: list):
+    def match_make(self, params: list, msg_queue: Queue):
         """
         Initiates matchmaking for a player
         :param params: [username, uid, elo]
         :return: ack
         """
-        username, uid, elo = params
+        curr_username, opp_username, elo = params
         curr_time = time.time()
-        self.queueing.append((username, uid, elo, curr_time))
+        self.move_queues[curr_username] = msg_queue
+        self.queueing.append((curr_username, elo, curr_time))
         return msg('ack', [True])
 
 
