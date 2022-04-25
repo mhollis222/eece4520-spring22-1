@@ -154,6 +154,8 @@ class GameController:
                     hs = players[1]
                     ls = players[0]
 
+
+
                 # TODO: implement get_opponent() in server.py
                 opponent = self.client.send_request(msg('get_opponent', [self.client_uid]))[0]
 
@@ -174,8 +176,15 @@ class GameController:
                     winner_expected_win = opponent_expected_win
                     loser_expected_win = client_expected_win
 
-                winner_elo = self.client.send_request(msg('updated_elo', [1, winner_expected_win]))[0]
-                loser_elo = self.client.send_request(msg('updated_elo', [1, loser_expected_win]))[0]
+                if self.model.display_winner == 0:
+                    win_res = 0.5
+                    los_res = 0.5
+                else:
+                    win_res = 1
+                    los_res = 0
+                winner_elo = self.client.send_request(msg('updated_elo', [win_res, winner_expected_win]))[0]
+                loser_elo = self.client.send_request(msg('updated_elo', [los_res, loser_expected_win]))[0]
+
                 winner_hs = hs.score
                 loser_hs = ls.score
 
