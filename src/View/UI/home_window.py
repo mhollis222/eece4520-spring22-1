@@ -14,7 +14,7 @@ def get_elo(username: str) -> str:
     :return: the ELO rating of the desired user
     """
     db = Database('localhost', 'reversi', 'eece4520')
-    for user in db.fetch_data():
+    for user in db.fetch_user_data():
         if user.get("username") == username:
             return user.get("elo")
 
