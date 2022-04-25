@@ -4,7 +4,7 @@ class ReversiMessage:
     # get_elo: params = [username]
     # set_elo: params = [username, elo]
     # get_players: params = [None]
-    # send_move: params = [opponent_uid, move]
+    # send_move: params = [opponent_username, move]
     # rcv_move: params = [None]
     # log_in: params = [username, password, uid]
     # request_game: params = [local username, local uid, elo]

@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from Model.ai_player import AIPLayer
+from Model.ai_player import AIPlayer
 from Controller.game_controller import GameController
 from View.UI.gui_board import GuiBoard
 from Model.human_player import HumanPlayer
@@ -119,7 +119,7 @@ class SettingsWindow(tk.Toplevel):
 
     def play_ai(self):
         player1 = HumanPlayer(self.config['User']['username'])
-        player2 = AIPLayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
+        player2 = AIPlayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
 
         # game = Game(player1, player2)
         # dec = GameDecoratorAI(game)
