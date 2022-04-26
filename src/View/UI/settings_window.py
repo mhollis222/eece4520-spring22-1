@@ -146,7 +146,7 @@ class SettingsWindow(tk.Toplevel):
         game_id = details[0]
         opponent_username = details[1]
         player1 = HumanPlayer(human_username)
-        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', [opponent_username]))[0])
+        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', [opponent_username]))[0], game_id)
         controller = GameController(player1, player2, False, game_id)
         # TODO: not sure what else is needed here
         self.withdraw()
