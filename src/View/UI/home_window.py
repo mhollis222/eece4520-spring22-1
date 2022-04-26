@@ -116,12 +116,12 @@ class HomeWindow(tk.Toplevel):
         self.frame3.elo_message = tk.Label(self, text=str(elo),
                                            fg='white', font=("Arial", 25, "bold"), bg='#343434')
         self.frame3.elo_message.grid(row=1, column=1, columnspan=3, sticky='s', pady=30)
-        # Wins
-        self.frame3.wins = tk.Label(self, text='Wins: 10', fg='white', font=("Arial", 25, "bold"), bg='#343434')
-        self.frame3.wins.grid(row=2, column=1, sticky='se')
-        # Losses
-        self.frame3.losses = tk.Label(self, text='Losses: 1', fg='white', font=("Arial", 25, "bold"), bg='#343434')
-        self.frame3.losses.grid(row=2, column=3, sticky='sw')
+        # # Wins
+        # self.frame3.wins = tk.Label(self, text='Wins: 10', fg='white', font=("Arial", 25, "bold"), bg='#343434')
+        # self.frame3.wins.grid(row=2, column=1, sticky='se')
+        # # Losses
+        # self.frame3.losses = tk.Label(self, text='Losses: 1', fg='white', font=("Arial", 25, "bold"), bg='#343434')
+        # self.frame3.losses.grid(row=2, column=3, sticky='sw')
         # Play Game Button
         self.member_play_button = tk.Button(self, text='Play Game', width=30, height=2, fg='black', font=("Arial", 15),
                                             command=self.open_member_options)

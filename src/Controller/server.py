@@ -13,7 +13,7 @@ event = threading.Event()
 
 
 class ReversiServer:
-    def __init__(self, host='127.0.0.1', port=1235, buffer_size=1024):
+    def __init__(self, host='127.0.0.11', port=1235, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size

@@ -5,8 +5,8 @@ from Model.game_decorator_ai import GameDecoratorAI
 from Model.game_decorator_online import GameDecoratorOnline
 from View.textual_view import TextualView
 from View.UI.gui_board import GuiBoard
-from client import ReversiClient
-from message import ReversiMessage as msg
+from Controller.client import ReversiClient
+from Controller.message import ReversiMessage as msg
 import configparser
 
 from pathlib import Path

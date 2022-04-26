@@ -70,7 +70,7 @@ class SignUpWindow(tk.Toplevel):
     def register(self):
         """Attempts to write a new user object to the database"""
 
-        if self.new_username_entry.get() == '' :
+        if self.new_username_entry.get() == '':
             messagebox.showerror('Register failure', 'Username cannot be empty.')
         elif self.new_password_entry.get() == '':
             messagebox.showerror('Register failure', 'Password cannot be empty.')

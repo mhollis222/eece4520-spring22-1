@@ -1,6 +1,5 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-
 from Model.ai_player import AIPlayer
 from Controller.game_controller import GameController
 from View.UI.gui_board import GuiBoard
@@ -9,12 +8,13 @@ from View.UI.player_color import ChoosePlayerColor
 from View.UI.board_size import TempWindow
 from View.UI.board_align import AlignmentWindow
 import configparser
-from client import ReversiClient
-from message import ReversiMessage as msg
-
+from Controller.client import ReversiClient
+from Model.game import Game
+from Model.game_decorator_ai import GameDecoratorAI
+from Controller.message import ReversiMessage as msg
 from pathlib import Path
-
-from online_player import OnlinePlayer
+from Model.online_player import OnlinePlayer
+from View.UI.matchmaking_error_window import MatchmakingErrorWindow
 
 path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
@@ -106,9 +106,9 @@ class SettingsWindow(tk.Toplevel):
 
     # function call to start game
     def start_game(self):
-        if self.config_settings['Model']['ai'] == 'False':
+        if self.config_settings['Model']['mode'] == 'local':
             self.play_local()
-        elif self.config_settings['Model']['online'] == 'True':
+        elif self.config_settings['Model']['mode'] == 'online':
             self.play_online()
         else:
             self.play_ai()
@@ -128,27 +128,36 @@ class SettingsWindow(tk.Toplevel):
     def play_ai(self):
         player1 = HumanPlayer(self.config['User']['username'])
         player2 = AIPlayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
-
-        # game = Game(player1, player2)
-        # dec = GameDecoratorAI(game)
-        # game.start()
-        # player2.add_simulator(dec)
+        game = Game(player1, player2)
+        dec = GameDecoratorAI(game)
+        game.start()
+        player2.add_simulator(dec)
         player2.add_opp(player1)
         controller = GameController(player1, player2, True)
-        # controller.save_settings()
-        # controller.setup()
-        # game_win = GuiBoard(self)
-        # game_win.focus_force()
+        controller.save_settings()
+        controller.setup()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
         self.withdraw()
 
     def play_online(self):
-        human_username = self.config['User']['username']
-        human_elo = self.client.send_request(msg('get_elo', [human_username]))
-        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
-        game_id = details[0]
-        opponent_username = details[1]
-        player1 = HumanPlayer(human_username)
-        player2 = OnlinePlayer(opponent_username, game_id)
-        controller = GameController(player1, player2, False, game_id)
-        # TODO: not sure what else is needed here
-        self.withdraw()
+        try:
+            human_username = self.config['User']['username']
+            human_elo = self.client.send_request(msg('get_elo', [human_username]))
+            details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+            game_id = details[0]
+            opponent_username = details[1]
+            player1 = HumanPlayer(human_username)
+            player2 = OnlinePlayer(opponent_username, game_id)
+            controller = GameController(player1, player2, False, game_id)
+            controller.save_settings()
+            controller.setup()
+            controller.play_game()
+            game_win = GuiBoard(self)
+            game_win.focus_force()
+            self.withdraw()
+            self.withdraw()
+        except BaseException as e:
+            error_win = MatchmakingErrorWindow(self)
+            error_win.focus_force()
+            self.withdraw()
