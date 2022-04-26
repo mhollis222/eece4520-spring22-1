@@ -6,14 +6,16 @@ class ReversiMessage:
     # get_players: params = [None]
     # update_game_state = [game_id, last_player, move]
     # update_game_complete = [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
-    # send_move: params = [opponent_uid, move, game_id]
+    # send_move: params = [opponent_user, current_user, move, game_id]
     # log_in: params = [username, password, uid]
     # request_game: params = [local username, local uid, elo]
-    # challenge_player: params = [opposing player uid]
+    # challenge: params = [local username, opponent id]
     #####################################################
     # Responses
 
-    requests = ['get_elo', 'leaderboard', 'get_players', 'send_move', 'log_in', 'request_game', 'register']
+    requests = ['get_elo', 'leaderboard', 'get_players', 'send_move',
+                'log_in', 'request_game', 'register', 'challenge', 'rcv_message',
+                'updated_elo', 'update_game_state']
 
     def __init__(self, msg_type: str, params: list):
         assert(msg_type in ReversiMessage.requests)

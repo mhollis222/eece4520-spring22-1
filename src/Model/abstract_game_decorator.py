@@ -11,7 +11,7 @@ class GameDecorator(AbstractGame):
         return self.game
 
     def get_order(self):
-        return self.game.get_order
+        return self.game.get_order()
 
     def validate_move(self, move: Move, play: AbstractPlayer):
         self.game.validate_move(move, play)
@@ -58,3 +58,15 @@ class GameDecorator(AbstractGame):
 
     def get_moves_sim(self, moves, play):
         pass
+
+    def get_p1(self):
+        return self.game.p1
+
+    def get_p2(self):
+        return self.game.p2
+
+    def set_p1_ident(self, indentifier: int):
+        self.game.p1.identifier = indentifier
+
+    def set_p2_ident(self, indentifier: int):
+        self.game.p2.identifier = indentifier

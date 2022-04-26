@@ -4,6 +4,10 @@ from Model.abstract_player import AbstractPlayer
 
 
 class AbstractGame(ABC):
+    def __init__(self):
+        self.p1: AbstractPlayer = None
+        self.p2: AbstractPlayer = None
+
     @abstractmethod
     def get_order(self):
         pass

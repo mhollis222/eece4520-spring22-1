@@ -42,7 +42,7 @@ class HomeWindow(tk.Toplevel):
                                           bg='#066b28', padx=125)
         self.frame2.leaderboard_label.grid(row=1, column=0)
 
-        lb = self.client.send_request(msg('leaderboard', []))[0]
+        lb = self.client.send_request(msg('leaderboard', []))
         elo = self.client.send_request(msg('get_elo', [self.config['User']['username']]))[0]
 
         try:

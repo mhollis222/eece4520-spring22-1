@@ -6,15 +6,24 @@ from Model.move import Move
 
 
 class GameDecoratorOnline(GameDecorator):
-    def __init__(self, game: AbstractGame):
+    def __init__(self, game: AbstractGame, order):
         super().__init__(game)
         self.active_player = super().get_active_player()
+        self.order = order
+        # if order[0].name == self.game.p1.name:
+        #     self.game.p1.identifier = 1
+        #     self.game.p2.identifier = 2
+        # else:
+        #     self.game.p1.identifier = 2
+        #     self.game.p2.identifier = 1
+        self.active_player = 0
 
     def reconstruct(self, state: list, last_active_player: AbstractPlayer):
         # call this immediately after start() if reconstruction is needed
+
         cell = 1
         for elem in state:
-            cell = (cell + 1) % 2
+            cell = (cell + 1) % 2 # this will alternate between 0 and 1, we use 0 as empty.
             if cell == 0:
                 color = Cell.BLACK
             else:
@@ -25,7 +34,7 @@ class GameDecoratorOnline(GameDecorator):
         self.active_player = last_active_player
 
     def get_order(self):
-        return super().get_order()
+        return self.order
 
     def validate_move(self, move: Move, play: AbstractPlayer):
         super().validate_move(move, play)
@@ -55,7 +64,7 @@ class GameDecoratorOnline(GameDecorator):
         return super().display_winner()
 
     def get_active_player(self) -> AbstractPlayer:
-        return self.active_player
+        return self.order[self.active_player]
 
     def switch_players(self, player: AbstractPlayer):
-        super().switch_players(player)
+        self.active_player = (self.active_player + 1) % 2

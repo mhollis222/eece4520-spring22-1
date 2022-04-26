@@ -1,3 +1,5 @@
+import time
+
 from Model.game import Game, Cell
 from Model.move import Move
 from Model.abstract_player import AbstractPlayer
@@ -19,19 +21,20 @@ class GameFactory:
     from Model.abstract_game import AbstractGame
 
     @staticmethod
-    def get_game(game_type: str, p1: AbstractPlayer, p2: AbstractPlayer, width: int, height: int) -> AbstractGame:
+    def get_game(game_type: str, p1: AbstractPlayer, p2: AbstractPlayer, width: int, height: int, g_order: list) -> AbstractGame:
         if game_type == 'local':
             return Game(p1, p2, width, height)
         elif game_type == 'AI':
             return GameDecoratorAI(Game(p1, p2, width, height))
         elif game_type == 'online':
-            return GameDecoratorOnline(Game(p1, p2, width, height))
+            game = Game(p1, p2, width, height)
+            return GameDecoratorOnline(game, g_order)
         raise ValueError('Unknown game type')
 
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False, game_id=0, reconstruct=False):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False, game_id=0, reconstruct=False, g_order=None):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -41,11 +44,12 @@ class GameController:
         self.config.read(settings_path)
         self.ai = ai
         self.simulator = None
-        self.setup()
-        self.client = None
+        self.client = ReversiClient()
         self.game_id = game_id
         self.last_move = None
         self.reconstruct = reconstruct
+        self.g_order = g_order
+        self.setup()
 
     def play_game(self):
         """
@@ -76,7 +80,7 @@ class GameController:
                     attempt = Move(x, y)
 
                 # Checks whose turn it is and updates the board with their corresponding piece
-                if self.model.get_active_player() == self.model.get_order()()[0]:
+                if self.model.get_active_player() == self.model.get_order()[0]:
                     self.model.update_board(attempt, Cell.BLACK)
                 else:
                     self.model.update_board(attempt, Cell.WHITE)
@@ -153,6 +157,7 @@ class GameController:
         :return: none
         """
         ai_turn = False
+        network_turn = False
         # Get the current player
         player = self.model.get_active_player()
         # Get the move
@@ -162,19 +167,20 @@ class GameController:
             move = player.make_move(0, 0)
             attempt = Move(move[0], move[1])
         elif player.type() == 'Online':
-            if self.last_move is None:
-                move = self.client.send_request(msg('rcv_move', []))
-            else:
-                move = player.make_move(self.last_move)
-            attempt = Move(move[0], move[1])
+            network_turn = True
+            move = 'TIMEOUT'
+            while move == 'TIMEOUT':
+                move = player.get_move()
+            attempt = move
         else:
             x, y = button.x, button.y
             attempt = Move(y, x)
             self.last_move = attempt
-            if self.model is GameDecoratorOnline:
+            if type(self.model) == GameDecoratorOnline:
                 self.client.send_request(msg('update_game_state', [self.game_id, self.p1.name, attempt]))
+                ret = self.p2.send_move(attempt)
 
-        if player == self.model.get_order()[0]:
+        if player.name == self.model.get_order()[0].name:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
@@ -187,7 +193,7 @@ class GameController:
             self.view.display_score()
             self.view.display_winner(self.model.display_winner())
 
-            if self.model is GameDecoratorOnline:
+            if type(self.model) == GameDecoratorOnline:
                 self.game_update()
         else:
             self.model.switch_players(player)  # Passes play to the other player
@@ -199,8 +205,8 @@ class GameController:
             self.view.display_board(moves)
             self.view.display_score()
             self.view.display_current_player(new_player)
-            if not ai_turn:
-                # figure out some way to get it to pause...
+            time.sleep(2)
+            if not ai_turn and not network_turn:
                 self.advance(None)
 
     def save_settings(self) -> bool:
@@ -228,21 +234,19 @@ class GameController:
 
         # Currently, unused
         ai_difficult = self.config.getint('Model', 'AI_difficulty')
-        # start_filled = self.config.getboolean('Model', 'start_filled')
-        # debug = self.config.getboolean('Misc', 'debug')
 
         if self.ai:
             game_type = 'AI'
-            decorator = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+            decorator = GameFactory.get_game(game_type, self.p1, self.p2, width, height, self.g_order)
             self.model = decorator.get_game()
             self.p2.add_simulator(decorator)
         elif self.p2.type() == 'Online':
             game_type = 'online'
-            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height, self.g_order)
             self.client = ReversiClient()
         else:
             game_type = 'local'
-            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height)
+            self.model = GameFactory.get_game(game_type, self.p1, self.p2, width, height, self.g_order)
 
         view_type = self.config['View']['style']
         p1_col = self.config['View']['p1_color']
@@ -253,9 +257,16 @@ class GameController:
         elif view_type == 'gui':
             self.view = GuiBoard(self.model, p1_col, p2_col, self)
             self.model.start()
-            if self.reconstruct and self.model is GameDecoratorOnline:
-                details = self.client.send_request(msg('get_game_state', [self.game_id]))
-                self.model.reconstruct(state=details[0], last_active_player=details[1])
+            if type(self.model) == GameDecoratorOnline:
+                if self.g_order[0].name == self.p1.name:
+                    self.model.set_p1_ident(1)
+                    self.model.set_p2_ident(2)
+                else:
+                    self.model.set_p1_ident(2)
+                    self.model.set_p2_ident(1)
+            # if self.reconstruct and self.model is GameDecoratorOnline:
+            #     details = self.client.send_request(msg('get_game_state', [self.game_id]))
+            #     self.model.reconstruct(state=details[0], last_active_player=details[1])
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())
