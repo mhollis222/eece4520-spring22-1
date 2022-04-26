@@ -169,39 +169,45 @@ class ReversiServer:
         """
         # query db for elo rating
         username = params[0]
-        return [self.db.fetch_user_data()[username].get('elo')]
+        for user in self.db.fetch_user_data():
+            if user.get("username") == username:
+                return [user.get("elo")]
 
     """
     Temporary functions for calculating elo
     """
-    def expected_win(self, opponent):
+    def expected_win(self, params: list, msg_queue: Queue):
         """
         Calculates the expected win rate of player (self) against the opponent
-        :param opponent: opponent's name
+        :param params: [username, opponent]
         :return: player's expected win rate
         """
-        playerELO = self.db.fetch_data(self).get("elo")
-        opponentELO = self.db.fetch_data(opponent).get("elo")
+        for user in self.db.fetch_user_data():
+            if user.get("username") == params[0]:
+                playerELO = user.get("elo")
+            if user.get("username") == params[1]:
+                opponentELO = user.get("elo")
         exponent = (opponentELO - playerELO) / 400
         probability = 1 / (1 + pow(10, exponent))
-        return probability
+        return [probability]
 
     """
     expected in the parameter is the probability from the above functions
     maybe we can add another thing to the database that shows the expected_win rate of that player
     not sure if it's "safe" to have a variable in the server that keeps track of that instead
     """
-    def updated_elo(self, result, expected):
+    def updated_elo(self, params: list, msg_queue: Queue):
         """
         Calculates change in ELO rating
-        :param result: Result of game (0 = lose; 0.5 = draw; 1 = win)
-        :param expected: Expected probability to win (from expected_win)
+        :param params: [Result of game (0 = lose; 0.5 = draw; 1 = win), Expected probability to win (from expected_win)]
         :return: updated ELO rating
         """
-        playerELO = self.db.fetch_data(self).get("elo")
+        for user in self.db.fetch_user_data():
+            if user.get("username") == params[0]:
+                playerELO = user.get("elo")
         k = 32
-        newELO = k * (result - expected)
-        return playerELO + newELO
+        newELO = k * (params[0] - params[1])
+        return [playerELO + newELO]
 
     def leaderboard(self, params: list, msg_queue: Queue):
         """

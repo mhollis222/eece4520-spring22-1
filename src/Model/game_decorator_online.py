@@ -8,8 +8,9 @@ from Model.move import Move
 class GameDecoratorOnline(GameDecorator):
     def __init__(self, game: AbstractGame):
         super().__init__(game)
+        self.active_player = super().get_active_player()
 
-    def reconstruct(self, state: list):
+    def reconstruct(self, state: list, last_active_player: AbstractPlayer):
         # call this immediately after start() if reconstruction is needed
         cell = 1
         for elem in state:
@@ -21,6 +22,7 @@ class GameDecoratorOnline(GameDecorator):
 
             move = Move(elem[0], elem[1])
             self.update_board(move, color)
+        self.active_player = last_active_player
 
     def get_order(self):
         return super().get_order()
@@ -53,7 +55,7 @@ class GameDecoratorOnline(GameDecorator):
         return super().display_winner()
 
     def get_active_player(self) -> AbstractPlayer:
-        return super().get_active_player()
+        return self.active_player
 
     def switch_players(self, player: AbstractPlayer):
         super().switch_players(player)
