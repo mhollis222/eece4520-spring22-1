@@ -2,6 +2,11 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from View.UI.p1_color_options import Player1ColorOptionsWindow
 from View.UI.p2_color_options import Player2ColorOptionsWindow
+from pathlib import Path
+
+
+def apply_path(path):
+    return Path(__file__).resolve().parents[0].joinpath(path).as_posix()
 
 
 class ChoosePlayerColor(tk.Toplevel):
@@ -25,7 +30,7 @@ class ChoosePlayerColor(tk.Toplevel):
         self.guest_title.grid(row=1, column=0, columnspan=2, sticky=tk.N)
 
         # play person button
-        self.person_image = Image.open('../View/UI/images/user.png')
+        self.person_image = Image.open(apply_path('images/user.png'))
         self.person_image = self.person_image.resize((175, 175))
         self.person_image = ImageTk.PhotoImage(self.person_image)
         self.person_button = tk.Button(self, width=400, height=230, text="Player 1", image=self.person_image,
@@ -34,7 +39,7 @@ class ChoosePlayerColor(tk.Toplevel):
         self.person_button.grid(row=1, column=0, padx=50, sticky='s')
 
         # play computer button
-        self.computer_image = Image.open('../View/UI/images/user.png')
+        self.computer_image = Image.open(apply_path('images/user.png'))
         self.computer_image = self.computer_image.resize((175, 175))
         self.computer_image = ImageTk.PhotoImage(self.computer_image)
         self.computer_button = tk.Button(self, width=400, height=230, text="Player 2",

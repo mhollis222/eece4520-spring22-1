@@ -9,6 +9,10 @@ path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
 
 
+def apply_path(path):
+    return Path(__file__).resolve().parents[0].joinpath(path).as_posix()
+
+
 class Player1ColorOptionsWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
