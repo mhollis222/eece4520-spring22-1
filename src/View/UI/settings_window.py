@@ -9,12 +9,12 @@ from View.UI.player_color import ChoosePlayerColor
 from View.UI.board_size import TempWindow
 from View.UI.board_align import AlignmentWindow
 import configparser
-from client import ReversiClient
-from message import ReversiMessage as msg
+from Controller.client import ReversiClient
+from Controller.message import ReversiMessage as msg
 
 from pathlib import Path
 
-from online_player import OnlinePlayer
+from Model.online_player import OnlinePlayer
 
 path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
