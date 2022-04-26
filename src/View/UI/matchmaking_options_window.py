@@ -29,21 +29,17 @@ class MatchmakingOptionsWindow(tk.Toplevel):
                                      command=self.open_root)
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
         # first line
-        self.label1 = tk.Label(self, text='Do you wish to save the game,', fg='white', font=("Arial", 30, "bold"),
-                               bg='green')
+        self.label1 = tk.Label(self, text='Do you wish to resume the previous game,', fg='white',
+                               font=("Arial", 30, "bold"), bg='green')
         self.label1.grid(row=1, columnspan=3, sticky=tk.S)
-        # second line
-        self.label2 = tk.Label(self, text='in case of a potential crash?', fg='white', font=("Arial", 30, "bold"),
-                               bg='green')
-        self.label2.grid(row=2, columnspan=3, sticky=tk.N)
         # yes button
         self.challenge_button = tk.Button(self, text='Yes', width=30, height=2, font=("Arial", 15),
                                           command=self.save)
-        self.challenge_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+        self.challenge_button.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         # no button
         self.challenge_button = tk.Button(self, text='No', width=30, height=2, font=("Arial", 15),
                                           command=self.no_save)
-        self.challenge_button.grid(row=3, column=1, columnspan=2, padx=5, pady=5)
+        self.challenge_button.grid(row=2, column=1, columnspan=2, padx=5, pady=5)
 
     def open_root(self):
         """Naviagtes to the login page"""
