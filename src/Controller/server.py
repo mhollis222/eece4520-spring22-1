@@ -146,6 +146,11 @@ class ReversiServer:
             'request_game': self.match_make,
             'register': self.register,
             'log_in': self.log_in_request,
+            'update_game_state': self.update_game_state,
+            'get_game_state': self.get_game_state,
+            'update_game_complete': self.update_game_complete,
+            'expected_win': self.expected_win,
+            'updated_elo': self.updated_elo,
         }.get(msg_type)(params, msg_queue)
 
     """
@@ -233,6 +238,15 @@ class ReversiServer:
         :param params: [game_id, last_player, move]
         """
         self.db.write_update_turn(params[0], params[1], params[2])
+
+    def get_game_state(self, params: list, msg_queue: Queue):
+        """
+        Retrieves move list corresponding to requested game
+        :param params: [game_id]
+        :return: list of type Move
+        """
+        return [self.db.fetch_game_data(params[0]).get("gamestate"),
+                self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
 
     def update_game_complete(self, params: list, msg_queue: Queue):
         """
