@@ -1,5 +1,5 @@
 from human_player import HumanPlayer
-from ai_player import AIPLayer
+from ai_player import AIPlayer
 from game import Game
 from move import Move
 from Controller.game_controller import GameController
@@ -10,7 +10,7 @@ from Model.game_decorator_ai import GameDecoratorAI
 
 def main():
     player1 = HumanPlayer("Steve")
-    player2 = AIPLayer("Jill", 3)
+    player2 = AIPlayer("Jill", 3)
 
     game = Game(player1, player2)
     dec = GameDecoratorAI(game)

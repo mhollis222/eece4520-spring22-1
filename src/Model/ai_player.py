@@ -5,10 +5,10 @@ import numpy as np
 from time import sleep
 
 
-class AIPLayer(AbstractPlayer):
+class AIPlayer(AbstractPlayer):
     # TODO: switch to the decorator once merged
     def __init__(self, name, difficulty: int):
-        super(AIPLayer, self).__init__(name)
+        super(AIPlayer, self).__init__(name)
         self.simulator = None
         self.depth = difficulty
         self.opp = None

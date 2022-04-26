@@ -1,9 +1,7 @@
 import copy
-import random
 import socket
 import pickle
 import threading
-import uuid
 from queue import Queue
 from Controller.message import ReversiMessage as msg
 import time
@@ -52,11 +50,6 @@ class ReversiServer:
         :return: Nothing
         """
         with conn:
-            # if not self.move_queues[address]:
-            #     id_binary = pickle.dumps([address])
-            #     conn.sendall(id_binary)
-            #     print('sent address')
-
             while True:
                 # Check if we have received any messages to transmit
                 if not move_queue.empty():
@@ -64,7 +57,6 @@ class ReversiServer:
                     rsp = pickle.dumps(move)
                     conn.sendall(rsp)
                     print('sent a message to client')
-
                 try:
                     # Check the buffer to see if there has been any received messages
                     ex_binary = conn.recv(self.buffer_size)
@@ -73,9 +65,10 @@ class ReversiServer:
                         break
                     ex = pickle.loads(ex_binary)
                     rsp = self.parse_msg(ex, move_queue)
-                    rsp_binary = pickle.dumps(rsp)
-                    conn.sendall(rsp_binary)
-                    print('sent a message to client')
+                    if rsp:
+                        rsp_binary = pickle.dumps(rsp)
+                        conn.sendall(rsp_binary)
+                        print('sent a message to client')
                 # If no messages are received for 5 seconds, loop
                 except socket.timeout:
                     pass
@@ -106,7 +99,7 @@ class ReversiServer:
                 for p in queue:
                     if time.time() - p[3] > TIMEOUT:
                         q = self.move_queues.get(p[0])
-                        q.put(msg('mm_resp', [False]))
+                        q.put(['MATCH_NOT_FOUND'])
                         self.move_queues[p[0]] = None
 
                 # attempt to pair players
@@ -119,11 +112,12 @@ class ReversiServer:
                     if abs(player[1] - opp[1]) < TOLERANCE:
                         print('found match')
                         # send mm_resp
+                        game_id = self.db.write_update_game_start()
                         q = self.move_queues.get(player[0])
-                        q.put(msg('mm_resp', [True, opp[0]]))
+                        q.put(msg('mm_resp', [opp[0], game_id]))
                         print(f'queue size player {q.qsize()}')
                         q = self.move_queues.get(opp[0])
-                        q.put(msg('mm_resp', [True, player[0]]))
+                        q.put(msg('mm_resp', [player[0], game_id]))
                         print(f'queue size opp {q.qsize()}')
                         # remove from queue
                         self.queueing.remove(player)
@@ -132,7 +126,6 @@ class ReversiServer:
                         queue.remove(opp)
                         self.move_queues[player[0]] = None
                         self.move_queues[opp[0]] = None
-                        self.db.write_update_game_start()
             event.wait(5)
 
     def parse_msg(self, request: msg, msg_queue):
@@ -260,10 +253,10 @@ class ReversiServer:
         """
         try:
             q = self.move_queues.get(params[0])
-            q.put(msg('send_move', params))
-            return msg('ack', [True])
+            q.put(params[1])
+
         except:
-            return msg('ack', [False])
+            return [-1]
 
     def log_in_request(self, params: list, msg_queue: Queue):
         """
@@ -286,7 +279,7 @@ class ReversiServer:
         :param params: [username, uid, elo]
         :return: ack
         """
-        curr_username, opp_username, elo = params
+        curr_username, elo = params
         curr_time = time.time()
         self.move_queues[curr_username] = msg_queue
         self.queueing.append((curr_username, elo, curr_time))
