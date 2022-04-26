@@ -47,18 +47,16 @@ class MatchmakingOptionsWindow(tk.Toplevel):
         self.master.deiconify()  # show the root window
 
     def save(self):
-        messagebox.showerror("", "Saved")
-        # self.config['Model']['save'] = 'yes'
-        # self.save_preferences()
-        # settings_options_win = SettingsWindow(self)
-        # settings_options_win.focus_force()
-        # self.withdraw()
+        self.config['Model']['save'] = 'yes'
+        self.save_preferences()
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
 
     def no_save(self):
-        messagebox.showerror("", "Not Saved")
-        # self.config['Model']['save'] = 'no'
-        # self.save_preferences()
-        # settings_options_win = SettingsWindow(self)
-        # settings_options_win.focus_force()
-        # self.withdraw()
+        self.config['Model']['save'] = 'no'
+        self.save_preferences()
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
 
