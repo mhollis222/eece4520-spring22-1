@@ -1,9 +1,9 @@
 import tkinter as tk
 
 
-class MatchmakingErrorWindow(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class MatchmakingErrorWindow(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.title('Matchmaking Error Page')
         self.geometry("2000x2000")
