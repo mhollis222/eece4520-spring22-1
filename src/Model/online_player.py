@@ -16,9 +16,12 @@ class OnlinePlayer(AbstractPlayer):
         self.human_player = human_name
 
     def make_move(self, row: int, column: int):
-        message = msg('send_move', [self.name, self.human_player, Move(row, column), self.game_id])
+        if row == -1 and column == -1:
+            message = msg('rcv_message', [self.human_player])
+        else:
+            message = msg('send_move', [self.name, self.human_player, Move(row, column), self.game_id])
         response = self.client.send_request(message)
-        return response[0]
+        return response
 
     def add_move(self, move: Move):
         self.history.append(move)

@@ -55,7 +55,7 @@ class GameDecoratorOnline(GameDecorator):
         return super().display_winner()
 
     def get_active_player(self) -> AbstractPlayer:
-        return self.active_player
+        return super().get_active_player()
 
     def switch_players(self, player: AbstractPlayer):
         super().switch_players(player)

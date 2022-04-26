@@ -67,6 +67,7 @@ class LoginWindow(tk.Tk):
         if self.client.send_request(msg('log_in', [username, password])):
             self.config['User']['username'] = username
             self.save_preferences()
+            self.client.username = username
             print("login successful")
             home_win = HomeWindow(self)
             home_win.focus_force()

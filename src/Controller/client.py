@@ -6,7 +6,7 @@ from Controller.message import ReversiMessage as msg
 class ReversiClient:
     _instance = None
 
-    def __new__(cls, host='127.0.0.11', port=1235, buffer_size=1024):
+    def __new__(cls, host='127.0.0.1', port=1234, buffer_size=1024):
         """
         Creates a new outgoing queue for the client. Only one should ever exist.
         Should be importable from any file and used where needed.
@@ -20,7 +20,6 @@ class ReversiClient:
             cls._instance.port = port
             cls._instance.buffer_size = buffer_size
             cls._instance.uid = None
-            cls._instance.in_game = None
             cls._instance.socket = None
             cls._instance.username = None
 

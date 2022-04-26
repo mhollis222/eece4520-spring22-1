@@ -1,4 +1,5 @@
 import copy
+import random
 import socket
 import pickle
 import threading
@@ -13,7 +14,7 @@ event = threading.Event()
 
 
 class ReversiServer:
-    def __init__(self, host='127.0.0.11', port=1235, buffer_size=1024):
+    def __init__(self, host='127.0.0.1', port=1234, buffer_size=1024):
         self.host = host
         self.port = port
         self.buffer_size = buffer_size
@@ -118,13 +119,14 @@ class ReversiServer:
                     player = queue[0]
                     opp = queue[1]
                     # send mm_resp
+                    order = [player[0], opp[0]] if random.Random().random() > 0.5 else [opp[0], player[0]]
                     # game_id = self.db.write_update_game_start()
                     game_id = 45
                     q = self.move_queues.get(player[0])
-                    q.put([opp[0], game_id])
+                    q.put([opp[0], game_id, order])
                     print(f'queue size player {q.qsize()}')
                     q = self.move_queues.get(opp[0])
-                    q.put([player[0], game_id])
+                    q.put([player[0], game_id, order])
                     print(f'queue size opp {q.qsize()}')
                     # remove from queue
                     self.queueing.remove(player)
@@ -141,12 +143,13 @@ class ReversiServer:
                         if abs(player[1] - opp[1]) < TOLERANCE:
                             print('found match')
                             # send mm_resp
+                            order = [player[0], opp[0]] if random.Random().random() > 0.5 else [opp[0], player[0]]
                             game_id = self.db.write_update_game_start()
                             q = self.move_queues.get(player[0])
-                            q.put(msg('mm_resp', [opp[0], game_id]))
+                            q.put(msg('mm_resp', [opp[0], game_id, order]))
                             print(f'queue size player {q.qsize()}')
                             q = self.move_queues.get(opp[0])
-                            q.put(msg('mm_resp', [player[0], game_id]))
+                            q.put(msg('mm_resp', [player[0], game_id, order]))
                             print(f'queue size opp {q.qsize()}')
                             # remove from queue
                             self.queueing.remove(player)

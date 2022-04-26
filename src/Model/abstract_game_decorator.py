@@ -11,7 +11,7 @@ class GameDecorator(AbstractGame):
         return self.game
 
     def get_order(self):
-        return self.game.get_order
+        return self.game.get_order()
 
     def validate_move(self, move: Move, play: AbstractPlayer):
         self.game.validate_move(move, play)
