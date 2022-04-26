@@ -13,7 +13,7 @@ class MatchmakingErrorWindow(tk.Toplevel):
 
         # title
         self.title = tk.Label(self,
-                              text='Unable to currently matchmake.',
+                              text='Unable to currently matchmake...',
                               fg='white', font=("Arial", 45, "bold"), bg='green')
         self.title.grid(row=1, columnspan=2, sticky=tk.N)
         self.title2 = tk.Label(self,

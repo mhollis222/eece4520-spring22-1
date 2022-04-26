@@ -15,13 +15,16 @@ class OnlinePlayer(AbstractPlayer):
         self.game_id = game_id
         self.human_player = human_name
 
-    def make_move(self, row: int, column: int):
-        if row == -1 and column == -1:
-            message = msg('rcv_message', [self.human_player])
-        else:
-            message = msg('send_move', [self.name, self.human_player, Move(row, column), self.game_id])
-        response = self.client.send_request(message)
-        return response
+    def make_move(self, row, column):
+        pass
+
+    def send_move(self, move: Move):
+        message = msg('send_move', [self.name, self.human_player, move, self.game_id])
+        return self.client.send_request(message)
+
+    def get_move(self):
+        message = msg('rcv_message', [self.human_player])
+        return self.client.send_request(message)
 
     def add_move(self, move: Move):
         self.history.append(move)
