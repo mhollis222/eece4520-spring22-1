@@ -190,28 +190,6 @@ class Game(AbstractGame):
         # Here in the event that a piece is placed on the edge, since while loop won't trigger
         return []
 
-    # deprecated?
-    @staticmethod
-    def _get_cardinal_location(origin_cell, distance, direction):
-        """
-        Obtains target cell location (cartesian) from cardinal inputs and reference cell
-        :param origin_cell: reference location upon which distance and direction are applied
-        :param distance: magnitude with respect to origin_cell
-        :param direction: cardinal direction range(8) clockwise starting with North
-        :return: target cell location (x, y)
-        """
-        location = (
-            (origin_cell[0], origin_cell[1] - distance),  # W
-            (origin_cell[0] + distance, origin_cell[1] - distance),  # SW
-            (origin_cell[0] + distance, origin_cell[1]),  # S
-            (origin_cell[0] + distance, origin_cell[1] + distance),  # SE
-            (origin_cell[0], origin_cell[1] + distance),  # E
-            (origin_cell[0] - distance, origin_cell[1] + distance),  # NE
-            (origin_cell[0] - distance, origin_cell[1]),  # N
-            (origin_cell[0] - distance, origin_cell[1] - distance)  # NW
-        )
-        return location[direction]
-
     def update_score(self):
         """
         Iterates through the board to count the number of cells each player has

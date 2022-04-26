@@ -68,6 +68,7 @@ class GuestOptionsWindow(tk.Toplevel):
     def open_settings_options(self):
         """Naviagtes to the settings preference window"""
         self.config['Model']['ai'] = str(False)
+        self.config['Model']['mode'] = 'local'
         self.save_preferences()
         settings_options_win = SettingsWindow(self)
         settings_options_win.focus_force()

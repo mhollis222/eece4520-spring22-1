@@ -23,7 +23,7 @@ class GameFactory:
         if game_type == 'local':
             return Game(p1, p2, width, height)
         elif game_type == 'AI':
-            return GameDecoratorAI(Game(p1, p2, width, height))
+            return GameDecoratorAI(Game(p1, p2, width, height), g_order)
         elif game_type == 'online':
             game = Game(p1, p2, width, height)
             return GameDecoratorOnline(game, g_order)
@@ -47,8 +47,8 @@ class GameController:
         self.last_move = None
         self.reconstruct = reconstruct
         self.g_order = g_order
-        self.setup()
-
+        if game_id > -1:
+            self.setup()
 
     def play_game(self):
         """
@@ -181,6 +181,10 @@ class GameController:
             self.model.update_board(attempt, Cell.BLACK)
         else:
             self.model.update_board(attempt, Cell.WHITE)
+
+        if self.game_id < 0:
+            self.model.switch_players(player)
+            return
 
         self.model.update_score()
 

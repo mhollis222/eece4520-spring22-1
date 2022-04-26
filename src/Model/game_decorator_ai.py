@@ -7,11 +7,14 @@ from Model.move import Move
 
 
 class GameDecoratorAI(GameDecorator):
-    def __init__(self, game: AbstractGame):
+    def __init__(self, game: AbstractGame, order):
         super().__init__(game)
+        self.active_player = super().get_active_player()
+        self.order = order
+        self.active_player = 0
 
     def get_order(self):
-        return super().get_order()
+        return self.order
 
     def validate_move(self, move: Move, play: AbstractPlayer):
         super().validate_move(move, play)
@@ -62,7 +65,7 @@ class GameDecoratorAI(GameDecorator):
         return super().display_winner()
 
     def get_active_player(self) -> AbstractPlayer:
-        return super().get_active_player()
+        return self.order[self.active_player]
 
     def switch_players(self, player: AbstractPlayer):
         super().switch_players(player)
