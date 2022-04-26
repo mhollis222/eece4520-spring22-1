@@ -99,7 +99,7 @@ class ReversiServer:
                 for p in queue:
                     if time.time() - p[3] > TIMEOUT:
                         q = self.move_queues.get(p[0])
-                        q.put(msg('mm_resp', [False]))
+                        q.put(['MATCH_NOT_FOUND'])
                         self.move_queues[p[0]] = None
 
                 # attempt to pair players
@@ -114,10 +114,10 @@ class ReversiServer:
                         # send mm_resp
                         game_id = self.db.write_update_game_start()
                         q = self.move_queues.get(player[0])
-                        q.put(msg('mm_resp', [True, opp[0], game_id]))
+                        q.put(msg('mm_resp', [opp[0], game_id]))
                         print(f'queue size player {q.qsize()}')
                         q = self.move_queues.get(opp[0])
-                        q.put(msg('mm_resp', [True, player[0], game_id]))
+                        q.put(msg('mm_resp', [player[0], game_id]))
                         print(f'queue size opp {q.qsize()}')
                         # remove from queue
                         self.queueing.remove(player)
@@ -279,7 +279,7 @@ class ReversiServer:
         :param params: [username, uid, elo]
         :return: ack
         """
-        curr_username, opp_username, elo = params
+        curr_username, elo = params
         curr_time = time.time()
         self.move_queues[curr_username] = msg_queue
         self.queueing.append((curr_username, elo, curr_time))

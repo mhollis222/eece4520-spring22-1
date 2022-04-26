@@ -29,7 +29,7 @@ class ReversiClient:
     def send_request(self, req: msg) -> list:
         with socket.socket() as my_socket:
             my_socket.connect((self.host, self._instance.port))
-            my_socket.settimeout(15)
+            my_socket.settimeout(60)
             m_binary = pickle.dumps(req)
             my_socket.sendall(m_binary)
             print('sent message')
