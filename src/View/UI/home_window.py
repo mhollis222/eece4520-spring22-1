@@ -1,22 +1,11 @@
 import tkinter as tk
-from member_play_options_window import MemberPlayOptionsWindow
-from Model.database import Database
+from View.UI.member_play_options_window import MemberPlayOptionsWindow
 import configparser
 from pathlib import Path
+from Controller.client import ReversiClient
+from Controller.message import ReversiMessage as msg
 path_parent = Path(__file__).resolve().parents[3]
 preference_path = path_parent.joinpath('preferences.ini').as_posix()
-
-
-def get_elo(username: str) -> str:
-    """
-    Returns the ELO rating of the desired user
-    :param username: username of the desired username
-    :return: the ELO rating of the desired user
-    """
-    db = Database('localhost', 'reversi', 'eece4520')
-    for user in db.fetch_user_data():
-        if user.get("username") == username:
-            return user.get("elo")
 
 
 class HomeWindow(tk.Toplevel):
@@ -25,6 +14,8 @@ class HomeWindow(tk.Toplevel):
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(preference_path)
+
+        self.client = ReversiClient()
 
         self.title('Home Page')
         self.geometry("2000x2000")
@@ -51,10 +42,8 @@ class HomeWindow(tk.Toplevel):
                                           bg='#066b28', padx=125)
         self.frame2.leaderboard_label.grid(row=1, column=0)
 
-        db = Database('localhost', 'reversi', 'eece4520')
-        lb = db.sorted_leaderboard()
-        # username string = lb[x].get("username")
-        # elo string = lb[x].get("elo")
+        lb = self.client.send_request(msg('leaderboard', []))[0]
+        elo = self.client.send_request(msg('get_elo', [self.config['User']['username']]))[0]
 
         try:
             self.frame2.first_player = tk.Label(self, text='1. '+lb[0].get("username")+': '+str(lb[0].get("elo")),
@@ -124,7 +113,7 @@ class HomeWindow(tk.Toplevel):
                                            font=("Arial", 25, "bold"), bg='#343434')
         self.frame3.elo_message.grid(row=1, column=1, columnspan=3, padx=40, pady=90, sticky='n')
         # ELO Score
-        self.frame3.elo_message = tk.Label(self, text=str(get_elo(str(self.config['User']['username']))),
+        self.frame3.elo_message = tk.Label(self, text=str(elo),
                                            fg='white', font=("Arial", 25, "bold"), bg='#343434')
         self.frame3.elo_message.grid(row=1, column=1, columnspan=3, sticky='s', pady=30)
         # Wins

@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
-
-from Model.database import Database
-from signup_window import SignUpWindow
-from guest_play_options_window import GuestOptionsWindow
-from home_window import HomeWindow
+from View.UI.signup_window import SignUpWindow
+from View.UI.guest_play_options_window import GuestOptionsWindow
+from View.UI.home_window import HomeWindow
+from Controller.client import ReversiClient
+from Controller.message import ReversiMessage as msg
 import configparser
 
 
@@ -20,6 +20,8 @@ class LoginWindow(tk.Tk):
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(preference_path)
         # self.setup()
+
+        self.client = ReversiClient()
 
         self.title('Login Page')
         self.geometry("2000x2000")
@@ -61,9 +63,8 @@ class LoginWindow(tk.Tk):
         """Attempts to successfully log into the database with the provided username and password"""
         username = self.username_entry.get()
         password = self.password_entry.get()
-        db = Database('localhost', 'reversi', 'eece4520')
 
-        if db.verify_credentials(username, password):
+        if self.client.send_request(msg('log_in', [username, password])):
             self.config['User']['username'] = username
             self.save_preferences()
             print("login successful")

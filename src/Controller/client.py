@@ -1,75 +1,43 @@
 import socket
 import pickle
-from msg import ReversiMessage as msg
-from queue import Queue
+from Controller.message import ReversiMessage as msg
 
 
 class ReversiClient:
-    def __init__(self, host='127.0.0.1', port=1234, buffer_size=1024):
-        self.host = host
-        self.port = port
-        self.buffer_size = buffer_size
-        self.out_queue = Queue(15)
-        self.uid = None
-        self.in_game = True
+    _instance = None
 
-    def start(self):
+    def __new__(cls, host='127.0.0.1', port=1235, buffer_size=1024):
+        """
+        Creates a new outgoing queue for the client. Only one should ever exist.
+        Should be importable from any file and used where needed.
+        :param size: the size for our queue.
+        """
+
+        if cls._instance is None:
+            print('creating client singleton')
+            cls._instance = super(ReversiClient, cls).__new__(cls)
+            cls._instance.host = host
+            cls._instance.port = port
+            cls._instance.buffer_size = buffer_size
+            cls._instance.uid = None
+            cls._instance.in_game = None
+            cls._instance.socket = None
+            cls._instance.username = None
+
+        return cls._instance
+
+    def send_request(self, req: msg) -> list:
         with socket.socket() as my_socket:
-            my_socket.connect((self.host, self.port))
-            print('Client Connected')
-            # retrieve uid
-            uid_binary = my_socket.recv(self.buffer_size)
-            uid = pickle.loads(uid_binary)
-            self.parse_response(uid)
-
-            # start main loop
-            while True:
-                if not self.out_queue.empty():
-                    m = self.out_queue.get()
-                    m_binary = pickle.dumps(m)
-                    my_socket.sendall(m_binary)
-
+            my_socket.connect((self.host, self._instance.port))
+            my_socket.settimeout(60)
+            m_binary = pickle.dumps(req)
+            my_socket.sendall(m_binary)
+            print('sent message')
+            try:
                 result_binary = my_socket.recv(self.buffer_size)
-                if not result_binary:
-                    break
+                print('received message')
                 result = pickle.loads(result_binary)
-                self.parse_response(result)
+                return result
+            except socket.timeout:
+                return ['TIMEOUT']
 
-    def parse_response(self, rsp: msg):
-        msg_type = rsp.get_type()
-        params = rsp.params
-        return {
-            'send_elo': self.send_elo,
-            'send_leaderboard': self.send_leaderboard,
-            'send_players': self.send_players,
-            'send_move': self.send_move,
-            'ack': self.ack,
-            'log_in_resp': self.log_in_resp,
-            'send_uid': self.send_uid,
-        }.get(msg_type)(params)
-
-    def send_elo(self, params: list):
-        pass
-
-    def send_leaderboard(self, params: list):
-        pass
-
-    def send_players(self, params: list):
-        pass
-
-    def send_move(self, params: list):
-        print(f'received a move with uid {params[0]}')
-
-    def ack(self, params: list):
-        print(f'received ack with value {params[0]}')
-
-    def log_in_resp(self, params: list):
-        pass
-
-    def send_uid(self, params: list):
-        self.uid = params[0]
-
-
-if __name__ == '__main__':
-    client = ReversiClient()
-    client.start()

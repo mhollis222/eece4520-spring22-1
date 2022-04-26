@@ -101,7 +101,7 @@ class Database:
             self._cursor.execute(
                 "CREATE TABLE IF NOT EXISTS games("
                 " gameid int NOT NULL,"
-                " lastactiveplayer varchar(20) NOT NULL,"
+                " lastactiveplayer varchar(20),"
                 " gamestate JSON);"
             )
         except mysql.connector.ProgrammingError as err:
@@ -119,6 +119,7 @@ class Database:
         self._cursor.execute("SELECT username FROM users")
         try:
             users = self._cursor.fetchall()
+            # realistically this line should be: `if username in users or username in ['AI', 'local', 'guest']:`
             for user in users:
                 if user[0] == username:  # prevents users from making duplicate usernames
                     return -1
@@ -136,6 +137,7 @@ class Database:
             "VALUES (%s, %s, %s, %s, %s, %s)"
         )
         self._cursor.execute(add_elements, (username, password, 1500, 0, 0, 0))
+        return 1
 
     def write_update_turn(self, game_id: int, last_player, last_move: Model.move.Move):
         """
@@ -193,15 +195,14 @@ class Database:
         self._cursor.execute(update_winner, winner_elo, winner_hs, winner)
         self._cursor.execute(update_loser, loser_elo, loser_hs, loser)
 
-    def write_update_game_start(self, player_one):
+    def write_update_game_start(self):
         """
-        add game instance to database
-        :param player_one: user who goes first ("last player" for a new game)
-        :return: none
+        add game instance to database with game ID
+        :return: id_max
         """
         update_elements = (
             "INSERT INTO games (gameid, lastactiveplayer, gamestate) "
-            "VALUES (%i, %s, JSON_ARRAY())"
+            "VALUES (%s, NULL, JSON_ARRAY())"
         )
         self._cursor.execute("SELECT * FROM games")
         data = self._cursor.fetchall()
@@ -209,8 +210,8 @@ class Database:
         for row in data:
             if row[0] > id_max:
                 id_max = row[0]
-        self._cursor.execute(update_elements, (id_max + 1, player_one))
-        return id_max + 1
+        self._cursor.execute(update_elements, id_max + 1)
+        return id_max
 
     def _clear_data(self):
         """

@@ -1,8 +1,7 @@
-import os
 import tkinter as tk
 from PIL import Image, ImageTk
-from difficulty_window1 import AIDifficultyIWindow
-from settings_window import SettingsWindow
+from View.UI.difficulty_window1 import AIDifficultyIWindow
+from View.UI.settings_window import SettingsWindow
 import configparser
 from pathlib import Path
 path_parent = Path(__file__).resolve().parents[3]

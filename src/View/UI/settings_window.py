@@ -1,18 +1,21 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from Model.ai_player import AIPLayer
-from Model.game import Game
+from Model.ai_player import AIPlayer
 from Controller.game_controller import GameController
-from Model.game_decorator_ai import GameDecoratorAI
-from gui_board import GuiBoard
+from View.UI.gui_board import GuiBoard
 from Model.human_player import HumanPlayer
-from player_color import ChoosePlayerColor
-from board_size import TempWindow
-from board_align import AlignmentWindow
+from View.UI.player_color import ChoosePlayerColor
+from View.UI.board_size import TempWindow
+from View.UI.board_align import AlignmentWindow
 import configparser
+from client import ReversiClient
+from message import ReversiMessage as msg
 
 from pathlib import Path
+
+from online_player import OnlinePlayer
+
 path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
 preference_path = path_parent.joinpath('preferences.ini').as_posix()
@@ -21,6 +24,7 @@ preference_path = path_parent.joinpath('preferences.ini').as_posix()
 class SettingsWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.client = ReversiClient()
         self.title("Settings Window")
         self.geometry("2000x2000")
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
@@ -121,7 +125,7 @@ class SettingsWindow(tk.Toplevel):
 
     def play_ai(self):
         player1 = HumanPlayer(self.config['User']['username'])
-        player2 = AIPLayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
+        player2 = AIPlayer("Computer", int(self.config_settings['Model']['ai_difficulty']))
 
         # game = Game(player1, player2)
         # dec = GameDecoratorAI(game)
@@ -133,4 +137,16 @@ class SettingsWindow(tk.Toplevel):
         # controller.setup()
         # game_win = GuiBoard(self)
         # game_win.focus_force()
+        self.withdraw()
+
+    def play_online(self):
+        human_username = self.config['User']['username']
+        human_elo = self.client.send_request(msg('get_elo', [human_username]))
+        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        game_id = details[0]
+        opponent_username = details[1]
+        player1 = HumanPlayer(human_username)
+        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', [opponent_username]))[0], game_id)
+        controller = GameController(player1, player2, False, game_id)
+        # TODO: not sure what else is needed here
         self.withdraw()
