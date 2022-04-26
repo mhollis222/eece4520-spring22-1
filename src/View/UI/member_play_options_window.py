@@ -1,9 +1,10 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from View.UI.difficulty_window2 import AIDifficultyIIWindow
-from View.UI.settings_window import SettingsWindow
+from View.UI.matchmaking_options_window import MatchmakingOptionsWindow
 import configparser
 from Controller.client import ReversiClient
+from View.UI.settings_window import SettingsWindow
 
 from pathlib import Path
 path_parent = Path(__file__).resolve().parents[3]
@@ -69,7 +70,6 @@ class MemberPlayOptionsWindow(tk.Toplevel):
                                        font=("Arial", 17), command=self.open_online)
         self.online_button.grid(row=1, column=3, padx=50, sticky='s')
 
-
     def open_login(self):
         """Naviagtes to the login page"""
         self.destroy()
@@ -95,8 +95,8 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         """Navigates to the game settings page"""
         self.config['Model']['mode'] = 'match'
         self.save_preferences()
-        settings_options_win = SettingsWindow(self)
-        settings_options_win.focus_force()
+        mathcmaking_options_win = MatchmakingOptionsWindow(self)
+        mathcmaking_options_win.focus_force()
         self.withdraw()
 
     def open_online(self):

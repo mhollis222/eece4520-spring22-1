@@ -45,7 +45,7 @@ class OnlineWindow(tk.Toplevel):
         # self.listbox.bind('<<ListboxSelect>>', self.player_selected)
         # challenge button
         self.challenge_button = tk.Button(self, text='Challenge', width=30, height=2, font=("Arial", 15),
-                                       command=self.challenge)
+                                          command=self.challenge)
         self.challenge_button.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.N)
 
     def open_root(self):
@@ -61,7 +61,8 @@ class OnlineWindow(tk.Toplevel):
         if self.player is None:
             messagebox.showerror("", "You must select a player to challenge")
         else:
-            self.config['User']['opponent'] = self.chosen_entry.get()
+            self.player = self.chosen_entry.get()
+            self.config['User']['opponent'] = self.player
             self.save_preferences()
             settings_options_win = SettingsWindow(self)
             settings_options_win.focus_force()
