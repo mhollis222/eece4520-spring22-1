@@ -108,6 +108,8 @@ class SettingsWindow(tk.Toplevel):
     def start_game(self):
         if self.config_settings['Model']['ai'] == 'False':
             self.play_local()
+        elif self.config_settings['Model']['online'] == 'True':
+            self.play_online()
         else:
             self.play_ai()
 
@@ -146,7 +148,7 @@ class SettingsWindow(tk.Toplevel):
         game_id = details[0]
         opponent_username = details[1]
         player1 = HumanPlayer(human_username)
-        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', [opponent_username]))[0], game_id)
+        player2 = OnlinePlayer(opponent_username, game_id)
         controller = GameController(player1, player2, False, game_id)
         # TODO: not sure what else is needed here
         self.withdraw()
