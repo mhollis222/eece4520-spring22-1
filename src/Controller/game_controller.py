@@ -13,7 +13,6 @@ from pathlib import Path
 
 path_parent = Path(__file__).resolve().parents[2]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
-preferences_path = path_parent.joinpath('preferences.ini').as_posix()
 
 
 class GameFactory:
@@ -32,7 +31,7 @@ class GameFactory:
 
 class GameController:
 
-    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False):
+    def __init__(self, p1: AbstractPlayer, p2: AbstractPlayer, ai: bool = False, game_id = 0):
         self.model = None
         self.view = None
         self.p1 = p1
@@ -40,13 +39,12 @@ class GameController:
         # special options to save comments on writes (i hope)
         self.config = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
         self.config.read(settings_path)
-        self.pref = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        self.pref.read(preferences_path)
-        self.client_uid = self.pref.get('User', 'username')
         self.ai = ai
         self.simulator = None
         self.setup()
         self.client = None
+        self.game_id = game_id
+        self.last_move = None
 
     def play_game(self):
         """
@@ -117,12 +115,17 @@ class GameController:
             move = player.make_move(0, 0)
             attempt = Move(move[0], move[1])
         elif player.type() == 'Online':
-            # TODO: rcv_move() needs implementation in server.py
-            move = self.client.send_request(msg('rcv_move', []))
+            if self.last_move is None:
+                move = self.client.send_request(msg('rcv_move', []))
+            else:
+                move = player.make_move(self.last_move)
             attempt = Move(move[0], move[1])
         else:
             x, y = button.x, button.y
             attempt = Move(y, x)
+            self.last_move = attempt
+            if self.model is GameDecoratorOnline:
+                self.client.send_request(msg('update_game_state', [self.game_id, self.p1.name, attempt]))
 
         if player == self.model.get_order()[0]:
             self.model.update_board(attempt, Cell.BLACK)
@@ -130,13 +133,6 @@ class GameController:
             self.model.update_board(attempt, Cell.WHITE)
 
         self.model.update_score()
-
-        # the following code should only execute during the client player's turn
-        if self.model is GameDecoratorOnline and player.type() == 'Human':
-            # TODO: implement get_game_id() in server.py
-            game_id = self.client.send_request(msg('get_game_id', [self.client_uid]))[0]
-
-            self.client.send_request(msg('update_game_state', [game_id, self.client_uid, attempt]))
 
         if self.model.has_game_ended():
             print("Game ended")
@@ -154,22 +150,17 @@ class GameController:
                     hs = players[1]
                     ls = players[0]
 
-
-
-                # TODO: implement get_opponent() in server.py
-                opponent = self.client.send_request(msg('get_opponent', [self.client_uid]))[0]
-
                 if hs.type() == 'Human':
-                    winner = self.client_uid
-                    loser = opponent
+                    winner = self.p1.name
+                    loser = self.p2.name
                 else:
-                    winner = opponent
-                    loser = self.client_uid
+                    winner = self.p2.name
+                    loser = self.p1.name
 
-                opponent_expected_win = self.client.send_request(msg('expected_win', [opponent]))[0]
-                client_expected_win = self.client.send_request(msg('expected_win', [self.client_uid]))[0]
+                opponent_expected_win = self.client.send_request(msg('expected_win', [self.p2.name]))[0]
+                client_expected_win = self.client.send_request(msg('expected_win', [self.p1.name]))[0]
 
-                if winner == self.client_uid:
+                if winner == self.p1.name:
                     winner_expected_win = client_expected_win
                     loser_expected_win = opponent_expected_win
                 else:
@@ -188,10 +179,7 @@ class GameController:
                 winner_hs = hs.score
                 loser_hs = ls.score
 
-                # TODO: implement get_game_id() in server.py
-                game_id = self.client.send_request(msg('get_game_id', [self.client_uid]))[0]
-
-                self.client.send_request(msg('update_game_complete', [game_id, winner, winner_elo, winner_hs,
+                self.client.send_request(msg('update_game_complete', [self.game_id, winner, winner_elo, winner_hs,
                                                                       loser, loser_elo, loser_hs]))
         else:
             self.model.switch_players(player)  # Passes play to the other player

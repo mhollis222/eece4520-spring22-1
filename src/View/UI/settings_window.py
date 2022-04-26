@@ -140,9 +140,13 @@ class SettingsWindow(tk.Toplevel):
         self.withdraw()
 
     def play_online(self):
-        player1 = HumanPlayer(self.config['User']['username'])
-        # TODO: implement get_opponent() in server.py
-        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', []))[0])
-        controller = GameController(player1, player2, False)
+        human_username = self.config['User']['username']
+        human_elo = self.client.send_request(msg('get_elo', [human_username]))
+        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        game_id = details[0]
+        opponent_username = details[1]
+        player1 = HumanPlayer(human_username)
+        player2 = OnlinePlayer(self.client.send_request(msg('get_opponent', [opponent_username]))[0])
+        controller = GameController(player1, player2, False, game_id)
         # TODO: not sure what else is needed here
         self.withdraw()
