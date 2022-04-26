@@ -69,9 +69,7 @@ class Database:
             entry = {"username": elem[0],
                      "password": elem[1],
                      "elo": elem[2],
-                     "high_score": elem[3],
-                     "wins": elem[4],
-                     "losses": elem[5]}
+                     "high_score": elem[3]}
             entry_list.append(entry)
         return entry_list
 
@@ -95,9 +93,7 @@ class Database:
                 " username varchar(20) NOT NULL,"
                 " password varchar(20) NOT NULL,"
                 " elo int NOT NULL,"
-                " highscore int NOT NULL,"
-                " wins int NOT NULL,"
-                " losses int NOT NULL);"
+                " highscore int NOT NULL;"
             )
             self._cursor.execute(
                 "CREATE TABLE IF NOT EXISTS games("
@@ -134,10 +130,10 @@ class Database:
             print("Failed to fetch active users in database: ", err)
             pass
         add_elements = (
-            "INSERT INTO users (username, password, elo, highscore, wins, losses) "
-            "VALUES (%s, %s, %s, %s, %s, %s)"
+            "INSERT INTO users (username, password, elo, highscore) "
+            "VALUES (%s, %s, %s, %s)"
         )
-        self._cursor.execute(add_elements, (username, password, 1500, 0, 0, 0))
+        self._cursor.execute(add_elements, (username, password, 1500, 0))
         return 1
 
     def write_update_turn(self, game_id: int, last_player, last_move: Model.move.Move):
@@ -186,12 +182,12 @@ class Database:
             loser_hs = loser_hs_og[3]
         update_winner = (
             "UPDATE users "
-            "SET elo = (%s), highscore = (%s), wins = wins + 1 "
+            "SET elo = (%s), highscore = (%s) "
             "WHERE username = (%s)"
         )
         update_loser = (
             "UPDATE users "
-            "SET elo = (%s), highscore = (%s), losses = losses + 1 "
+            "SET elo = (%s), highscore = (%s) "
             "WHERE username = (%s)"
         )
         self._cursor.execute(update_winner, (winner_elo, winner_hs, winner))
