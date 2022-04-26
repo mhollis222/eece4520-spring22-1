@@ -26,8 +26,7 @@ class GameFactory:
             return GameDecoratorAI(Game(p1, p2, width, height))
         elif game_type == 'online':
             game = Game(p1, p2, width, height)
-            game.order = g_order
-            return GameDecoratorOnline(game)
+            return GameDecoratorOnline(game, g_order)
         raise ValueError('Unknown game type')
 
 
