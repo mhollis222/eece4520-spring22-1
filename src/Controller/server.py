@@ -248,13 +248,13 @@ class ReversiServer:
         :param params: [Result of game (0 = lose; 0.5 = draw; 1 = win), Expected probability to win (from expected_win)]
         :return: updated ELO rating
         """
-        # for user in self.db.fetch_user_data():
-        #     if user.get("username") == params[0]:
-        #         playerELO = user.get("elo")
-        # k = 32
-        # newELO = k * (params[0] - params[1])
-        # return [playerELO + newELO]
-        return [1500]
+        for user in self.db.fetch_user_data():
+            if user.get("username") == params[0]:
+                playerELO = user.get("elo")
+        k = 32
+        newELO = k * (params[0] - params[1])
+        return [playerELO + newELO]
+        # return [1500]
 
     def leaderboard(self, params: list, msg_queue: Queue):
         """
@@ -265,8 +265,8 @@ class ReversiServer:
         :return: an ack with param [success?]
         """
         # update elo rating after game
-        # return [self.db.sorted_leaderboard()]
-        return [{'username': 'jim', 'elo': 1500}]
+        return [self.db.sorted_leaderboard()]
+        # return [{'username': 'jim', 'elo': 1500}]
 
     def register(self, params: list, msg_queue: Queue):
         """
@@ -274,9 +274,9 @@ class ReversiServer:
         :param params: [username, password]
         :return:
         """
-        # username, password = params
-        # return [self.db.write_user(username, password)]
-        return [1]
+        username, password = params
+        return [self.db.write_user(username, password)]
+        # return [1]
 
     # Finished
     def get_players(self, params: list, msg_queue: Queue):
@@ -292,8 +292,8 @@ class ReversiServer:
         Updates database with last played move to corresponding game
         :param params: [game_id, last_player, move]
         """
-        # self.db.write_update_turn(params[0], params[1], params[2])
-        return [1]
+        self.db.write_update_turn(params[0], params[1], params[2])
+        # return [1]
 
     def get_game_state(self, params: list, msg_queue: Queue):
         """
@@ -301,20 +301,20 @@ class ReversiServer:
         :param params: [game_id]
         :return: list of type Move
         """
-        # return [self.db.fetch_game_data(params[0]).get("gamestate"),
-        #         self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
-        return [1]
+        return [self.db.fetch_game_data(params[0]).get("gamestate"),
+                self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
+        # return [1]
 
     def update_game_complete(self, params: list, msg_queue: Queue):
         """
         Removes game instance from database if not done so already
         :param params: [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
         """
-        # if self.db.fetch_game_data(params[0]):
-        #     self.db.write_update_game_complete(game_id=params[0])
-        #     self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
-        #                                         loser=params[4], loser_elo=params[5], loser_hs=params[6])
-        return [1]
+        if self.db.fetch_game_data(params[0]):
+            self.db.write_update_game_complete(game_id=params[0])
+            self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
+                                                loser=params[4], loser_elo=params[5], loser_hs=params[6])
+        # return [1]
 
     # Unfinished
     def send_move(self, params: list, msg_queue: Queue):
@@ -338,11 +338,11 @@ class ReversiServer:
         :return: ack on success
         """
         username, password = params
-        # if self.db.verify_credentials(username, password):
-        self.occupants.append(username)
-        #     return [True]
-        # return [False]
-        return [True]
+        if self.db.verify_credentials(username, password):
+            self.occupants.append(username)
+            return [True]
+        return [False]
+        # return [True]
 
     # Finished (kinda)
     def match_make(self, params: list, msg_queue: Queue):
