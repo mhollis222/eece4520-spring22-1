@@ -143,13 +143,13 @@ class GuiBoard(AbstractView):
         self.score_frame.grid(row=2, column=0, sticky='NWES')
 
         self.score_frame.score_one = tk.Label(self.score_frame,
-                                              text=str(self.model.get_order()[0].name) + ": " +
-                                                   str(self.model.get_order()[0].score), bg='#343434',
+                                              text=str(self.model.get_p1().name) + ": " +
+                                                   str(self.model.get_p1().score), bg='#343434',
                                               fg='white', font=('Arial', 20))
         self.score_frame.score_one.grid(row=2, column=0, columnspan=2, sticky='w', padx=75)
         self.score_frame.score_two = tk.Label(self.score_frame,
-                                              text=str(self.model.get_order()[1].name) + ": " +
-                                                   str(self.model.get_order()[1].score), fg='white', font=('Arial', 20),
+                                              text=str(self.model.get_p2().name) + ": " +
+                                                   str(self.model.get_p2().score), fg='white', font=('Arial', 20),
                                               bg='#343434')
         self.score_frame.score_two.grid(row=2, column=0, columnspan=2, sticky='ne', padx=100)
 

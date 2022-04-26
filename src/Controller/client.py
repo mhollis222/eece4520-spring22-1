@@ -28,7 +28,7 @@ class ReversiClient:
     def send_request(self, req: msg) -> list:
         with socket.socket() as my_socket:
             my_socket.connect((self.host, self._instance.port))
-            my_socket.settimeout(60)
+            my_socket.settimeout(5)
             m_binary = pickle.dumps(req)
             my_socket.sendall(m_binary)
             print(f'sent message {req}')
@@ -38,5 +38,5 @@ class ReversiClient:
                 print(f'received message {result}')
                 return result
             except socket.timeout:
-                return ['TIMEOUT']
+                return 'TIMEOUT'
 

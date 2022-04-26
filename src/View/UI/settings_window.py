@@ -149,9 +149,14 @@ class SettingsWindow(tk.Toplevel):
             human_username = self.client.username
             human_elo = self.client.send_request(msg('get_elo', [human_username]))
             details = self.client.send_request(msg('request_game', [human_username, human_elo]))
-            game_id = details[1]
-            opponent_username = details[0]
-            order = details[2]
+            resp = 'TIMEOUT'
+            count = 0
+            while resp == 'TIMEOUT' and count < 12:
+                resp = self.client.send_request(msg('rcv_message', [human_username]))
+                count += 1
+            game_id = resp[1]
+            opponent_username = resp[0]
+            order = resp[2]
             player1 = HumanPlayer(human_username)
             player2 = OnlinePlayer(opponent_username, game_id, human_username)
             if order[0] == human_username:

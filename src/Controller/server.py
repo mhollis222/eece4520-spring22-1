@@ -37,12 +37,11 @@ class ReversiServer:
                 conn, address = my_socket.accept()
                 conn.settimeout(5)
                 print(f'Connected by {address}')
-                queue = Queue(5)
-                thread = threading.Thread(target=self.handle_client, args=(conn, queue))
+                thread = threading.Thread(target=self.handle_client, args=[conn])
                 thread.start()
 
     # do we need queues???
-    def handle_client(self, conn, move_queue: Queue):
+    def handle_client(self, conn):
         """
         Handles sending and receiving messages to/from the client.
         :param conn: The client connection.
@@ -53,11 +52,11 @@ class ReversiServer:
         with conn:
             while True:
                 # Check if we have received any messages to transmit
-                if not move_queue.empty():
-                    move = move_queue.get()
-                    rsp = pickle.dumps(move)
-                    conn.sendall(rsp)
-                    print('sent a message to client')
+                # if not move_queue.empty():
+                #     move = move_queue.get()
+                #     rsp = pickle.dumps(move)
+                #     conn.sendall(rsp)
+                #     print('sent a message to client')
                 try:
                     # Check the buffer to see if there has been any received messages
                     ex_binary = conn.recv(self.buffer_size)
@@ -65,7 +64,7 @@ class ReversiServer:
                     if not ex_binary:
                         break
                     ex = pickle.loads(ex_binary)
-                    rsp = self.parse_msg(ex, move_queue)
+                    rsp = self.parse_msg(ex)
                     if rsp:
                         rsp_binary = pickle.dumps(rsp)
                         conn.sendall(rsp_binary)
@@ -156,11 +155,9 @@ class ReversiServer:
                             self.queueing.remove(opp)
                             queue.remove(player)
                             queue.remove(opp)
-                            # self.move_queues[player[0]] = None
-                            # self.move_queues[opp[0]] = None
             event.wait(5)
 
-    def parse_msg(self, request: msg, msg_queue):
+    def parse_msg(self, request: msg):
         """
         Handles how client requests are handled by the server.
         It matches the request type to its appropriate callback.
@@ -185,7 +182,7 @@ class ReversiServer:
             'updated_elo': self.updated_elo,
             'challenge': self.challenge,
             'rcv_message': self.receive,
-        }.get(msg_type)(params, msg_queue)
+        }.get(msg_type)(params)
 
     """
     Defining a request callback:
@@ -195,7 +192,7 @@ class ReversiServer:
     `params` can be unused, but bust be a parameter.
     """
     # Done
-    def get_elo(self, params: list, msg_queue: Queue):
+    def get_elo(self, params: list):
         """
         Returns the current user's elo
         :param params: [the player's username]
@@ -208,12 +205,11 @@ class ReversiServer:
         #         return [user.get("elo")]
         return [1500]
 
-    def challenge(self, params: list, msg_queue: Queue):
+    def challenge(self, params: list):
         """
         Challenges a player
         """
         local, online = params
-        self.move_queues[local] = msg_queue
         curr_time = time.time()
         self.queueing.append((local, online, curr_time))
 
@@ -221,7 +217,7 @@ class ReversiServer:
     """
     Temporary functions for calculating elo
     """
-    def expected_win(self, params: list, msg_queue: Queue):
+    def expected_win(self, params: list):
         """
         Calculates the expected win rate of player (self) against the opponent
         :param params: [username, opponent]
@@ -242,7 +238,7 @@ class ReversiServer:
     maybe we can add another thing to the database that shows the expected_win rate of that player
     not sure if it's "safe" to have a variable in the server that keeps track of that instead
     """
-    def updated_elo(self, params: list, msg_queue: Queue):
+    def updated_elo(self, params: list):
         """
         Calculates change in ELO rating
         :param params: [Result of game (0 = lose; 0.5 = draw; 1 = win), Expected probability to win (from expected_win)]
@@ -256,7 +252,7 @@ class ReversiServer:
         # return [playerELO + newELO]
         return [1500]
 
-    def leaderboard(self, params: list, msg_queue: Queue):
+    def leaderboard(self, params: list):
         """
         Potentially unneeded.
         Meant to update the elo ranking for a player.
@@ -268,7 +264,7 @@ class ReversiServer:
         # return [self.db.sorted_leaderboard()]
         return [{'username': 'jim', 'elo': 1500}]
 
-    def register(self, params: list, msg_queue: Queue):
+    def register(self, params: list):
         """
         Handles registration for an account
         :param params: [username, password]
@@ -279,7 +275,7 @@ class ReversiServer:
         return [1]
 
     # Finished
-    def get_players(self, params: list, msg_queue: Queue):
+    def get_players(self, params: list):
         """
         Returns the players currently online, along with their UID, elo, and username
         :param params: []
@@ -287,7 +283,7 @@ class ReversiServer:
         """
         return [self.occupants]
 
-    def update_game_state(self, params: list, msg_queue: Queue):
+    def update_game_state(self, params: list):
         """
         Updates database with last played move to corresponding game
         :param params: [game_id, last_player, move]
@@ -295,7 +291,7 @@ class ReversiServer:
         # self.db.write_update_turn(params[0], params[1], params[2])
         return [1]
 
-    def get_game_state(self, params: list, msg_queue: Queue):
+    def get_game_state(self, params: list):
         """
         Retrieves move list corresponding to requested game
         :param params: [game_id]
@@ -305,7 +301,7 @@ class ReversiServer:
         #         self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
         return [1]
 
-    def update_game_complete(self, params: list, msg_queue: Queue):
+    def update_game_complete(self, params: list):
         """
         Removes game instance from database if not done so already
         :param params: [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
@@ -317,20 +313,22 @@ class ReversiServer:
         return [1]
 
     # Unfinished
-    def send_move(self, params: list, msg_queue: Queue):
+    def send_move(self, params: list):
         """
         Receives a move from a player and routes it to their opponent.
-        :param params: [opponent_uid, move]
+        :param params: [opponent_user, current_user, move]
         :return: ack describing success
         """
         try:
-            self.move_queues[params[1]] = msg_queue
             q = self.move_queues.get(params[0])
             q.put(params[2])
+            print('message added successfuly')
+            return ['hi']
+
         except:
             return [-1]
 
-    def log_in_request(self, params: list, msg_queue: Queue):
+    def log_in_request(self, params: list):
         """
         Handles a client request to log in.
         On success adds players to the online roster.
@@ -339,13 +337,14 @@ class ReversiServer:
         """
         username, password = params
         # if self.db.verify_credentials(username, password):
+        self.move_queues[username] = Queue(5)
         self.occupants.append(username)
         #     return [True]
         # return [False]
         return [True]
 
     # Finished (kinda)
-    def match_make(self, params: list, msg_queue: Queue):
+    def match_make(self, params: list):
         """
         Initiates matchmaking for a player
         :param msg_queue: message queue used to return the message
@@ -354,12 +353,15 @@ class ReversiServer:
         """
         curr_username, elo = params
         curr_time = time.time()
-        self.move_queues[curr_username] = msg_queue
         self.queueing.append((curr_username, elo, curr_time))
+        return ['matchmaking_started']
 
-    def receive(self, params: list, msg_queue: Queue):
-        self.move_queues[params[0]] = msg_queue
+    def receive(self, params: list):
+        q: Queue = self.move_queues.get(params[0])
         print('checking for messages')
+        if not q.empty():
+            return q.get()
+
 
 
 
