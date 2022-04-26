@@ -80,7 +80,7 @@ class Database:
         elem = self._cursor.fetchone()
         game = {"gameid": elem[0],
                 "lastactiveplayer": elem[1],
-                "gamestate": (json.dumps(elem[2][0]), json.dumps(elem[2][1]))}
+                "gamestate": eval(json.dumps(elem[2]))}
         return game
 
     def _init_table(self):
@@ -151,7 +151,8 @@ class Database:
         update_elements = (
             "UPDATE games "
             "SET lastactiveplayer = (%s), gamestate = JSON_ARRAY_APPEND(gamestate, '$', (%s)), "
-            "gamestate = JSON_ARRAY_APPEND(gamestate, '$[last]', (%s)), gameid = (%s)"
+            "gamestate = JSON_ARRAY_APPEND(gamestate, '$[last]', (%s)) "
+            "WHERE gameid = (%s)"
         )
         self._cursor.execute(update_elements, (last_player, last_move.get_coords()[0], last_move.get_coords()[1],
                                                game_id))
@@ -303,8 +304,10 @@ class Database:
         # update game state (called every time turn resolves)
         # game state is a double that represents game state
         db.write_update_turn(game_id, username, Model.move.Move(4, 5))
+        db.write_update_turn(game_id, "opp", Model.move.Move(5, 4))
         print("TURN UPDATED")
         print(db.fetch_game_data(game_id))
+        print(db.fetch_game_data(game_id).get("gamestate"))
 
         # update elo and score when game finishes (called when game is completed)
         db.write_update_game_complete(game_id)
