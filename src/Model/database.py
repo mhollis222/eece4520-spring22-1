@@ -76,7 +76,7 @@ class Database:
         return entry_list
 
     def fetch_game_data(self, game_id: int):
-        self._cursor.execute("SELECT * FROM games WHERE gameid = (%s)", game_id)
+        self._cursor.execute("SELECT * FROM games WHERE gameid = (%s)", [game_id])
         elem = self._cursor.fetchone()
         game = {"gameid": elem[0],
                 "lastactiveplayer": elem[1],
@@ -88,6 +88,7 @@ class Database:
         initialize table of users within database if not created already
         :return: none
         """
+        print("tables initializing")
         try:
             self._cursor.execute(
                 "CREATE TABLE IF NOT EXISTS users("
@@ -161,7 +162,7 @@ class Database:
         :param game_id: game to be removed from database
         :return: none
         """
-        self._cursor.execute("DELETE FROM games WHERE gameid = (%s)", game_id)
+        self._cursor.execute("DELETE FROM games WHERE gameid = (%s)", [game_id])
 
     def write_update_users_complete(self, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs):
         """
@@ -174,14 +175,14 @@ class Database:
         :param loser_hs: score to be compared versus user high score and potentially update
         :return: none
         """
-        winner_hs_og = self._cursor.execute("SELECT * FROM users WHERE username = (%s)", winner)
-        for hs in winner_hs_og:
-            if winner_hs < hs[3]:
-                winner_hs = winner_hs_og[3]
-        loser_hs_og = self._cursor.execute("SELECT * FROM users WHERE username = (%s)", loser)
-        for hs in loser_hs_og:
-            if loser_hs < hs[3]:
-                loser_hs = loser_hs_og[3]
+        self._cursor.execute("SELECT * FROM users WHERE username = (%s)", [winner])
+        winner_hs_og = self._cursor.fetchone()
+        if winner_hs < winner_hs_og[3]:
+            winner_hs = winner_hs_og[3]
+        self._cursor.execute("SELECT * FROM users WHERE username = (%s)", [loser])
+        loser_hs_og = self._cursor.fetchone()
+        if loser_hs < winner_hs_og[3]:
+            loser_hs = loser_hs_og[3]
         update_winner = (
             "UPDATE users "
             "SET elo = (%s), highscore = (%s), wins = wins + 1 "
@@ -192,8 +193,8 @@ class Database:
             "SET elo = (%s), highscore = (%s), losses = losses + 1 "
             "WHERE username = (%s)"
         )
-        self._cursor.execute(update_winner, winner_elo, winner_hs, winner)
-        self._cursor.execute(update_loser, loser_elo, loser_hs, loser)
+        self._cursor.execute(update_winner, (winner_elo, winner_hs, winner))
+        self._cursor.execute(update_loser, (loser_elo, loser_hs, loser))
 
     def write_update_game_start(self):
         """
@@ -210,7 +211,8 @@ class Database:
         for row in data:
             if row[0] > id_max:
                 id_max = row[0]
-        self._cursor.execute(update_elements, id_max + 1)
+        id_max = id_max + 1
+        self._cursor.execute(update_elements, [id_max])
         return id_max
 
     def _clear_data(self):
@@ -219,7 +221,7 @@ class Database:
         :return: none
         """
         self._cursor.execute("DROP TABLE IF EXISTS users;")
-        self._cursor.exeute("DROP TABLE IF EXISTS games;")
+        self._cursor.execute("DROP TABLE IF EXISTS games;")
 
     def verify_credentials(self, username, password):
         """
@@ -262,6 +264,7 @@ class Database:
         db = Database(ipaddr, db_user, db_password)
 
         db._clear_data()  # use only for testing db
+        db._init_table()
 
         # initialization of table
         print("EMPTY DB")
@@ -293,7 +296,7 @@ class Database:
         lose_high_score = 14
 
         # start game (called when game is initialized)
-        game_id = db.write_update_game_start(username)
+        game_id = db.write_update_game_start()
         print("GAME STARTED")
         print(db.fetch_game_data(game_id))
 
@@ -308,7 +311,7 @@ class Database:
         db.write_update_users_complete(username, win_elo, win_high_score, "opp", lose_elo, lose_high_score)
         print("GAME FINISHED")
         print(db.fetch_user_data())
-        print(db.fetch_game_data(game_id))
+        # print(db.fetch_game_data(game_id))
 
         # leaderboard test
         db.write_user("user1", "pass1")
