@@ -25,7 +25,7 @@ class GameFactory:
         if game_type == 'local':
             return Game(p1, p2, width, height)
         elif game_type == 'AI':
-            return GameDecoratorAI(Game(p1, p2, width, height))
+            return GameDecoratorAI(Game(p1, p2, width, height), g_order)
         elif game_type == 'online':
             game = Game(p1, p2, width, height)
             return GameDecoratorOnline(game, g_order)
@@ -49,7 +49,10 @@ class GameController:
         self.last_move = None
         self.reconstruct = reconstruct
         self.g_order = g_order
-        self.setup()
+
+        if game_id > -1:
+            self.setup()
+
 
     def play_game(self):
         """
@@ -185,6 +188,10 @@ class GameController:
         else:
             self.model.update_board(attempt, Cell.WHITE)
 
+        if self.game_id < 0:
+            self.model.switch_players(player)
+            return
+
         self.model.update_score()
 
         if self.model.has_game_ended():
@@ -257,16 +264,12 @@ class GameController:
         elif view_type == 'gui':
             self.view = GuiBoard(self.model, p1_col, p2_col, self)
             self.model.start()
-            if type(self.model) == GameDecoratorOnline:
-                if self.g_order[0].name == self.p1.name:
-                    self.model.set_p1_ident(1)
-                    self.model.set_p2_ident(2)
-                else:
-                    self.model.set_p1_ident(2)
-                    self.model.set_p2_ident(1)
-            # if self.reconstruct and self.model is GameDecoratorOnline:
-            #     details = self.client.send_request(msg('get_game_state', [self.game_id]))
-            #     self.model.reconstruct(state=details[0], last_active_player=details[1])
+
+            if self.reconstruct and self.model is GameDecoratorOnline:
+                details = self.client.send_request(msg('get_game_state', [self.game_id]))
+                self.model.reconstruct(state=details[0], last_active_player=details[1])
+            print(self.model.get_active_player())
+
             self.view.display_board(self.model.get_valid_moves(self.model.get_active_player()))
             self.view.display_score()
             self.view.display_current_player(self.model.get_active_player())

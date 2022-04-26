@@ -242,6 +242,9 @@ class ReversiServer:
         newELO = k * (params[0] - params[1])
         return [playerELO + newELO]
 
+        # return [1500]
+
+
     def leaderboard(self, params: list):
         """
         Potentially unneeded.
@@ -253,6 +256,9 @@ class ReversiServer:
         # update elo rating after game
         return [self.db.sorted_leaderboard()]
 
+        # return [{'username': 'jim', 'elo': 1500}]
+
+
     def register(self, params: list):
         """
         Handles registration for an account
@@ -261,6 +267,9 @@ class ReversiServer:
         """
         username, password = params
         return [self.db.write_user(username, password)]
+
+        # return [1]
+
 
     # Finished
     def get_players(self, params: list):
@@ -277,7 +286,9 @@ class ReversiServer:
         :param params: [game_id, last_player, move]
         """
         self.db.write_update_turn(params[0], params[1], params[2])
-        return [1]
+
+        # return [1]
+
 
     def get_game_state(self, params: list):
         """
@@ -288,6 +299,9 @@ class ReversiServer:
         return [self.db.fetch_game_data(params[0]).get("gamestate"),
                 self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
 
+        # return [1]
+
+
     def update_game_complete(self, params: list):
         """
         Removes game instance from database if not done so already
@@ -297,7 +311,8 @@ class ReversiServer:
             self.db.write_update_game_complete(game_id=params[0])
             self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
                                                 loser=params[4], loser_elo=params[5], loser_hs=params[6])
-        return [1]
+
+        # return [1]
 
     # Unfinished
     def send_move(self, params: list):
@@ -324,10 +339,11 @@ class ReversiServer:
         """
         username, password = params
         if self.db.verify_credentials(username, password):
-            self.move_queues[username] = Queue(5)
+
             self.occupants.append(username)
             return [True]
         return [False]
+        # return [True]
 
     # Finished (kinda)
     def match_make(self, params: list):
