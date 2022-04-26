@@ -32,11 +32,11 @@ class ReversiClient:
             my_socket.settimeout(60)
             m_binary = pickle.dumps(req)
             my_socket.sendall(m_binary)
-            print('sent message')
+            print(f'sent message {req}')
             try:
                 result_binary = my_socket.recv(self.buffer_size)
-                print('received message')
                 result = pickle.loads(result_binary)
+                print(f'received message {result}')
                 return result
             except socket.timeout:
                 return ['TIMEOUT']
