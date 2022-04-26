@@ -6,10 +6,10 @@ import threading
 from queue import Queue
 from Controller.message import ReversiMessage as msg
 import time
-# from Model.database import Database
+from Model.database import Database
 
 TIMEOUT = 30
-TOLERANCE = 20  # not sure what this should actually be but i'll figure it out
+TOLERANCE = 500  # not sure what this should actually be but i'll figure it out
 event = threading.Event()
 
 
@@ -22,7 +22,7 @@ class ReversiServer:
         self.move_queues = dict()
         self.queueing = []
         self.challenges = []
-        # self.db = Database('localhost', 'reversi', 'eece4520')
+        self.db = Database('localhost', 'reversi', 'eece4520')
 
     def start(self):
         with socket.socket() as my_socket:
@@ -51,12 +51,6 @@ class ReversiServer:
         """
         with conn:
             while True:
-                # Check if we have received any messages to transmit
-                # if not move_queue.empty():
-                #     move = move_queue.get()
-                #     rsp = pickle.dumps(move)
-                #     conn.sendall(rsp)
-                #     print('sent a message to client')
                 try:
                     # Check the buffer to see if there has been any received messages
                     ex_binary = conn.recv(self.buffer_size)
@@ -93,8 +87,7 @@ class ReversiServer:
                 p1 = self.challenges[0]
                 p2 = self.challenges[1]
                 if p1[1] == p2[0] and p1[0] == p2[1]:
-                    # game_id = self.db.write_update_game_start()
-                    game_id = 45
+                    game_id = self.db.write_update_game_start()
                     q = self.move_queues.get(p1[0])
                     q.put([p2[0], game_id])
                     q = self.move_queues.get(p2[0])
@@ -119,8 +112,7 @@ class ReversiServer:
                     opp = queue[1]
                     # send mm_resp
                     order = [player[0], opp[0]] if random.Random().random() > 0.5 else [opp[0], player[0]]
-                    # game_id = self.db.write_update_game_start()
-                    game_id = 45
+                    game_id = self.db.write_update_game_start()
                     q = self.move_queues.get(player[0])
                     q.put([opp[0], game_id, order])
                     print(f'queue size player {q.qsize()}')
@@ -199,11 +191,11 @@ class ReversiServer:
         :return: a 'send_elo' message with param [user elo]
         """
         # query db for elo rating
-        # username = params[0]
-        # for user in self.db.fetch_user_data():
-        #     if user.get("username") == username:
-        #         return [user.get("elo")]
-        return [1500]
+        username = params[0]
+        for user in self.db.fetch_user_data():
+            if user.get("username") == username:
+                return [user.get("elo")]
+        return ['Error']
 
     def challenge(self, params: list):
         """
@@ -223,15 +215,14 @@ class ReversiServer:
         :param params: [username, opponent]
         :return: player's expected win rate
         """
-        # for user in self.db.fetch_user_data():
-        #     if user.get("username") == params[0]:
-        #         playerELO = user.get("elo")
-        #     if user.get("username") == params[1]:
-        #         opponentELO = user.get("elo")
-        # exponent = (opponentELO - playerELO) / 400
-        # probability = 1 / (1 + pow(10, exponent))
-        # return [probability]
-        return [0.5]
+        for user in self.db.fetch_user_data():
+            if user.get("username") == params[0]:
+                playerELO = user.get("elo")
+            if user.get("username") == params[1]:
+                opponentELO = user.get("elo")
+        exponent = (opponentELO - playerELO) / 400
+        probability = 1 / (1 + pow(10, exponent))
+        return [probability]
 
     """
     expected in the parameter is the probability from the above functions
@@ -244,13 +235,12 @@ class ReversiServer:
         :param params: [Result of game (0 = lose; 0.5 = draw; 1 = win), Expected probability to win (from expected_win)]
         :return: updated ELO rating
         """
-        # for user in self.db.fetch_user_data():
-        #     if user.get("username") == params[0]:
-        #         playerELO = user.get("elo")
-        # k = 32
-        # newELO = k * (params[0] - params[1])
-        # return [playerELO + newELO]
-        return [1500]
+        for user in self.db.fetch_user_data():
+            if user.get("username") == params[0]:
+                playerELO = user.get("elo")
+        k = 32
+        newELO = k * (params[0] - params[1])
+        return [playerELO + newELO]
 
     def leaderboard(self, params: list):
         """
@@ -261,8 +251,7 @@ class ReversiServer:
         :return: an ack with param [success?]
         """
         # update elo rating after game
-        # return [self.db.sorted_leaderboard()]
-        return [{'username': 'jim', 'elo': 1500}]
+        return [self.db.sorted_leaderboard()]
 
     def register(self, params: list):
         """
@@ -270,9 +259,8 @@ class ReversiServer:
         :param params: [username, password]
         :return:
         """
-        # username, password = params
-        # return [self.db.write_user(username, password)]
-        return [1]
+        username, password = params
+        return [self.db.write_user(username, password)]
 
     # Finished
     def get_players(self, params: list):
@@ -288,7 +276,7 @@ class ReversiServer:
         Updates database with last played move to corresponding game
         :param params: [game_id, last_player, move]
         """
-        # self.db.write_update_turn(params[0], params[1], params[2])
+        self.db.write_update_turn(params[0], params[1], params[2])
         return [1]
 
     def get_game_state(self, params: list):
@@ -297,19 +285,18 @@ class ReversiServer:
         :param params: [game_id]
         :return: list of type Move
         """
-        # return [self.db.fetch_game_data(params[0]).get("gamestate"),
-        #         self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
-        return [1]
+        return [self.db.fetch_game_data(params[0]).get("gamestate"),
+                self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
 
     def update_game_complete(self, params: list):
         """
         Removes game instance from database if not done so already
         :param params: [game_id, winner, winner_elo, winner_hs, loser, loser_elo, loser_hs]
         """
-        # if self.db.fetch_game_data(params[0]):
-        #     self.db.write_update_game_complete(game_id=params[0])
-        #     self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
-        #                                         loser=params[4], loser_elo=params[5], loser_hs=params[6])
+        if self.db.fetch_game_data(params[0]):
+            self.db.write_update_game_complete(game_id=params[0])
+            self.db.write_update_users_complete(winner=params[1], winner_elo=params[2], winner_hs=params[3],
+                                                loser=params[4], loser_elo=params[5], loser_hs=params[6])
         return [1]
 
     # Unfinished
@@ -336,12 +323,11 @@ class ReversiServer:
         :return: ack on success
         """
         username, password = params
-        # if self.db.verify_credentials(username, password):
-        self.move_queues[username] = Queue(5)
-        self.occupants.append(username)
-        #     return [True]
-        # return [False]
-        return [True]
+        if self.db.verify_credentials(username, password):
+            self.move_queues[username] = Queue(5)
+            self.occupants.append(username)
+            return [True]
+        return [False]
 
     # Finished (kinda)
     def match_make(self, params: list):
