@@ -112,6 +112,8 @@ class SettingsWindow(tk.Toplevel):
     def start_game(self):
         if self.config_settings['Model']['mode'] == 'local':
             self.play_local()
+        elif self.config_settings['Model']['mode'] == 'match':
+            self.play_match()
         elif self.config_settings['Model']['mode'] == 'online':
             self.play_online()
         else:
@@ -144,7 +146,7 @@ class SettingsWindow(tk.Toplevel):
         game_win.focus_force()
         self.withdraw()
 
-    def play_online(self):
+    def play_match(self):
         try:
             human_username = self.client.username
             human_elo = self.client.send_request(msg('get_elo', [human_username]))

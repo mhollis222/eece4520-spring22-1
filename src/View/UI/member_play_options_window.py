@@ -66,7 +66,7 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.online_image = ImageTk.PhotoImage(self.online_image)
         self.online_button = tk.Button(self,  width=400, height=250, text="Online Player", image=self.online_image,
                                        bg='#41ab24', activebackground='green', compound=tk.TOP, fg='white',
-                                       font=("Arial", 17))
+                                       font=("Arial", 17), command=self.open_online)
         self.online_button.grid(row=1, column=3, padx=50, sticky='s')
 
 
@@ -92,6 +92,14 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         self.withdraw()
 
     def open_matchmake(self):
+        """Navigates to the game settings page"""
+        self.config['Model']['mode'] = 'match'
+        self.save_preferences()
+        settings_options_win = SettingsWindow(self)
+        settings_options_win.focus_force()
+        self.withdraw()
+
+    def open_online(self):
         """Navigates to the game settings page"""
         self.config['Model']['mode'] = 'online'
         self.save_preferences()
