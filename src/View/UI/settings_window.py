@@ -147,7 +147,7 @@ class SettingsWindow(tk.Toplevel):
         self.withdraw()
 
     def play_match(self):
-        try:
+        #try:
             human_username = self.client.username
             human_elo = self.client.send_request(msg('get_elo', [human_username]))
             details = self.client.send_request(msg('request_game', [human_username, human_elo]))
@@ -162,21 +162,18 @@ class SettingsWindow(tk.Toplevel):
             player1 = HumanPlayer(human_username)
             player2 = OnlinePlayer(opponent_username, game_id, human_username)
             if order[0] == human_username:
-                player1.identifier = 1
-                player2.identifier = 2
                 g_order = [player1, player2]
             else:
-                player2.identifier = 1
-                player1.identifier = 2
                 g_order = [player2, player1]
             controller = GameController(player1, player2, False, game_id, False, g_order=g_order)
+            # anything below here never runs..
             controller.save_settings()
             controller.setup()
             game_win = GuiBoard(self)
             game_win.focus_force()
             self.withdraw()
             self.withdraw()
-        except BaseException as e:
-            error_win = MatchmakingErrorWindow(self)
-            error_win.focus_force()
-            self.withdraw()
+        # except BaseException as e:
+        #     error_win = MatchmakingErrorWindow(self)
+        #     error_win.focus_force()
+        #     self.withdraw()

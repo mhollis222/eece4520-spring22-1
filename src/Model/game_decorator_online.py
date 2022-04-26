@@ -10,12 +10,12 @@ class GameDecoratorOnline(GameDecorator):
         super().__init__(game)
         self.active_player = super().get_active_player()
         self.order = order
-        if order[0].name == self.game.p1.name:
-            self.game.p1.identifier = 1
-            self.game.p2.identifier = 2
-        else:
-            self.game.p1.identifier = 2
-            self.game.p2.identifier = 1
+        # if order[0].name == self.game.p1.name:
+        #     self.game.p1.identifier = 1
+        #     self.game.p2.identifier = 2
+        # else:
+        #     self.game.p1.identifier = 2
+        #     self.game.p2.identifier = 1
         self.active_player = 0
 
     def reconstruct(self, state: list, last_active_player: AbstractPlayer):
