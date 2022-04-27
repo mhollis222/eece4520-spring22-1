@@ -148,12 +148,12 @@ class SettingsWindow(tk.Toplevel):
         game_win.focus_force()
         self.withdraw()
 
-    def play_match(self):
+    def play_online(self):
         # try:
         self.client.send_request(msg('get_elo', ['PLAY MATCH SELECTED']))
         human_username = self.client.username
         human_elo = self.client.send_request(msg('get_elo', [human_username]))
-        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        # details = self.client.send_request(msg('request_game', [human_username, human_elo]))
         resp = 'TIMEOUT'
         count = 0
         while resp == 'TIMEOUT' and count < 12:
@@ -175,6 +175,32 @@ class SettingsWindow(tk.Toplevel):
         game_win = GuiBoard(self)
         game_win.focus_force()
         self.withdraw()
+
+    def play_match(self):
+        # try:
+        human_username = self.client.username
+        # human_elo = self.client.send_request(msg('get_elo', [human_username]))
+        # details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        resp = 'TIMEOUT'
+        count = 0
+        while resp == 'TIMEOUT' and count < 12:
+            resp = self.client.send_request(msg('rcv_message', [human_username]))
+            count += 1
+        game_id = resp[1]
+        opponent_username = resp[0]
+        order = resp[2]
+        player1 = HumanPlayer(human_username)
+        player2 = OnlinePlayer(opponent_username, game_id, human_username)
+        if order[0] == human_username:
+            g_order = [player1, player2]
+        else:
+            g_order = [player2, player1]
+        controller = GameController(player1, player2, False, game_id, False, g_order=g_order)
+        # anything below here never runs..
+        controller.save_settings()
+        controller.setup()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
         self.withdraw()
         # except BaseException as e:
         #     error_win = MatchmakingErrorWindow(self)
