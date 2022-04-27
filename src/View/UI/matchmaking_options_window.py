@@ -60,3 +60,11 @@ class MatchmakingOptionsWindow(tk.Toplevel):
         settings_options_win.focus_force()
         self.withdraw()
 
+    def save_preferences(self) -> bool:
+        """
+        Stores the desired settings dict as a yaml file at `settings_path`
+        :param settings: the settings to be stored.
+        :return: success of operation
+        """
+        with open(settings_path, 'w') as f:
+            self.config.write(f)

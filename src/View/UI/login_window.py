@@ -64,7 +64,7 @@ class LoginWindow(tk.Tk):
         username = self.username_entry.get()
         password = self.password_entry.get()
 
-        if self.client.send_request(msg('log_in', [username, password])):
+        if self.client.send_request(msg('log_in', [username, password]))[0]:
             self.config['User']['username'] = username
             self.save_preferences()
             self.client.username = username
