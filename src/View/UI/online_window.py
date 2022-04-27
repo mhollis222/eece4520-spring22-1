@@ -63,22 +63,17 @@ class OnlineWindow(tk.Toplevel):
         self.player = self.listbox.get(selected_index)
 
     def challenge(self):
-        if self.player is None:
-            messagebox.showerror("", "You must select a player to challenge")
+        if self.player not in self.client.send_request(msg('get_players', []))[0]:
+            self.human_username = self.client.username
+            self.human_elo = self.client.send_request(msg('get_elo', [self.human_username]))
+            self.opponent_username = self.player
+            self.opponent_elo = self.client.send_request(msg('get_elo', [self.player]))
+            details = self.client.send_request(msg('challenge', [self.human_username, self.opponent_username]))
+            settings_options_win = SettingsWindow(self)
+            settings_options_win.focus_force()
+            self.withdraw()
         else:
-            self.player = self.chosen_entry.get()
-
-            if self.player not in self.client.send_request(msg('get_players', []))[0]:
-                self.human_username = self.client.username
-                self.human_elo = self.client.send_request(msg('get_elo', [self.human_username]))
-                self.opponent_username = self.player
-                self.opponent_elo = self.client.send_request(msg('get_elo', [self.player]))
-                details = self.client.send_request(msg('challenge', [self.human_username, self.opponent_username]))
-                settings_options_win = SettingsWindow(self)
-                settings_options_win.focus_force()
-                self.withdraw()
-            else:
-                messagebox.showerror("", "Invalid Opponent. Please try again")
+            messagebox.showerror("", "Invalid Opponent. Please try again")
 
 
 
