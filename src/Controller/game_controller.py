@@ -177,7 +177,7 @@ class GameController:
             x, y = button.x, button.y
             attempt = Move(y, x)
             self.last_move = attempt
-            if type(self.model) == GameDecoratorOnline:
+            if type(self.model) == GameDecoratorOnline and self.game_id > -1:
                 self.client.send_request(msg('update_game_state', [self.game_id, self.p1.name, attempt]))
                 ret = self.p2.send_move(attempt)
 

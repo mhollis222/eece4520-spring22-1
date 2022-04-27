@@ -80,7 +80,8 @@ class Database:
         elem = self._cursor.fetchone()
         game = {"gameid": elem[0],
                 "lastactiveplayer": elem[1],
-                "gamestate": eval(json.dumps(elem[2]))}
+                "gamestate": eval(json.dumps(elem[2])),
+                "players": eval(json.dumps(elem[3]))}
         return game
 
     def _init_table(self):
@@ -103,7 +104,8 @@ class Database:
                 "CREATE TABLE IF NOT EXISTS games("
                 " gameid int NOT NULL,"
                 " lastactiveplayer varchar(20),"
-                " gamestate JSON);"
+                " gamestate JSON,"
+                " players JSON);"
             )
         except mysql.connector.ProgrammingError as err:
             print("Failed to create table: ", err)
@@ -120,16 +122,8 @@ class Database:
         self._cursor.execute("SELECT username FROM users")
         try:
             users = self._cursor.fetchall()
-            # realistically this line should be: `if username in users or username in ['AI', 'local', 'guest']:`
-            for user in users:
-                if user[0] == username:  # prevents users from making duplicate usernames
-                    return -1
-                if user[0] == 'AI':  # prevents users from signing up as unique AI tag
-                    return -1
-                if user[0] == 'local':  # prevents users from signing up as unique local tag
-                    return -1
-                if user[0] == 'guest':  # prevents users from signing up as unique guest tag
-                    return -1
+            if username in users or username in ['AI', 'local', 'guest']:
+                return -1
         except mysql.connector.errors as err:
             print("Failed to fetch active users in database: ", err)
             pass
@@ -197,14 +191,14 @@ class Database:
         self._cursor.execute(update_winner, (winner_elo, winner_hs, winner))
         self._cursor.execute(update_loser, (loser_elo, loser_hs, loser))
 
-    def write_update_game_start(self):
+    def write_update_game_start(self, players: list):
         """
         add game instance to database with game ID
         :return: id_max
         """
         update_elements = (
-            "INSERT INTO games (gameid, lastactiveplayer, gamestate) "
-            "VALUES (%s, NULL, JSON_ARRAY())"
+            "INSERT INTO games (gameid, lastactiveplayer, gamestate, players) "
+            "VALUES (%s, NULL, JSON_ARRAY(), JSON_ARRAY())"
         )
         self._cursor.execute("SELECT * FROM games")
         data = self._cursor.fetchall()
@@ -214,6 +208,13 @@ class Database:
                 id_max = row[0]
         id_max = id_max + 1
         self._cursor.execute(update_elements, [id_max])
+        add_users = (
+            "UPDATE games "
+            "SET players = JSON_ARRAY_APPEND(players, '$', (%s)), "
+            "players = JSON_ARRAY_APPEND(players, '$[last]', (%s)) "
+            "WHERE gameid = (%s)"
+        )
+        self._cursor.execute(add_users, (players[0], players[1], id_max))
         return id_max
 
     def _clear_data(self):
@@ -297,7 +298,7 @@ class Database:
         lose_high_score = 14
 
         # start game (called when game is initialized)
-        game_id = db.write_update_game_start()
+        game_id = db.write_update_game_start([username, "opp"])
         print("GAME STARTED")
         print(db.fetch_game_data(game_id))
 

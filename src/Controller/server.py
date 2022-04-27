@@ -87,7 +87,7 @@ class ReversiServer:
                 p1 = self.challenges[0]
                 p2 = self.challenges[1]
                 if p1[1] == p2[0] and p1[0] == p2[1]:
-                    game_id = self.db.write_update_game_start()
+                    game_id = self.db.write_update_game_start([p1[0], p2[0]])
                     q = self.move_queues.get(p1[0])
                     q.put([p2[0], game_id])
                     q = self.move_queues.get(p2[0])
@@ -112,7 +112,7 @@ class ReversiServer:
                     opp = queue[1]
                     # send mm_resp
                     order = [player[0], opp[0]] if random.Random().random() > 0.5 else [opp[0], player[0]]
-                    game_id = self.db.write_update_game_start()
+                    game_id = self.db.write_update_game_start(order)
                     q = self.move_queues.get(player[0])
                     q.put([opp[0], game_id, order])
                     print(f'queue size player {q.qsize()}')
@@ -135,7 +135,7 @@ class ReversiServer:
                             print('found match')
                             # send mm_resp
                             order = [player[0], opp[0]] if random.Random().random() > 0.5 else [opp[0], player[0]]
-                            game_id = self.db.write_update_game_start()
+                            game_id = self.db.write_update_game_start(order)
                             q = self.move_queues.get(player[0])
                             q.put(msg('mm_resp', [opp[0], game_id, order]))
                             print(f'queue size player {q.qsize()}')

@@ -13,6 +13,9 @@ class OnlinePlayer(AbstractPlayer, ABC):
         return 'Online'
 
     def make_move(self, row, column):
+        pass
+
+    def get_move(self):
         if self.first:
             return Move(5, 3)
         else:
