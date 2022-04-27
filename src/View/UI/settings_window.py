@@ -112,11 +112,11 @@ class SettingsWindow(tk.Toplevel):
     def start_game(self):
         if self.config_settings['Model']['mode'] == 'local':
             self.play_local()
-        elif self.config_settings['Model']['mode'] == 'match':
+        elif self.config_settings['Model']['mode'] == 'match' and self.config_settings['Model']['save'] == 'no':
             self.play_match()
         elif self.config_settings['Model']['mode'] == 'online':
             self.play_online()
-        elif self.config_settings['Model']['save'] == 'yes':
+        elif self.config_settings['Model']['mode'] == 'match' and self.config_settings['Model']['save'] == 'yes':
             self.play_recover()
         else:
             self.play_ai()
@@ -150,6 +150,7 @@ class SettingsWindow(tk.Toplevel):
 
     def play_online(self):
         # try:
+        self.client.send_request(msg('get_elo', ['PLAY MATCH SELECTED']))
         human_username = self.client.username
         human_elo = self.client.send_request(msg('get_elo', [human_username]))
         # details = self.client.send_request(msg('request_game', [human_username, human_elo]))
@@ -209,8 +210,10 @@ class SettingsWindow(tk.Toplevel):
     def play_recover(self):
         human_username = self.client.username
         game = self.client.send_request(msg('get_game_by_user', [human_username]))
+        self.client.send_request(msg('get_elo', ['PRE-CHECK']))
         if not game:
             return self.play_match()
+        self.client.send_request(msg('get_elo', ['POST-CHECK']))
         game_id = game[0]
         participants = self.client.send_request(msg('get_game_participants', [game_id]))
         opponent_username = ""

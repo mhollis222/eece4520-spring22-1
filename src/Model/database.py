@@ -84,9 +84,12 @@ class Database:
                 "players": eval(json.dumps(elem[3]))}
         return game
 
-    def find_game_by_user(self, username):
-        username = '"{}"'.format(username)
-        self._cursor.execute("SELECT gameid FROM games WHERE JSON_CONTAINS(players, %s)", username)
+    def find_game_by_user(self, username: list):
+        username = ''"{}"''.format(username)
+        try:
+            self._cursor.execute("SELECT gameid FROM games WHERE JSON_CONTAINS(players, %s)", [username])
+        except mysql.connector.errors.DataError:
+            return 1
         game_id = self._cursor.fetchone()
         return game_id
 
