@@ -7,6 +7,9 @@ from Controller.client import ReversiClient
 from View.UI.settings_window import SettingsWindow
 
 from pathlib import Path
+
+from View.UI.online_window import OnlineWindow
+
 path_parent = Path(__file__).resolve().parents[3]
 settings_path = path_parent.joinpath('settings.ini').as_posix()
 
@@ -95,16 +98,16 @@ class MemberPlayOptionsWindow(tk.Toplevel):
         """Navigates to the game settings page"""
         self.config['Model']['mode'] = 'match'
         self.save_preferences()
-        mathcmaking_options_win = MatchmakingOptionsWindow(self)
-        mathcmaking_options_win.focus_force()
+        matchmaking_options_win = MatchmakingOptionsWindow(self)
+        matchmaking_options_win.focus_force()
         self.withdraw()
 
     def open_online(self):
         """Navigates to the game settings page"""
         self.config['Model']['mode'] = 'online'
         self.save_preferences()
-        settings_options_win = SettingsWindow(self)
-        settings_options_win.focus_force()
+        online_win = OnlineWindow(self)
+        online_win.focus_force()
         self.withdraw()
 
     def save_preferences(self) -> bool:
