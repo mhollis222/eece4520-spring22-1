@@ -262,6 +262,8 @@ class ReversiServer:
         :return:
         """
         username, password = params
+        self.move_queues[username] = Queue(5)
+        self.occupants.append(username)
         return [self.db.write_user(username, password)]
 
     # Finished

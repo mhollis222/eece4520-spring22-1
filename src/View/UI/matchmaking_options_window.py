@@ -29,7 +29,7 @@ class MatchmakingOptionsWindow(tk.Toplevel):
                                      command=self.open_root)
         self.back_button.grid(row=0, column=0, padx=0, sticky='nw')
         # first line
-        self.label1 = tk.Label(self, text='Do you wish to resume the previous game,', fg='white',
+        self.label1 = tk.Label(self, text='Check for unfinished games?', fg='white',
                                font=("Arial", 30, "bold"), bg='green')
         self.label1.grid(row=1, columnspan=3, sticky=tk.S)
         # yes button

@@ -15,7 +15,8 @@ class ReversiMessage:
 
     requests = ['get_elo', 'leaderboard', 'get_players', 'send_move',
                 'log_in', 'request_game', 'register', 'challenge', 'rcv_message',
-                'updated_elo', 'update_game_state']
+                'updated_elo', 'update_game_state', 'get_game_participants',
+                'get_game_by_user', 'get_game_state', 'update_game_complete', 'expected_elo']
 
     def __init__(self, msg_type: str, params: list):
         assert(msg_type in ReversiMessage.requests)

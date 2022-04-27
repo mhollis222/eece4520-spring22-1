@@ -82,7 +82,9 @@ class SignUpWindow(tk.Toplevel):
             print("Password entries do not match.")
             messagebox.showerror('Mismatched Passwords', 'Password entries do not match.')
         else:
-            self.open_home(self.new_username_entry.get())
+            username = self.new_username_entry.get()
+            self.client.username = username
+            self.open_home(username)
 
     def save_preferences(self) -> bool:
         """
