@@ -4,6 +4,7 @@ from Controller.message import ReversiMessage as msg
 from tkinter import messagebox
 from settings_window import SettingsWindow
 import configparser
+from Controller.client import ReversiClient
 
 from pathlib import Path
 path_parent = Path(__file__).resolve().parents[3]
@@ -13,7 +14,7 @@ preference_path = path_parent.joinpath('preferences.ini').as_posix()
 class OnlineWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-
+        self.client = ReversiClient()
         self.title('Online Challenge Page')
         self.geometry("2000x2000")
         self.rowconfigure([0, 1, 2, 3], minsize=50, weight=1)
@@ -23,6 +24,10 @@ class OnlineWindow(tk.Toplevel):
         self.config.read(preference_path)
         self.client = ReversiClient()
         self.player = None
+        self.human_username = None
+        self.human_elo = None
+        self.opponent_username = None
+        self.opponent_elo = None
 
         # back button
         self.back_button = tk.Button(self, text='Back', width=10, height=2, font=("Arial", 12),
@@ -33,7 +38,7 @@ class OnlineWindow(tk.Toplevel):
         self.label1 = tk.Label(self, text='Challenge a User Online', fg='white', font=("Arial", 30, "bold"), bg='green')
         self.label1.grid(row=0, columnspan=3, sticky=tk.S)
         # list of online players
-        self.players = tuple(self.client.send_request(msg('get_players', [])))
+        self.players = tuple(self.client.send_request(msg('get_players', []))[0])
         self.players_var = tk.StringVar(value=self.players)
         self.listbox = tk.Listbox(listvariable=self.players_var)
         self.listbox.grid(row=1, columnspan=3, sticky=tk.S)
@@ -62,10 +67,18 @@ class OnlineWindow(tk.Toplevel):
             messagebox.showerror("", "You must select a player to challenge")
         else:
             self.player = self.chosen_entry.get()
-            self.config['User']['opponent'] = self.player
-            self.save_preferences()
-            settings_options_win = SettingsWindow(self)
-            settings_options_win.focus_force()
-            self.withdraw()
+
+            if self.player not in self.client.send_request(msg('get_players', []))[0]:
+                self.human_username = self.client.username
+                self.human_elo = self.client.send_request(msg('get_elo', [self.human_username]))
+                self.opponent_username = self.player
+                self.opponent_elo = self.client.send_request(msg('get_elo', [self.player]))
+                details = self.client.send_request(msg('challenge', [self.human_username, self.opponent_username]))
+                settings_options_win = SettingsWindow(self)
+                settings_options_win.focus_force()
+                self.withdraw()
+            else:
+                messagebox.showerror("", "Invalid Opponent. Please try again")
+
 
 
