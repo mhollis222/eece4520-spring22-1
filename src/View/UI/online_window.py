@@ -2,7 +2,7 @@ import tkinter as tk
 from Controller.client import ReversiClient
 from Controller.message import ReversiMessage as msg
 from tkinter import messagebox
-from settings_window import SettingsWindow
+from View.UI.settings_window import SettingsWindow
 import configparser
 from Controller.client import ReversiClient
 

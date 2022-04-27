@@ -179,8 +179,8 @@ class SettingsWindow(tk.Toplevel):
     def play_match(self):
         # try:
         human_username = self.client.username
-        # human_elo = self.client.send_request(msg('get_elo', [human_username]))
-        # details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        human_elo = self.client.send_request(msg('get_elo', [human_username]))
+        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
         resp = 'TIMEOUT'
         count = 0
         while resp == 'TIMEOUT' and count < 12:
