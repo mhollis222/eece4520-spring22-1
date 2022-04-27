@@ -182,7 +182,10 @@ class SettingsWindow(tk.Toplevel):
 
     def play_recover(self):
         human_username = self.client.username
-        game_id = self.client.send_request(msg('get_game_by_user', [human_username]))[0]
+        game = self.client.send_request(msg('get_game_by_user', [human_username]))
+        if not game:
+            return self.play_match()
+        game_id = game[0]
         participants = self.client.send_request(msg('get_game_participants', [game_id]))
         opponent_username = ""
         for player in participants:
