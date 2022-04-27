@@ -116,6 +116,8 @@ class SettingsWindow(tk.Toplevel):
             self.play_match()
         elif self.config_settings['Model']['mode'] == 'online':
             self.play_online()
+        elif self.config_settings['Model']['save'] == 'yes':
+            self.play_recover()
         else:
             self.play_ai()
 
@@ -147,33 +149,62 @@ class SettingsWindow(tk.Toplevel):
         self.withdraw()
 
     def play_match(self):
-        #try:
-            human_username = self.client.username
-            human_elo = self.client.send_request(msg('get_elo', [human_username]))
-            details = self.client.send_request(msg('request_game', [human_username, human_elo]))
-            resp = 'TIMEOUT'
-            count = 0
-            while resp == 'TIMEOUT' and count < 12:
-                resp = self.client.send_request(msg('rcv_message', [human_username]))
-                count += 1
-            game_id = resp[1]
-            opponent_username = resp[0]
-            order = resp[2]
-            player1 = HumanPlayer(human_username)
-            player2 = OnlinePlayer(opponent_username, game_id, human_username)
-            if order[0] == human_username:
-                g_order = [player1, player2]
-            else:
-                g_order = [player2, player1]
-            controller = GameController(player1, player2, False, game_id, False, g_order=g_order)
-            # anything below here never runs..
-            controller.save_settings()
-            controller.setup()
-            game_win = GuiBoard(self)
-            game_win.focus_force()
-            self.withdraw()
-            self.withdraw()
+        # try:
+        human_username = self.client.username
+        human_elo = self.client.send_request(msg('get_elo', [human_username]))
+        details = self.client.send_request(msg('request_game', [human_username, human_elo]))
+        resp = 'TIMEOUT'
+        count = 0
+        while resp == 'TIMEOUT' and count < 12:
+            resp = self.client.send_request(msg('rcv_message', [human_username]))
+            count += 1
+        game_id = resp[1]
+        opponent_username = resp[0]
+        order = resp[2]
+        player1 = HumanPlayer(human_username)
+        player2 = OnlinePlayer(opponent_username, game_id, human_username)
+        if order[0] == human_username:
+            g_order = [player1, player2]
+        else:
+            g_order = [player2, player1]
+        controller = GameController(player1, player2, False, game_id, False, g_order=g_order)
+        # anything below here never runs..
+        controller.save_settings()
+        controller.setup()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
+        self.withdraw()
+        self.withdraw()
         # except BaseException as e:
         #     error_win = MatchmakingErrorWindow(self)
         #     error_win.focus_force()
         #     self.withdraw()
+
+    def play_recover(self):
+        human_username = self.client.username
+        game_id = self.client.send_request(msg('get_game_by_user', [human_username]))[0]
+        participants = self.client.send_request(msg('get_game_participants', [game_id]))
+        opponent_username = ""
+        for player in participants:
+            if player != human_username:
+                opponent_username = player
+        self.client.send_request(msg('challenge', [human_username, opponent_username]))
+        resp = 'TIMEOUT'
+        count = 0
+        while resp == 'TIMEOUT' and count < 12:
+            resp = self.client.send_request(msg('rcv_message', [human_username]))
+            count += 1
+        order = self.client.send_request(msg('get_game_state', [game_id]))[1]
+        player1 = HumanPlayer(human_username)
+        player2 = OnlinePlayer(opponent_username, game_id, human_username)
+        if order[0] == human_username:
+            g_order = [player1, player2]
+        else:
+            g_order = [player2, player1]
+        controller = GameController(player1, player2, False, game_id, reconstruct=True, g_order=g_order)
+        controller.save_settings()
+        controller.setup()
+        game_win = GuiBoard(self)
+        game_win.focus_force()
+        self.withdraw()
+        self.withdraw()

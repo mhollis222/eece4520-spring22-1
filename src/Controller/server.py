@@ -174,6 +174,8 @@ class ReversiServer:
             'updated_elo': self.updated_elo,
             'challenge': self.challenge,
             'rcv_message': self.receive,
+            'get_game_participants': self.get_game_participants,
+            'get_game_by_user': self.get_game_by_user,
         }.get(msg_type)(params)
 
     """
@@ -286,6 +288,22 @@ class ReversiServer:
         """
         return [self.db.fetch_game_data(params[0]).get("gamestate"),
                 self.db.fetch_game_data(params[0]).get("lastactiveplayer")]
+
+    def get_game_participants(self, params: list):
+        """
+        Retrieves participants list corresponding to requested game
+        :param params: [game_id]
+        :return: list of usernames (2)
+        """
+        return [self.db.fetch_game_data(params[0]).get("players")]
+
+    def get_game_by_user(self, params: list):
+        """
+        Retrieves game id based on username
+        :param params: [username]
+        :return: game id
+        """
+        return [self.db.find_game_by_user(params[0])]
 
     def update_game_complete(self, params: list):
         """

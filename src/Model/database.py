@@ -84,6 +84,12 @@ class Database:
                 "players": eval(json.dumps(elem[3]))}
         return game
 
+    def find_game_by_user(self, username):
+        username = '"{}"'.format(username)
+        self._cursor.execute("SELECT gameid FROM games WHERE JSON_CONTAINS(players, %s)", username)
+        game_id = self._cursor.fetchone()
+        return game_id
+
     def _init_table(self):
         """
         initialize table of users within database if not created already
